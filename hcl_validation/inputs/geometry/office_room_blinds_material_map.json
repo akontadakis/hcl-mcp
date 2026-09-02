@@ -1,0 +1,15 @@
+{
+  "_README": "Pinned material map for office_room_blinds.obj — the base room plus the Venetian_Blinds group (Rad_Blind_R070 -> diffuse plastic, refl 0.70; an interior shade, NOT type:context which is for external shading). Keys cover every OBJ group so these exact values win over the auto-map. up_axis Z (Z-up Blender export). ORIENTATION (re-authored 2026-07-05): modelled in the true-north frame, north_angle_deg 0; the window sits in the SOUTH (-Y) wall so at north_angle_deg 0 it is SOUTH-facing. NOTE: unlike office_room.obj, this re-exported blinds OBJ does NOT contain a Rad_Luminaire_L09 group (the electric luminaires live only in the pre-authored radiance/ scenes for this variant), so this map intentionally omits the luminaire key. See office_room_material_map.json for the base-room notes.",
+  "units": "m",
+  "up_axis": "Z",
+  "north_angle_deg": 0,
+
+  "Rad_Floor_R020": { "type": "floor", "refl": 0.20 },
+  "Rad_Wall_R050": { "type": "plastic", "refl": 0.50 },
+  "Rad_Ceiling_R080": { "type": "plastic", "refl": 0.80 },
+  "Rad_Frame_R050": { "type": "plastic", "refl": 0.50 },
+  "Rad_Furniture_R050": { "type": "plastic", "refl": 0.50 },
+  "Rad_ScreenGlass_R004": { "type": "plastic", "refl": 0.04 },
+  "Rad_Glazing_T073": { "type": "glass", "tvis": 0.73 },
+  "Rad_Blind_R070": { "type": "plastic", "refl": 0.70 }
+}

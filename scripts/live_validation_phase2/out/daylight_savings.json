@@ -1,0 +1,31 @@
+{
+  "_meta": {
+    "tool": "mcp__hcl-mcp__daylight_savings",
+    "date": "2026-07-18",
+    "scene": "office_room.rad + materials.rad; single center reference point [0,0,0.8], weights=[1.0], iset=500, p_rated=448 W, area=31.4 m^2",
+    "note": "Both wrappers exercised LIVE end-to-end through the MCP tool. Annual mode ran the full 8760-h sim + per-hour controls (no confirmation-gate block). First realistic-scene live run, not a measured baseline."
+  },
+  "point_in_time": {
+    "ran": true,
+    "mode": "point_in_time",
+    "daylight_lux": [0],
+    "controls": {"fL": [1], "fP": [1], "FP": 1, "P_elec": 448, "P_saved": 0, "reduction": 0},
+    "note": "Wrapper ran end-to-end. daylight_lux=0 because run_grid (unlike daylight_factor) does NOT add a sky internally and scene_sets had no sky source -> no daylight -> no dimming. Usage nuance / potential UX footgun (FINDING), not a wrapper failure."
+  },
+  "annual": {
+    "ran": true,
+    "mode": "annual",
+    "n_timesteps": 8760,
+    "applied_weights": [1],
+    "controls": {
+      "annual_kwh": 164.39020103157986,
+      "annual_kwh_per_m2": 5.235356720750952,
+      "mean_FP": 0.14059096284173156,
+      "mean_reduction": 0.8594090371582684,
+      "occupied_hours": 2610,
+      "per_hour_len": 2610
+    },
+    "consistency_check": "occupied_hours 2610 = 10 h x 261 weekdays (08:00-18:00 mask). annual_kwh_per_m2 5.24 = (448 W / 31.4 m^2) x 2610 h x mean_FP 0.141 -> ~5.26 (matches). mean_reduction 85.9% plausible for a well-daylit center point (Athens, DA_avg 0.71).",
+    "full_result_file": "tool-results/mcp-hcl-mcp-daylight_savings-1784354366240.txt (8760-derived 2610 per-hour rows; too large to inline/commit)"
+  }
+}

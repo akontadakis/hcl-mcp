@@ -1,0 +1,22 @@
+{
+  "_README": "Pinned material map for office_room_corner_window.obj — the corner-window variant of office_room.obj: the single window is replaced by an L-shaped CORNER opening with glazing on TWO walls, a shared corner mullion, and split head/jamb/sill frames. Re-authored 2026-07-05 with COMPASS-named, per-facade groups: Rad_Glazing_South_T073 (window in the South/-Y wall) and Rad_Glazing_West_T073 (return in the West/-X wall); frames Rad_Frame_South_R050 / Rad_Frame_West_R050 / Rad_Frame_Corner_R050 (the mullion). Keys cover every OBJ group so these exact values win over the tester's auto-generated map (which would otherwise default glazing to tvis 0.65 and mis-type Rad_ScreenGlass as a window). Z-up Blender export -> up_axis Z. ORIENTATION: the geometry is modelled in the true-north frame, so north_angle_deg 0 -> the corner faces SOUTH + WEST (the South pane's outward -Y normal is true south; the West pane's outward -X normal is true west). The two facades carry DISTINCT glazing modifiers, so each can be evaluated independently (south vs west). Rad_Luminaire_L09 is type:luminaire bound to the L09_neutral fixture (IES + measured SPD, ABSOLUTE paths). Equivalent hand-built scene: radiance/office_room_corner_window.rad (materials in radiance/materials.rad).",
+  "units": "m",
+  "up_axis": "Z",
+  "north_angle_deg": 0,
+
+  "Rad_Floor_R020": { "type": "floor", "refl": 0.20 },
+  "Rad_Wall_R050": { "type": "plastic", "refl": 0.50 },
+  "Rad_Ceiling_R080": { "type": "plastic", "refl": 0.80 },
+  "Rad_Furniture_R050": { "type": "plastic", "refl": 0.50 },
+  "Rad_ScreenGlass_R004": { "type": "plastic", "refl": 0.04 },
+  "Rad_Frame_South_R050": { "type": "plastic", "refl": 0.50 },
+  "Rad_Frame_West_R050": { "type": "plastic", "refl": 0.50 },
+  "Rad_Frame_Corner_R050": { "type": "plastic", "refl": 0.50 },
+  "Rad_Glazing_South_T073": { "type": "glass", "tvis": 0.73 },
+  "Rad_Glazing_West_T073": { "type": "glass", "tvis": 0.73 },
+  "Rad_Luminaire_L09": {
+    "type": "luminaire",
+    "ies": "/abs/path/to/hcl-mcp/hcl_validation/inputs/luminaires/L09_neutral.ies",
+    "spd": "/abs/path/to/hcl-mcp/hcl_validation/inputs/spd/L09_neutral.spd"
+  }
+}

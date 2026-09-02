@@ -1,0 +1,30 @@
+{
+  "_meta": {
+    "date": "2026-07-18",
+    "tools": ["run_grid (electric_lights)", "glare_ugr (electric_lights)", "lighting_controls"],
+    "scene": "office_room.rad + materials.rad; 4x L09_neutral at (+/-1, +/-1.8, 2.9), down-pointing (electric_lights payload: ies+spd+placement)",
+    "note": "FIRST end-to-end LIVE run of the electric integrated path (prior: emit-/mock-tested only; known gotchas ies2rad -o / ordered colorize / !xform). All three steps ran clean (no crash). run_grid/glare_ugr colorized the IES internally from the electric_lights payload (no separate colored_luminaire chaining needed). First live run, NOT an absolute-photometry baseline."
+  },
+  "run_grid_electric": {
+    "ran": true, "n_points": 45, "total_wattage": 152,
+    "electric_photopic_lux": {"min": 27.22, "max": 46.52, "approx_avg": 36.0},
+    "electric_photopic_lux_per_point": [28.65,33.49,34.65,33.55,28.69,37.60,44.01,45.39,44.04,37.67,38.67,45.16,46.52,45.34,38.62,32.71,38.00,39.20,38.12,29.58,29.11,33.23,34.68,33.25,29.09,29.51,37.92,38.96,37.81,32.62,38.25,44.92,46.04,44.74,38.37,36.95,43.07,44.43,43.04,36.86,27.26,31.54,32.68,31.45,27.22],
+    "melanopic_over_photopic": 0.765,
+    "spatial_pattern": "higher under/near the 4 fixtures (peaks ~45-46.5 lux), lower at the between-fixture edges/corners (~27-29 lux) -- see electric_photopic_lux_per_point (grid rows of 5, x=[1.4,0.7,0,-0.7,-1.4], y stepping -Y toward the window); pattern is internally consistent with 4 ceiling fixtures.",
+    "daylight_lux": 0,
+    "daylight_note": "0 because scene_sets has no sky source (run_grid adds none) -- same nuance as daylight_savings point_in_time; this run isolates the ELECTRIC contribution.",
+    "MAGNITUDE_FLAG": "~36 lux avg was ~14x too low. ROOT-CAUSED (see electric_source_cal_fix.json): NOT a batwing effect (L09 nadir candela ~1878 ~= peak) and NOT an hcl-mcp bug -- the local custom Radiance 6.1a build's compiled source_corr drops the ies2rad brightdata A1 (candela-scale) multiplier. FIXED via a source.cal patch: the same grid then reads avg 494 lux (min 363 / max 627), realistic and exactly 14.4x higher. hcl-mcp electric pipeline is correct given a Radiance whose source_corr honors A1. Shape + spectrum + wattage were correct throughout."
+  },
+  "glare_ugr_electric": {
+    "ran": true, "UGR": 0, "DGP": 0.160066,
+    "glare_source_peak_value": 387.75,
+    "view": "-vta -vp 0 0 1.2 -vd 0 -1 0 -vh 180 -vv 180 (seated eye, room center, facing -Y window)",
+    "note": "Render + evalglare ran end-to-end. DGP 0.16 = low glare (below the 0.35 perceptible threshold), plausible for ceiling panels out of the direct line of sight. UGR_FLAG: evalglare returned UGR=0 despite a listed glare source -- plausible (no UGR-relevant source at the Guth positions for this geometry) but worth a sanity check."
+  },
+  "lighting_controls": {
+    "ran": true, "itot_per_point": [0, 100, 300, 500, 800], "iset": 500, "weights": [0.2,0.2,0.2,0.2,0.2],
+    "fL": [1, 0.8, 0.4, 0, 0], "fP": [1, 0.8210526, 0.4631579, 0, 0],
+    "FP": 0.4568421, "P_elec": 204.665, "P_saved": 243.335, "reduction": 0.543158,
+    "note": "Clean ContinuousOff dimming curve (full at 0 daylight -> off at >=iset). Fed a daylight SWEEP to exercise the range; the annual controls were already driven live with REAL daylight in Task 2 daylight_savings (8760 h)."
+  }
+}

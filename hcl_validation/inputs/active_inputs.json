@@ -1,0 +1,101 @@
+{
+  "_README": "INPUT SELECTOR + AUTO-DISCOVERY. You normally DON'T need to edit this. Drop your files into the matching inputs/ subfolder using the right EXTENSION (geometry/<name>.obj [+ <name>.mtl], weather/<name>.epw, luminaires/<name>.ies, spd/<name>.spd, sensors/<name>.pts) and the whole validation runs against them automatically. Each path field below is either an explicit path (relative to hcl_validation/inputs/) OR the literal \"auto\" to let the hcl-mcp-tester discover the file by extension — see _resolution for the exact rules. material_map can be \"auto\" too: if no map covers your OBJ's groups, the tester AUTO-GENERATES one from the OBJ + its .mtl (illustrative reflectances) so even a bare <name>.obj + <name>.mtl runs end-to-end. NOTE: the shipped folder holds MULTIPLE geometry/luminaire/spd files (four room models = single-window + corner-window, each ±blinds; one tunable-white fixture in three CCTs) so you can run the comparison SCENARIOS in GUIDE.md Part 4.5. Because >1 file of a class is present, plain \"auto\" would be ambiguous, so the base fields below NAME a default (office_room.obj + L09_neutral); each scenario swaps one. Drop a single file of your own and \"auto\" becomes unambiguous again.",
+
+  "geometry_obj": "geometry/office_room.obj",
+  "material_map": "auto",
+
+  "epw": "auto",
+  "wea": "auto",
+
+  "ies": "luminaires/L09_neutral.ies",
+
+  "spd_daylight": "spd/L09_neutral.spd",
+  "spd_luminaire": "spd/L09_neutral.spd",
+
+  "points": "sensors/office_room_grid.pts",
+  "points_observer": "sensors/observer_1.pts",
+  "points_photosensor": "sensors/sensor_1.pts",
+
+  "site": {
+    "_note": "Location for colored_sky / atmosphere_from_epw / annual calls. With \"auto\": true the tester reads lat/lon/UTC from the DISCOVERED EPW's LOCATION header; the explicit values below are the fallback (and match the shipped Athens EPW). north_angle_deg is taken from the resolved material_map when present, else this fallback. All shipped models are authored in the true-north frame -> north_angle_deg 0 (single window faces SOUTH, corner faces SOUTH+WEST by geometry).",
+    "auto": true,
+    "lat": 37.90,
+    "lon": 23.73,
+    "utc_offset": 2,
+    "north_angle_deg": 0
+  },
+
+  "compliance": {
+    "standard": "brown_2022",
+    "period": "daytime",
+    "channel_type": 1,
+    "target_mel_edi": 250,
+    "target_em_lux": 500
+  },
+
+  "_resolution": {
+    "_doc": "How the tester turns \"auto\" (or a missing/absent path) into a concrete file. Applied per input class, in order.",
+    "order": [
+      "1. EXPLICIT — if the field above names a file that EXISTS on disk, use exactly that.",
+      "2. GLOB — else list inputs/<folder>/*.<ext> for that class.",
+      "3. ONE match -> use it.",
+      "4. MANY matches -> FIRST apply that class's `roles` block if it has one (spd, points): roles split the matches into physically different kinds and ALWAYS win over sort order. Only within a single role (or for a class with no roles) do you fall back to: prefer a file NOT in _sample_files (i.e. one YOU dropped); if several remain, pick the alphabetically-first and WARN in the report; if only sample files remain, use _canonical for that class. NOTE: _sample_files is currently empty, so the _canonical branch is unreachable by design — a class that ships several candidates must therefore name an explicit default above (geometry_obj, ies, spd_*, points* all do) rather than rely on it.",
+      "5. ZERO matches -> that class is unavailable; SKIP its workflows and say so. Missing geometry or EPW is non-fatal: the spectral core (W1), resources, prompts, and EPW-free paths still run."
+    ],
+    "by_class": {
+      "geometry_obj": { "folder": "geometry", "ext": ["obj"] },
+      "epw":          { "folder": "weather",   "ext": ["epw"] },
+      "wea":          { "folder": "weather",   "ext": ["wea"], "derive_if_absent": "if no .wea exists, derive it from the resolved EPW with Radiance: epw2wea <epw> <epw-stem>.wea (Radiance is live on this machine)." },
+      "ies":          { "folder": "luminaires","ext": ["ies"] },
+      "spd": {
+        "folder": "spd", "ext": ["spd"],
+        "roles": {
+          "spd_luminaire": "filename matches led|lamp|lum|fixture|3000k|4000k|5000k -> the electric source",
+          "spd_daylight":  "everything else (sky|daylight|measured|d65|skyspd) -> the daylight/surface source",
+          "fallbacks": "exactly ONE .spd -> use it for BOTH roles. TWO unhinted -> alphabetically first = spd_daylight, second = spd_luminaire (WARN). SPDs are optional — many workflows use presets/derived spectra instead."
+        }
+      },
+      "points": {
+        "folder": "sensors",
+        "ext": ["pts"],
+        "optional": "if none, use import_geometry(derive_sensors=true)'s grid_points (horizontal) + observer_points (vertical, at the eye) instead.",
+        "roles": {
+          "_why": "A .pts is NOT one interchangeable class. Three physically different sensor kinds share the extension: a horizontal work-plane GRID (up-facing, z=workplane_h), VERTICAL EYE observers (gaze toward glazing), and daylight-dimming PHOTOSENSORS. Resolving them by alphabetical order silently substitutes one for another — e.g. a 1-point eye sensor where a 45-point work-plane grid belongs, which makes sDA/ASE degenerate (one point => 0% or 100%), averages DF over the wrong plane, and leaves EN 12464-1 uniformity undefined. Match by ROLE, never by sort order.",
+          "points": "filename matches grid|workplane|wp|task -> the horizontal work-plane grid. This is the DEFAULT `points` for run_grid / annual_daylight / daylight_factor / daylight_savings / sensors.",
+          "points_observer": "filename matches observer|eye|view|occupant -> vertical eye sensors (mel-EDI, glare views).",
+          "points_photosensor": "filename matches sensor|photo|dimming|zone -> daylight-dimming reference sensors (lighting_controls / daylight_savings zones).",
+          "fallbacks": "If a role has no filename match, prefer _canonical for that role. If a role has SEVERAL matches, take the alphabetically-first WITHIN THAT ROLE and WARN. Never let one role's file satisfy another role. Exactly ONE .pts on disk with no role hint -> use it for `points` and WARN that observer/photosensor roles fell back to derivation.",
+          "derive_instead": "Any role with no match can always be regenerated: workplane_grid (grid) / observer_points (eye) / photosensors (dimming), or import_geometry(derive_sensors=true) for grid+eye at once."
+        }
+      }
+    },
+    "material_map": {
+      "_doc": "Resolved AFTER the OBJ, because it must cover the OBJ's groups.",
+      "folder": "geometry", "ext": ["json", "matmap.json"],
+      "match": "Use a *material_map*.json / *.matmap.json in geometry/ whose material_map keys COVER every group the OBJ dry-run returns (the explicit field above wins if it covers them).",
+      "auto_generate_if_none": "If no on-disk map covers the groups, AUTO-GENERATE one: run import_geometry(dry_run=true) to get groups + suggestions, build {type, refl|tvis} per group from name_heuristics (using the .mtl-derived suggestions.<group>.suggested_refl when present), set units (default m), up_axis (Y if vertex normals ~ (0,1,0), Z if ~ (0,0,1); else Y), north_angle_deg (from site), channel_type 1. Write it to results/work/auto_material_map.json, pass it as import_geometry's sidecar, and FLAG in the report banner that materials are AUTO-GENERATED / illustrative (plausibility, not measured).",
+      "name_heuristics": {
+        "floor":     "name contains floor              -> {type:floor,   refl:0.2}",
+        "ceiling":   "name contains ceil               -> {type:plastic, refl:0.8}",
+        "wall":      "name contains wall|partition     -> {type:plastic, refl:0.5}",
+        "glass":     "name contains glass|glaz|window|aperture|skylight -> {type:glass, tvis:0.65}",
+        "shade":     "name contains shade|shading|louver|fin|context|external|brise -> {type:context, refl:0.35}",
+        "ground":    "name contains ground|terrain|site|grass -> {type:ground, refl:0.2}",
+        "luminaire": "name contains lum|light|fixture|lamp|fitting -> {type:luminaire} (needs an IES; if none resolved, fall back to {type:plastic, refl:0.5} and WARN)",
+        "default":   "unknown -> {type:plastic, refl: suggested_refl if present else 0.5}"
+      }
+    },
+    "_sample_files_note": "The old throwaway demo samples (sample_room.obj, synthetic_typeC.ies, measured_demo.spd, led_4000k_demo.spd, eye_points.pts) were removed. The files now in inputs/ are the REAL canonical scenario inputs, not deprioritized samples, so _sample_files below is empty — every present file competes on equal footing and the explicit base defaults above disambiguate.",
+    "_sample_files": [],
+    "_canonical": {
+      "geometry_obj": "geometry/office_room.obj",
+      "material_map": "geometry/office_room_material_map.json (pinned exact; each model has its own <name>_material_map.json — all Z-up, north_angle_deg 0 since the geometry is authored in the true-north frame: single window faces SOUTH, corner faces SOUTH+WEST. Corner maps carry per-facade groups Rad_Glazing_South_T073 / Rad_Glazing_West_T073). An equivalent pre-authored path is geometry/radiance/<model>.rad (+ materials.rad + luminaires_L09.rad), fed straight to run_grid/run_annual.",
+      "epw": "weather/GRC_Athens.167160_IWEC.epw",
+      "wea": "weather/GRC_Athens.167160_IWEC.wea (derived from the EPW with epw2wea)",
+      "ies": "luminaires/L09_neutral.ies",
+      "spd_daylight": "spd/L09_neutral.spd",
+      "spd_luminaire": "spd/L09_neutral.spd",
+      "points": "sensors/office_room_grid.pts (45-pt work-plane), observer_1.pts / observer_2.pts (eye), sensor_1.pts / sensor_2.pts (daylight-dimming) ship for the single-window south model; regenerate per model with workplane_grid/observer_points/photosensors, or use import_geometry(derive_sensors=true)"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "_README": "mm-rescaled twin of office_room_material_map.json (W2.10 / ADR-0002). Same physical room, vertices x1000, units:'mm'. Every check_geometry tolerance is absolute METRES, so `units` is load-bearing: this file must report ok:true with the SAME findings as the metre model. Regression it guards: units/up_axis were resolved from the sidecar and then never passed on, so a 1x1 m end-cap read as 1e6 units^2 and raised a spurious COINCIDENT_SURFACES error.",
+  "units": "mm",
+  "up_axis": "Z",
+  "north_angle_deg": 0,
+  "Rad_Floor_R020": {
+    "type": "floor",
+    "refl": 0.2
+  },
+  "Rad_Wall_R050": {
+    "type": "plastic",
+    "refl": 0.5
+  },
+  "Rad_Ceiling_R080": {
+    "type": "plastic",
+    "refl": 0.8
+  },
+  "Rad_Frame_R050": {
+    "type": "plastic",
+    "refl": 0.5
+  },
+  "Rad_Furniture_R050": {
+    "type": "plastic",
+    "refl": 0.5
+  },
+  "Rad_ScreenGlass_R004": {
+    "type": "plastic",
+    "refl": 0.04
+  },
+  "Rad_Glazing_T073": {
+    "type": "glass",
+    "tvis": 0.73
+  },
+  "Rad_Luminaire_L09": {
+    "type": "luminaire",
+    "ies": "/abs/path/to/hcl-mcp/hcl_validation/inputs/luminaires/L09_neutral.ies",
+    "spd": "/abs/path/to/hcl-mcp/hcl_validation/inputs/spd/L09_neutral.spd"
+  }
+}

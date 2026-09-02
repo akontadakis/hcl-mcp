@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "tool": "mcp__hcl-mcp__annual_daylight",
+    "date": "2026-07-18",
+    "scene": "office_room.rad + materials.rad (realistic side-lit office, -Y window)",
+    "points": "office_room_grid.pts (45 workplane pts, z=0.8)",
+    "wea": "athens_full.wea (epw2wea on GRC_Athens.167160_IWEC, 8760 hourly rows)",
+    "channel_type": 0,
+    "note": "First realistic-scene live run THROUGH THE MCP TOOL end-to-end (prior caveat: toy scene only + async wrapper not exercised live). DA rises smoothly from the far corner (0.023) to the -Y window (0.966); ASE per-point hours 0 (far) -> 998 (near window) from the dedicated direct-only (-ab 0) pass, distinct from the DA/UDI total pass. Realistic for sunny Athens (high near-window ASE/UDI-exceed = overlit/glare-prone zone). First realistic-scene live run, NOT a measured/calibrated baseline."
+  },
+  "ran": true,
+  "n_points": 45,
+  "n_timesteps": 8760,
+  "spatial": {
+    "sDA": 0.7555555555555555,
+    "ASE": 0.3111111111111111,
+    "DA_avg": 0.7145338441890166,
+    "UDI_autonomous_avg": 0.5704640272456364
+  },
+  "da_range": {"min": 0.023371647509578545, "max": 0.9659003831417624},
+  "ASE_per_point_hours": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,11,67,85,104,98,118,227,256,272,275,254,368,498,543,529,420,679,946,998,952,709],
+  "per_point_DA_first5": [0.023371647509578545,0.14597701149425288,0.11494252873563218,0.364367816091954,0.2045977011494253],
+  "per_point_DA_last5": [0.9647509578544061,0.9659003831417624,0.9659003831417624,0.9659003831417624,0.9593869731800766],
+  "interpretation": "sDA300/50% = 75.6% (well-daylit); ASE1000,250h = 31.1% (14/45 near-window points exceed 250h of >1000 lx direct sun) -> glare/overheat risk near the window, plausible for Athens. ASE from the separate -ab 0 pass; not interchangeable with the DA/UDI total-illuminance pass."
+}

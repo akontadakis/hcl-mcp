@@ -1,0 +1,118 @@
+# ============================================================================
+# Whitelist .gitignore — publish ONLY the selected set; ignore everything else.
+# Strategy: ignore every root entry with `/*`, then re-include (`!`) what ships.
+# ============================================================================
+
+# Ignore everything at the repo root by default
+/*
+
+# ---- Top-level files to publish ----
+!/.gitignore
+!/LICENSE
+!/README.md
+!/INSTALL.md
+!/THIRD-PARTY-NOTICES.md
+!/pyproject.toml
+!/pyrightconfig.json
+!/uv.lock
+# Agent-facing entry point. CLAUDE.md is deliberately NOT published — it is local working
+# instruction, not part of the distributed toolkit.
+!/CONTEXT.md
+
+# ---- Claude Code plugin: `/plugin marketplace add akontadakis/hcl-mcp` ----
+# `.mcp.json` is the plugin's server declaration; it doubles as a ready-to-use
+# project MCP config for anyone who clones this repo directly.
+!/.mcp.json
+!/.claude-plugin/
+
+# ---- Source and tests (entire trees) ----
+!/src/
+!/tests/
+
+# ---- Validation kit (docs + BYO-data inputs); generated run outputs stay ignored ----
+!/hcl_validation/
+/hcl_validation/results/work/
+
+# ---- Claude Code: ship only the validation tester subagent ----
+!/.claude/
+/.claude/*
+!/.claude/agents/
+
+# ---- Claude Code: auto-triggered skills ----
+!/skills/
+/skills/*
+!/skills/running-hcl-studies/
+
+# ---- docs/ — only the selected subset ----
+!/docs/
+/docs/*
+# Coefficient provenance: publish ONLY the CCM coefficient CSV. tests/test_sedes1_data.py
+# locks src/hcl_core/_sedes1_fig11.csv against it, so it must ship or the suite fails on a
+# clean clone. The digitisation notes, reconstruction PNGs, dashboard and source PDFs stay local.
+!/docs/Coefficient provenance/
+/docs/Coefficient provenance/*
+!/docs/Coefficient provenance/fig11_CCM_coefficients.csv
+# Figures: publish ONLY the deep-dive set that spectral-engine-radiance-deep-dive.md embeds.
+# The BE-manuscript figures and the site icons are local-only.
+!/docs/img/
+/docs/img/*
+!/docs/img/spectral-deep-dive/
+# The P3 errata record — every claim the P0-P2 rebuild falsified, and the corrected figure —
+# is NOT in this tree: it lives with its source data outside the published repo, and P3-G4
+# (the gate that used to assert its contents) moved out with it. The suite passes without it.
+!/docs/engines-install.md
+!/docs/hcl-methodology.md
+!/docs/literature-bibliography.md
+!/docs/operating-guide.md
+!/docs/radiance-6-build.md
+!/docs/recalibrating-cloud-ccm.md
+!/docs/smarts-build.md
+!/docs/spectral-engines.md
+!/docs/spectral-engine-comparison.md
+!/docs/spectral-engine-radiance-deep-dive.md
+!/docs/spectral-engine-validation.md
+!/docs/spectral-sky-as-built.md
+!/docs/spectral-sky-methodology.md
+!/docs/technical-reference.md
+# Manuscript drafts and their whole toolchain stay local: the .md sources, their built
+# .docx, the build script, and the reference.docx style template it needs.
+# docs/reference/ (the CIE S 026 toolbox) is likewise local. All covered by `/docs/*` above.
+
+# ---- docs/validation/ ----
+# Not published, and no rule below re-includes it: the measurement dossiers moved to the
+# outer _data/ tree on 2026-08-10 and are covered by the `/docs/*` ignore-all above. The
+# long allowlist that used to live here (open-data/, the luminaire assets, the campaign trees)
+# went with them. Nothing under src/ or tests/ imports that tree; the one file tests did read
+# (the SEDES2 coefficient CSV) now lives in tests/fixtures/ beside its test.
+
+# ---- Agent-workflow docs (referenced from CONTEXT.md) + ADRs ----
+!/docs/adr/
+
+# ============================================================================
+# Always-ignore junk (also inside the whitelisted trees above)
+# ============================================================================
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+.venv/
+.pytest_cache/
+.DS_Store
+**/.DS_Store
+
+# gensdaymtx per-AOD atmosphere cache (generated on first live run)
+atmos_data/
+
+# Local-only tooling / scratch — not pushed
+.superpowers/
+.git-rewrite/
+
+# ---- docs/Literature is entirely local: source PDFs, the methodology database and its _build
+# pipeline are all unpublished. Covered by the `/docs/*` rule above; stated here explicitly so the
+# next person does not re-add a whitelist for it. ----
+
+# docs/agents/ moved to the outer repo 2026-08-10 — agent-development notes are
+# not published. Covered by the `/docs/*` ignore-all above.
+
+.whetstone-mcp/

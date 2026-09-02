@@ -1,0 +1,15 @@
+
+{ hcl-mcp patch 2026-07-18: this Radiance build's compiled source_corr drops the ies2rad
+  brightdata A1 (candela-scale) multiplier -> flatcorr/corr return v instead of A1*v, so IES
+  luminaires under-emit by their candela scale (~14x for L09). Restore the explicit
+  pre-source_corr correction formulas (later defs override the source_corr ones above).
+  Verified: office_room 4xL09 electric grid avg 34.4 lux -> 494.1 lux (14.36x). Only affects
+  ies2rad luminaire brightdata; sky (gensky/gendaymtx) paths are unaffected. Revert: restore the backup. }
+boxprojection = abs(Dx)*A3*A4 + abs(Dy)*A2*A4 + abs(Dz)*A2*A3;
+lboxprojection = ( noneg(abs(Px-Dx*Ts)-A2/2)*A3*A4 + noneg(abs(Py-Dy*Ts)-A3/2)*A2*A4 + noneg(abs(Pz-Dz*Ts)-A4/2)*A2*A3 ) / Ts;
+cylprojection = A2*A3*sqrt(1-Dz*Dz) + PI/4*A2*A2*abs(Dz);
+corr(v) = noneg(if(AC-.5, A1*v, v));
+flatcorr(v) = corr(v) / Rdot;
+boxcorr(v) = noneg(A1*v) / boxprojection;
+lboxcorr(v) = noneg(A1*v) / lboxprojection;
+cylcorr(v) = noneg(A1*v) / cylprojection;

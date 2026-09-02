@@ -1,0 +1,16 @@
+{
+  "name": "hcl-mcp",
+  "metadata": {
+    "description": "Human-centric lighting as an MCP server — spectral skies from EPW, CIE S 026 alpha-opic metrics, circadian compliance, and Radiance daylight simulation."
+  },
+  "owner": {
+    "name": "Antonis Kontadakis",
+    "url": "https://github.com/akontadakis"
+  },
+  "plugins": [
+    {
+      "name": "hcl-mcp",
+      "source": "./"
+    }
+  ]
+}

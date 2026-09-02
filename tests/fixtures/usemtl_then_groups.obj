@@ -1,0 +1,13 @@
+# Regression fixture for C1: usemtl must stay active across g lines.
+# Two g blocks reuse the same usemtl — both faces must report group "shell".
+v 0 0 0
+v 1 0 0
+v 1 1 0
+v 0 1 0
+v 0 0 1
+v 1 0 1
+usemtl shell
+g block1
+f 1 2 3 4
+g block2
+f 1 2 6 5

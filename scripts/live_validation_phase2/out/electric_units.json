@@ -1,0 +1,27 @@
+{
+  "_meta": {
+    "date": "2026-07-18",
+    "tools": ["ies_analyze", "ies_to_radiance", "spd_to_channels", "colored_luminaire"],
+    "fixture": "L09_neutral (Glamox C95-R600x600 LED, 4000K)",
+    "note": "First live run of the electric UNIT tools through the MCP server. All four ran clean (no bugs surfaced). ies2rad -o path exercised; colorize correctly injected the selected channel triplet. First live run, not a photometric-lab baseline."
+  },
+  "ies_analyze": {
+    "ran": true, "input_watts": 38, "max_candela": 1902.4292, "rated_lumens": 4702,
+    "efficacy": 123.74, "flux_down": 4705.96, "flux_up": 0, "LOR": 1.0008,
+    "beam_field_reliable": false, "note": "downlight (flux_up=0); batwing distribution -> beam/field angles flagged approximate (honest)"
+  },
+  "ies_to_radiance": {
+    "ran": true, "returncode": 0, "outputs": ["L09.rad", "L09.dat"],
+    "command": "ies2rad -m 1 -dm -o L09 L09_neutral.ies > L09.rad",
+    "produced_light_def": "'L09_dist' light 'L09_light' ... 3 1 1 1 (neutral RGB before colorize)"
+  },
+  "spd_to_channels": {
+    "ran": true, "channel_type": 1,
+    "channels9": [0, 0.009, 0.006, 0.011, 0.013, 0.016, 0.017, 0.015, 0.004]
+  },
+  "colored_luminaire": {
+    "ran": true, "count": 2, "file": "L09_red.rad",
+    "injected_triplet": [0.017, 0.015, 0.004],
+    "note": "count=2 (red third) correctly replaced '3 1 1 1' -> '3 0.017 0.015 0.004' (channels9[6:9]). Source L09.rad left untouched."
+  }
+}

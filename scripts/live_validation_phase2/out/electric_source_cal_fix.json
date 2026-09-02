@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "date": "2026-07-18",
+    "title": "Root cause + fix for the electric ~14x under-emission",
+    "summary": "NOT an hcl-mcp bug. This custom Radiance 6.1a build's compiled source_corr built-in drops the ies2rad brightdata A1 (candela-scale) multiplier, so IES luminaires under-emit by their candela scale (14.3711x for L09). hcl-mcp's electric pipeline is correct."
+  },
+  "proof": {
+    "A1_arg_10x_test": "brightdata arg 14.3711 -> 143.711 gave IDENTICAL illuminance -> A1 ignored by source_corr",
+    "fold_into_RGB_test": "light RGB x14.3711 -> 420 lux nadir (= IES 1878 cd / 2.1^2 ~425) -> confirms A1 is the missing factor",
+    "source_cal_override_test": "shadowing source.cal with explicit flatcorr(v)=noneg(if(AC-.5,A1*v,v))/Rdot -> 420 lux -> the built-in source_corr is the culprit (local Radiance build issue)"
+  },
+  "grid_revalidation_office_room_4xL09": {
+    "broken_system_source_cal": {"min_lux": 25.3, "max_lux": 43.6, "avg_lux": 34.4},
+    "patched_source_cal_A1_restored": {"min_lux": 362.7, "max_lux": 627.0, "avg_lux": 494.1},
+    "ratio": 14.36,
+    "note": "The ratio 14.36x is broken-vs-patched at the SAME rad_params (-ab 1 revalidation) and equals the ies2rad brightdata A1 scale (14.3711). (The original Task-4 run used the tool default -ab 2 and read avg 36.0 lux broken; ~5% higher due to the extra ambient bounce, still ~14x low.) Patched magnitudes (avg ~494 lux) are realistic for 4x4702 lm over 31.4 m^2 (well-lit office).",
+    "per_point_patched_lux_file": "electric_patched_lux.txt (45 values)"
+  },
+  "fix": {
+    "layer": "Radiance environment (NOT hcl-mcp code)",
+    "do_not": "Do NOT fold A1 into hcl-mcp's color_luminaire RGB -- that would DOUBLE-scale on a correct/stock Radiance whose source_corr applies A1.",
+    "system_patch": "Append explicit corr/flatcorr/boxcorr/lboxcorr/cylcorr overrides to /usr/local/radiance/lib/source.cal (later defs win). Requires sudo. Backup first. Revert = restore source.cal.hclbak.",
+    "validated": "The override yields correct magnitudes (avg 494 lux) via a RAYPATH-shadowed source.cal; the identical text applied to the system file makes the MCP electric tools correct."
+  }
+}

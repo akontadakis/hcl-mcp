@@ -1,0 +1,17 @@
+{
+  "_meta": {
+    "tool": "mcp__hcl-mcp__daylight_factor",
+    "date": "2026-07-18",
+    "scene": "office_room.rad + materials.rad (realistic side-lit office, -Y window)",
+    "points": "office_room_grid.pts (45 workplane pts, z=0.8)",
+    "sky": "CIE Standard Overcast (gensky -c), month=6 day=21 hour=12, gnd_refl=0.2",
+    "note": "First live run on a REALISTIC room (prior caveat: toy fully-glazed scene only). DF falls off smoothly from the -Y window (15.9%) to the far corner (0.29%); magnitudes are plausible for a side-lit office. First realistic-scene live run, not a measured/calibrated baseline."
+  },
+  "ran": true,
+  "df_per_point": [0.3463,0.3266,0.4564,0.3763,0.2949,0.4437,0.3465,0.4361,0.4629,0.3888,0.5919,0.3589,0.6273,0.6954,0.5951,0.8367,0.7319,1.0275,0.9363,0.8488,1.1766,1.3542,1.4674,1.4626,1.3011,1.8138,2.3277,2.4251,2.3056,2.0207,3.6306,4.3639,4.4745,4.1689,3.5433,6.5596,8.2475,8.6807,7.9097,6.5476,12.3026,15.7057,15.874,15.5963,12.5059],
+  "df_avg": 3.531,
+  "df_min": 0.2949,
+  "df_max": 15.874,
+  "uniformity": 0.0835,
+  "e_outdoor": 18205.9468
+}

@@ -1,0 +1,9 @@
+# Four Glamox L09 luminaires (from L09_neutral.ies via ies2rad).
+# Each instance = ies2rad prototype L09_neutral.rad translated to a fixture at Z=2.8.
+# Emitter faces -Z (down); reads L09_neutral.dat at render time (keep it in this dir/RAYPATH).
+# Use:  oconv materials.rad luminaires_L09.rad <model>.rad > <model>.oct
+
+!xform -n L09_1 -t 1.0 1.8 2.8 L09_neutral.rad
+!xform -n L09_2 -t -1.0 1.8 2.8 L09_neutral.rad
+!xform -n L09_3 -t 1.0 -1.8 2.8 L09_neutral.rad
+!xform -n L09_4 -t -1.0 -1.8 2.8 L09_neutral.rad

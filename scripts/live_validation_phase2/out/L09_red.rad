@@ -1,0 +1,33 @@
+# ies2rad -m 1 -dm -o L09
+# Dimensions in meters
+#<IESNA:LM-63-1995
+#<[TEST]		1611010300
+#<[MANUFAC]	Glamox, by Glamox AS
+#<[LUMCAT]	16110103
+#<[LUMINAIRE]	C95-R600x600 LED 4800 827-865 CCT MP 4000K
+#<[LAMP]		16110103
+#<[DATE]		01.11.2016 11:29:14
+# Unknown lamp type (used default)
+
+# 38 watt luminaire, lamp*ballast factor = 1
+# IES file shape = rectangle
+# Radiance geometry shape = rectangle or box
+
+'void' brightdata 'L09_dist'
+5 flatcorr 'L09.dat' source.cal src_phi4 src_theta 
+0
+1 14.3711
+
+'L09_dist' light 'L09_light'
+0
+0
+3 0.017 0.015 0.004
+
+'L09_light' polygon 'L09.d'
+0
+0
+12
+	-0.286	-0.286	-0.00025
+	-0.286	0.286	-0.00025
+	0.286	0.286	-0.00025
+	0.286	-0.286	-0.00025

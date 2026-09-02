@@ -1,0 +1,6 @@
+{
+  "Floor":   {"type": "floor"},
+  "Ceiling": {"type": "plastic"},
+  "Walls":   {"type": "plastic"},
+  "Window":  {"type": "glass"}
+}

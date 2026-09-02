@@ -1,0 +1,19 @@
+{
+  "_README": "Pinned material map for office_room.obj. Keys are the OBJ's usemtl group names; values encode the reflectance/transmittance the names carry (R020 -> refl 0.20, T073 -> glass tvis 0.73, etc.). An on-disk map that covers every group wins over the tester's auto-generated map, so these EXACT values are used (the auto-map would otherwise default glazing to tvis 0.65 and mis-type Rad_ScreenGlass as a window). units/up_axis/north_angle_deg are read alongside the group specs. This Blender export is Z-up (height on +Z), so up_axis is Z. The window sits in the wall named North, so with north_angle_deg 0 it is a north-facing window; change north_angle_deg to reorient. REGENERATED 2026-06-29 after the OBJ gained a Rad_Luminaire_L09 group: it is type:luminaire bound to the L09_neutral fixture (IES photometry + measured SPD) so import_geometry returns a drop-in electric_lights payload for run_grid/run_image (combined daylight+electric). The luminaire ies/spd are ABSOLUTE paths so a direct import_geometry(sidecar=...) call resolves them irrespective of cwd; edit them if you relocate the repo or swap the CCT (L09_warm/L09_cool).",
+  "units": "m",
+  "up_axis": "Z",
+  "north_angle_deg": 0,
+
+  "Rad_Floor_R020": { "type": "floor", "refl": 0.20 },
+  "Rad_Wall_R050": { "type": "plastic", "refl": 0.50 },
+  "Rad_Ceiling_R080": { "type": "plastic", "refl": 0.80 },
+  "Rad_Frame_R050": { "type": "plastic", "refl": 0.50 },
+  "Rad_Furniture_R050": { "type": "plastic", "refl": 0.50 },
+  "Rad_ScreenGlass_R004": { "type": "plastic", "refl": 0.04 },
+  "Rad_Glazing_T073": { "type": "glass", "tvis": 0.73 },
+  "Rad_Luminaire_L09": {
+    "type": "luminaire",
+    "ies": "/abs/path/to/hcl-mcp/hcl_validation/inputs/luminaires/L09_neutral.ies",
+    "spd": "/abs/path/to/hcl-mcp/hcl_validation/inputs/spd/L09_neutral.spd"
+  }
+}

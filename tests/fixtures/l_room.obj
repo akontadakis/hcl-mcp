@@ -1,0 +1,27 @@
+# L-shaped room, Z-up, metres
+o Floor
+v 0 0 0
+v 6 0 0
+v 6 3 0
+v 3 3 0
+v 3 6 0
+v 0 6 0
+o Ceiling
+v 0 0 3
+v 6 0 3
+v 6 3 3
+v 3 3 3
+v 3 6 3
+v 0 6 3
+g Floor
+f 1 2 3 4 5 6
+g Ceiling
+f 12 11 10 9 8 7
+g Window
+f 1 2 8 7
+g Walls
+f 2 3 9 8
+f 3 4 10 9
+f 4 5 11 10
+f 5 6 12 11
+f 6 1 7 12

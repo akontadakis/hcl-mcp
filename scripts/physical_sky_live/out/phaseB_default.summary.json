@@ -1,0 +1,23 @@
+{
+  "ran": true,
+  "n_timesteps": 87600,
+  "coverage": {
+    "n_physical": 43830,
+    "n_template": 43770,
+    "coverage_pct": 50.034246575342465
+  },
+  "has_enhanced_solar_note": false,
+  "rd_series_divergence": {
+    "mean_abs": 0.0010810387288447704,
+    "max_abs": 0.03405121605416217,
+    "final_cum_pct": 0.2388224805523978
+  },
+  "wall_clock_s": 458.4,
+  "reason_if_not_ran": null,
+  "_meta": {
+    "label": "phaseB_default",
+    "timestep_min": 6,
+    "rad_params": "-ab 2 -ad 512 -aa 0.1 -ar 64",
+    "wall_clock_s": 458.4
+  }
+}

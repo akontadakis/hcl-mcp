@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "hcl-mcp": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/akontadakis/hcl-mcp",
+        "hcl-mcp"
+      ]
+    }
+  }
+}

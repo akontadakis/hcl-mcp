@@ -1,0 +1,24 @@
+{
+  "name": "hcl-mcp",
+  "description": "Human-centric lighting toolkit as a local MCP server: SPECTRL2/SEDES1 spectral skies from EPW weather, CIE S 026:2018 alpha-opic and melanopic metrics, nvRD alertness, WELL / EN 17037 / EN 12464-1 compliance verdicts, IES photometry, and a run-or-emit Radiance pipeline for daylight, electric-lighting and glare simulation.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Antonis Kontadakis",
+    "url": "https://github.com/akontadakis"
+  },
+  "homepage": "https://github.com/akontadakis/hcl-mcp",
+  "repository": "https://github.com/akontadakis/hcl-mcp",
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "lighting",
+    "daylight",
+    "radiance",
+    "circadian",
+    "melanopic",
+    "human-centric-lighting",
+    "building-physics",
+    "epw"
+  ]
+}

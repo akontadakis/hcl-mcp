@@ -1,0 +1,6754 @@
+# Geometry for office_room_corner_window_blinds (obj2rad). Modifiers in materials.rad.
+# Luminaire panels removed; IES emitters live in luminaires_L09.rad.
+
+Rad_Floor_R020 polygon Room_Floor.1
+0
+0
+9
+	2.150001	3.65	-0.2
+	-2.15	3.65	-0.2
+	-2.150001	-3.65	-0.2
+
+Rad_Floor_R020 polygon Room_Floor.1
+0
+0
+9
+	-2.150001	-3.65	-0.2
+	2.15	-3.65	-0.2
+	2.150001	3.65	-0.2
+
+Rad_Floor_R020 polygon Room_Floor.2
+0
+0
+9
+	2.150001	3.65	0
+	2.15	-3.65	0
+	-2.150001	-3.65	0
+
+Rad_Floor_R020 polygon Room_Floor.2
+0
+0
+9
+	-2.150001	-3.65	0
+	-2.15	3.65	0
+	2.150001	3.65	0
+
+Rad_Floor_R020 polygon Room_Floor.3
+0
+0
+9
+	2.150001	3.65	-0.2
+	2.150001	3.65	0
+	-2.15	3.65	0
+
+Rad_Floor_R020 polygon Room_Floor.3
+0
+0
+9
+	-2.15	3.65	0
+	-2.15	3.65	-0.2
+	2.150001	3.65	-0.2
+
+Rad_Floor_R020 polygon Room_Floor.4
+0
+0
+9
+	-2.15	3.65	-0.2
+	-2.15	3.65	0
+	-2.150001	-3.65	0
+
+Rad_Floor_R020 polygon Room_Floor.4
+0
+0
+9
+	-2.150001	-3.65	0
+	-2.150001	-3.65	-0.2
+	-2.15	3.65	-0.2
+
+Rad_Floor_R020 polygon Room_Floor.5
+0
+0
+9
+	-2.150001	-3.65	-0.2
+	-2.150001	-3.65	0
+	2.15	-3.65	0
+
+Rad_Floor_R020 polygon Room_Floor.5
+0
+0
+9
+	2.15	-3.65	0
+	2.15	-3.65	-0.2
+	-2.150001	-3.65	-0.2
+
+Rad_Floor_R020 polygon Room_Floor.6
+0
+0
+9
+	2.15	-3.65	-0.2
+	2.15	-3.65	0
+	2.150001	3.65	0
+
+Rad_Floor_R020 polygon Room_Floor.6
+0
+0
+9
+	2.150001	3.65	0
+	2.150001	3.65	-0.2
+	2.15	-3.65	-0.2
+
+Rad_Ceiling_R080 polygon Room_Ceiling.7
+0
+0
+9
+	2.150001	3.65	3
+	-2.15	3.65	3
+	-2.150001	-3.65	3
+
+Rad_Ceiling_R080 polygon Room_Ceiling.7
+0
+0
+9
+	-2.150001	-3.65	3
+	2.15	-3.65	3
+	2.150001	3.65	3
+
+Rad_Ceiling_R080 polygon Room_Ceiling.8
+0
+0
+9
+	2.150001	3.65	3.2
+	2.15	-3.65	3.2
+	-2.150001	-3.65	3.2
+
+Rad_Ceiling_R080 polygon Room_Ceiling.8
+0
+0
+9
+	-2.150001	-3.65	3.2
+	-2.15	3.65	3.2
+	2.150001	3.65	3.2
+
+Rad_Ceiling_R080 polygon Room_Ceiling.9
+0
+0
+9
+	2.150001	3.65	3
+	2.150001	3.65	3.2
+	-2.15	3.65	3.2
+
+Rad_Ceiling_R080 polygon Room_Ceiling.9
+0
+0
+9
+	-2.15	3.65	3.2
+	-2.15	3.65	3
+	2.150001	3.65	3
+
+Rad_Ceiling_R080 polygon Room_Ceiling.10
+0
+0
+9
+	-2.15	3.65	3
+	-2.15	3.65	3.2
+	-2.150001	-3.65	3.2
+
+Rad_Ceiling_R080 polygon Room_Ceiling.10
+0
+0
+9
+	-2.150001	-3.65	3.2
+	-2.150001	-3.65	3
+	-2.15	3.65	3
+
+Rad_Ceiling_R080 polygon Room_Ceiling.11
+0
+0
+9
+	-2.150001	-3.65	3
+	-2.150001	-3.65	3.2
+	2.15	-3.65	3.2
+
+Rad_Ceiling_R080 polygon Room_Ceiling.11
+0
+0
+9
+	2.15	-3.65	3.2
+	2.15	-3.65	3
+	-2.150001	-3.65	3
+
+Rad_Ceiling_R080 polygon Room_Ceiling.12
+0
+0
+9
+	2.15	-3.65	3
+	2.15	-3.65	3.2
+	2.150001	3.65	3.2
+
+Rad_Ceiling_R080 polygon Room_Ceiling.12
+0
+0
+9
+	2.150001	3.65	3.2
+	2.150001	3.65	3
+	2.15	-3.65	3
+
+Rad_Wall_R050 polygon Room_Wall_North.13
+0
+0
+9
+	2	3.65	0
+	-1.999999	3.65	0
+	-2	3.5	0
+
+Rad_Wall_R050 polygon Room_Wall_North.13
+0
+0
+9
+	-2	3.5	0
+	2	3.5	0
+	2	3.65	0
+
+Rad_Wall_R050 polygon Room_Wall_North.14
+0
+0
+9
+	2	3.65	3
+	2	3.5	3
+	-2	3.5	3
+
+Rad_Wall_R050 polygon Room_Wall_North.14
+0
+0
+9
+	-2	3.5	3
+	-1.999999	3.65	3
+	2	3.65	3
+
+Rad_Wall_R050 polygon Room_Wall_North.15
+0
+0
+9
+	2	3.65	0
+	2	3.65	3
+	-1.999999	3.65	3
+
+Rad_Wall_R050 polygon Room_Wall_North.15
+0
+0
+9
+	-1.999999	3.65	3
+	-1.999999	3.65	0
+	2	3.65	0
+
+Rad_Wall_R050 polygon Room_Wall_North.16
+0
+0
+9
+	-1.999999	3.65	0
+	-1.999999	3.65	3
+	-2	3.5	3
+
+Rad_Wall_R050 polygon Room_Wall_North.16
+0
+0
+9
+	-2	3.5	3
+	-2	3.5	0
+	-1.999999	3.65	0
+
+Rad_Wall_R050 polygon Room_Wall_North.17
+0
+0
+9
+	-2	3.5	0
+	-2	3.5	3
+	2	3.5	3
+
+Rad_Wall_R050 polygon Room_Wall_North.17
+0
+0
+9
+	2	3.5	3
+	2	3.5	0
+	-2	3.5	0
+
+Rad_Wall_R050 polygon Room_Wall_North.18
+0
+0
+9
+	2	3.5	0
+	2	3.5	3
+	2	3.65	3
+
+Rad_Wall_R050 polygon Room_Wall_North.18
+0
+0
+9
+	2	3.65	3
+	2	3.65	0
+	2	3.5	0
+
+Rad_Wall_R050 polygon Room_Wall_East.19
+0
+0
+9
+	2.150001	3.65	0
+	2	3.65	0
+	1.999999	-3.65	0
+
+Rad_Wall_R050 polygon Room_Wall_East.19
+0
+0
+9
+	1.999999	-3.65	0
+	2.15	-3.65	0
+	2.150001	3.65	0
+
+Rad_Wall_R050 polygon Room_Wall_East.20
+0
+0
+9
+	2.150001	3.65	3
+	2.15	-3.65	3
+	1.999999	-3.65	3
+
+Rad_Wall_R050 polygon Room_Wall_East.20
+0
+0
+9
+	1.999999	-3.65	3
+	2	3.65	3
+	2.150001	3.65	3
+
+Rad_Wall_R050 polygon Room_Wall_East.21
+0
+0
+9
+	2.150001	3.65	0
+	2.150001	3.65	3
+	2	3.65	3
+
+Rad_Wall_R050 polygon Room_Wall_East.21
+0
+0
+9
+	2	3.65	3
+	2	3.65	0
+	2.150001	3.65	0
+
+Rad_Wall_R050 polygon Room_Wall_East.22
+0
+0
+9
+	2	3.65	0
+	2	3.65	3
+	1.999999	-3.65	3
+
+Rad_Wall_R050 polygon Room_Wall_East.22
+0
+0
+9
+	1.999999	-3.65	3
+	1.999999	-3.65	0
+	2	3.65	0
+
+Rad_Wall_R050 polygon Room_Wall_East.23
+0
+0
+9
+	1.999999	-3.65	0
+	1.999999	-3.65	3
+	2.15	-3.65	3
+
+Rad_Wall_R050 polygon Room_Wall_East.23
+0
+0
+9
+	2.15	-3.65	3
+	2.15	-3.65	0
+	1.999999	-3.65	0
+
+Rad_Wall_R050 polygon Room_Wall_East.24
+0
+0
+9
+	2.15	-3.65	0
+	2.15	-3.65	3
+	2.150001	3.65	3
+
+Rad_Wall_R050 polygon Room_Wall_East.24
+0
+0
+9
+	2.150001	3.65	3
+	2.150001	3.65	0
+	2.15	-3.65	0
+
+Rad_Glazing_South_T073 polygon Room_Window_South.29
+0
+0
+9
+	0.474999	-3.575	1.025
+	-1.975001	-3.575	1.025
+	-1.975001	-3.575	2.475
+
+Rad_Glazing_South_T073 polygon Room_Window_South.29
+0
+0
+9
+	-1.975001	-3.575	2.475
+	0.474999	-3.575	2.475
+	0.474999	-3.575	1.025
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Sill.30
+0
+0
+9
+	0.499999	-3.57	1
+	0.499999	-3.58	1
+	-2	-3.58	1
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Sill.30
+0
+0
+9
+	-2	-3.58	1
+	-2	-3.57	1
+	0.499999	-3.57	1
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Sill.31
+0
+0
+9
+	0.499999	-3.57	1.025
+	-2	-3.57	1.025
+	-2	-3.58	1.025
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Sill.31
+0
+0
+9
+	-2	-3.58	1.025
+	0.499999	-3.58	1.025
+	0.499999	-3.57	1.025
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Sill.32
+0
+0
+9
+	0.499999	-3.57	1
+	-2	-3.57	1
+	-2	-3.57	1.025
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Sill.32
+0
+0
+9
+	-2	-3.57	1.025
+	0.499999	-3.57	1.025
+	0.499999	-3.57	1
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Sill.33
+0
+0
+9
+	-2	-3.57	1
+	-2	-3.58	1
+	-2	-3.58	1.025
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Sill.33
+0
+0
+9
+	-2	-3.58	1.025
+	-2	-3.57	1.025
+	-2	-3.57	1
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Sill.34
+0
+0
+9
+	-2	-3.58	1
+	0.499999	-3.58	1
+	0.499999	-3.58	1.025
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Sill.34
+0
+0
+9
+	0.499999	-3.58	1.025
+	-2	-3.58	1.025
+	-2	-3.58	1
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Sill.35
+0
+0
+9
+	0.499999	-3.58	1
+	0.499999	-3.57	1
+	0.499999	-3.57	1.025
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Sill.35
+0
+0
+9
+	0.499999	-3.57	1.025
+	0.499999	-3.58	1.025
+	0.499999	-3.58	1
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Head.36
+0
+0
+9
+	0.499999	-3.57	2.475
+	0.499999	-3.58	2.475
+	-2	-3.58	2.475
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Head.36
+0
+0
+9
+	-2	-3.58	2.475
+	-2	-3.57	2.475
+	0.499999	-3.57	2.475
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Head.37
+0
+0
+9
+	0.499999	-3.57	2.5
+	-2	-3.57	2.5
+	-2	-3.58	2.5
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Head.37
+0
+0
+9
+	-2	-3.58	2.5
+	0.499999	-3.58	2.5
+	0.499999	-3.57	2.5
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Head.38
+0
+0
+9
+	0.499999	-3.57	2.475
+	-2	-3.57	2.475
+	-2	-3.57	2.5
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Head.38
+0
+0
+9
+	-2	-3.57	2.5
+	0.499999	-3.57	2.5
+	0.499999	-3.57	2.475
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Head.39
+0
+0
+9
+	-2	-3.57	2.475
+	-2	-3.58	2.475
+	-2	-3.58	2.5
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Head.39
+0
+0
+9
+	-2	-3.58	2.5
+	-2	-3.57	2.5
+	-2	-3.57	2.475
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Head.40
+0
+0
+9
+	-2	-3.58	2.475
+	0.499999	-3.58	2.475
+	0.499999	-3.58	2.5
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Head.40
+0
+0
+9
+	0.499999	-3.58	2.5
+	-2	-3.58	2.5
+	-2	-3.58	2.475
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Head.41
+0
+0
+9
+	0.499999	-3.58	2.475
+	0.499999	-3.57	2.475
+	0.499999	-3.57	2.5
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Head.41
+0
+0
+9
+	0.499999	-3.57	2.5
+	0.499999	-3.58	2.5
+	0.499999	-3.58	2.475
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Jamb.42
+0
+0
+9
+	0.499999	-3.57	1.025
+	0.499999	-3.58	1.025
+	0.474999	-3.58	1.025
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Jamb.42
+0
+0
+9
+	0.474999	-3.58	1.025
+	0.474999	-3.57	1.025
+	0.499999	-3.57	1.025
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Jamb.43
+0
+0
+9
+	0.499999	-3.57	2.475
+	0.474999	-3.57	2.475
+	0.474999	-3.58	2.475
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Jamb.43
+0
+0
+9
+	0.474999	-3.58	2.475
+	0.499999	-3.58	2.475
+	0.499999	-3.57	2.475
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Jamb.44
+0
+0
+9
+	0.499999	-3.57	1.025
+	0.474999	-3.57	1.025
+	0.474999	-3.57	2.475
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Jamb.44
+0
+0
+9
+	0.474999	-3.57	2.475
+	0.499999	-3.57	2.475
+	0.499999	-3.57	1.025
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Jamb.45
+0
+0
+9
+	0.474999	-3.57	1.025
+	0.474999	-3.58	1.025
+	0.474999	-3.58	2.475
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Jamb.45
+0
+0
+9
+	0.474999	-3.58	2.475
+	0.474999	-3.57	2.475
+	0.474999	-3.57	1.025
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Jamb.46
+0
+0
+9
+	0.474999	-3.58	1.025
+	0.499999	-3.58	1.025
+	0.499999	-3.58	2.475
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Jamb.46
+0
+0
+9
+	0.499999	-3.58	2.475
+	0.474999	-3.58	2.475
+	0.474999	-3.58	1.025
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Jamb.47
+0
+0
+9
+	0.499999	-3.58	1.025
+	0.499999	-3.57	1.025
+	0.499999	-3.57	2.475
+
+Rad_Frame_South_R050 polygon Room_Window_South_Frame_Jamb.47
+0
+0
+9
+	0.499999	-3.57	2.475
+	0.499999	-3.58	2.475
+	0.499999	-3.58	1.025
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.48
+0
+0
+9
+	0.474999	-3.492222	1.043778
+	-1.975001	-3.492222	1.043778
+	-1.975001	-3.507778	1.028222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.48
+0
+0
+9
+	-1.975001	-3.507778	1.028222
+	0.474999	-3.507778	1.028222
+	0.474999	-3.492222	1.043778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.49
+0
+0
+9
+	0.474999	-3.492222	1.065778
+	-1.975001	-3.492222	1.065778
+	-1.975001	-3.507778	1.050222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.49
+0
+0
+9
+	-1.975001	-3.507778	1.050222
+	0.474999	-3.507778	1.050222
+	0.474999	-3.492222	1.065778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.50
+0
+0
+9
+	0.474999	-3.492222	1.087778
+	-1.975001	-3.492222	1.087778
+	-1.975001	-3.507778	1.072222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.50
+0
+0
+9
+	-1.975001	-3.507778	1.072222
+	0.474999	-3.507778	1.072222
+	0.474999	-3.492222	1.087778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.51
+0
+0
+9
+	0.474999	-3.492222	1.109778
+	-1.975001	-3.492222	1.109778
+	-1.975001	-3.507778	1.094222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.51
+0
+0
+9
+	-1.975001	-3.507778	1.094222
+	0.474999	-3.507778	1.094222
+	0.474999	-3.492222	1.109778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.52
+0
+0
+9
+	0.474999	-3.492222	1.131778
+	-1.975001	-3.492222	1.131778
+	-1.975001	-3.507778	1.116222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.52
+0
+0
+9
+	-1.975001	-3.507778	1.116222
+	0.474999	-3.507778	1.116222
+	0.474999	-3.492222	1.131778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.53
+0
+0
+9
+	0.474999	-3.492222	1.153778
+	-1.975001	-3.492222	1.153778
+	-1.975001	-3.507778	1.138222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.53
+0
+0
+9
+	-1.975001	-3.507778	1.138222
+	0.474999	-3.507778	1.138222
+	0.474999	-3.492222	1.153778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.54
+0
+0
+9
+	0.474999	-3.492222	1.175778
+	-1.975001	-3.492222	1.175778
+	-1.975001	-3.507778	1.160222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.54
+0
+0
+9
+	-1.975001	-3.507778	1.160222
+	0.474999	-3.507778	1.160222
+	0.474999	-3.492222	1.175778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.55
+0
+0
+9
+	0.474999	-3.492222	1.197778
+	-1.975001	-3.492222	1.197778
+	-1.975001	-3.507778	1.182222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.55
+0
+0
+9
+	-1.975001	-3.507778	1.182222
+	0.474999	-3.507778	1.182222
+	0.474999	-3.492222	1.197778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.56
+0
+0
+9
+	0.474999	-3.492222	1.219778
+	-1.975001	-3.492222	1.219778
+	-1.975001	-3.507778	1.204222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.56
+0
+0
+9
+	-1.975001	-3.507778	1.204222
+	0.474999	-3.507778	1.204222
+	0.474999	-3.492222	1.219778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.57
+0
+0
+9
+	0.474999	-3.492222	1.241778
+	-1.975001	-3.492222	1.241778
+	-1.975001	-3.507778	1.226222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.57
+0
+0
+9
+	-1.975001	-3.507778	1.226222
+	0.474999	-3.507778	1.226222
+	0.474999	-3.492222	1.241778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.58
+0
+0
+9
+	0.474999	-3.492222	1.263778
+	-1.975001	-3.492222	1.263778
+	-1.975001	-3.507778	1.248222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.58
+0
+0
+9
+	-1.975001	-3.507778	1.248222
+	0.474999	-3.507778	1.248222
+	0.474999	-3.492222	1.263778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.59
+0
+0
+9
+	0.474999	-3.492222	1.285778
+	-1.975001	-3.492222	1.285778
+	-1.975001	-3.507778	1.270222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.59
+0
+0
+9
+	-1.975001	-3.507778	1.270222
+	0.474999	-3.507778	1.270222
+	0.474999	-3.492222	1.285778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.60
+0
+0
+9
+	0.474999	-3.492222	1.307778
+	-1.975001	-3.492222	1.307778
+	-1.975001	-3.507778	1.292222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.60
+0
+0
+9
+	-1.975001	-3.507778	1.292222
+	0.474999	-3.507778	1.292222
+	0.474999	-3.492222	1.307778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.61
+0
+0
+9
+	0.474999	-3.492222	1.329778
+	-1.975001	-3.492222	1.329778
+	-1.975001	-3.507778	1.314222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.61
+0
+0
+9
+	-1.975001	-3.507778	1.314222
+	0.474999	-3.507778	1.314222
+	0.474999	-3.492222	1.329778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.62
+0
+0
+9
+	0.474999	-3.492222	1.351778
+	-1.975001	-3.492222	1.351778
+	-1.975001	-3.507778	1.336222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.62
+0
+0
+9
+	-1.975001	-3.507778	1.336222
+	0.474999	-3.507778	1.336222
+	0.474999	-3.492222	1.351778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.63
+0
+0
+9
+	0.474999	-3.492222	1.373778
+	-1.975001	-3.492222	1.373778
+	-1.975001	-3.507778	1.358222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.63
+0
+0
+9
+	-1.975001	-3.507778	1.358222
+	0.474999	-3.507778	1.358222
+	0.474999	-3.492222	1.373778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.64
+0
+0
+9
+	0.474999	-3.492222	1.395778
+	-1.975001	-3.492222	1.395778
+	-1.975001	-3.507778	1.380222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.64
+0
+0
+9
+	-1.975001	-3.507778	1.380222
+	0.474999	-3.507778	1.380222
+	0.474999	-3.492222	1.395778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.65
+0
+0
+9
+	0.474999	-3.492222	1.417778
+	-1.975001	-3.492222	1.417778
+	-1.975001	-3.507778	1.402222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.65
+0
+0
+9
+	-1.975001	-3.507778	1.402222
+	0.474999	-3.507778	1.402222
+	0.474999	-3.492222	1.417778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.66
+0
+0
+9
+	0.474999	-3.492222	1.439778
+	-1.975001	-3.492222	1.439778
+	-1.975001	-3.507778	1.424222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.66
+0
+0
+9
+	-1.975001	-3.507778	1.424222
+	0.474999	-3.507778	1.424222
+	0.474999	-3.492222	1.439778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.67
+0
+0
+9
+	0.474999	-3.492222	1.461778
+	-1.975001	-3.492222	1.461778
+	-1.975001	-3.507778	1.446222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.67
+0
+0
+9
+	-1.975001	-3.507778	1.446222
+	0.474999	-3.507778	1.446222
+	0.474999	-3.492222	1.461778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.68
+0
+0
+9
+	0.474999	-3.492222	1.483778
+	-1.975001	-3.492222	1.483778
+	-1.975001	-3.507778	1.468222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.68
+0
+0
+9
+	-1.975001	-3.507778	1.468222
+	0.474999	-3.507778	1.468222
+	0.474999	-3.492222	1.483778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.69
+0
+0
+9
+	0.474999	-3.492222	1.505778
+	-1.975001	-3.492222	1.505778
+	-1.975001	-3.507778	1.490222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.69
+0
+0
+9
+	-1.975001	-3.507778	1.490222
+	0.474999	-3.507778	1.490222
+	0.474999	-3.492222	1.505778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.70
+0
+0
+9
+	0.474999	-3.492222	1.527778
+	-1.975001	-3.492222	1.527778
+	-1.975001	-3.507778	1.512222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.70
+0
+0
+9
+	-1.975001	-3.507778	1.512222
+	0.474999	-3.507778	1.512222
+	0.474999	-3.492222	1.527778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.71
+0
+0
+9
+	0.474999	-3.492222	1.549778
+	-1.975001	-3.492222	1.549778
+	-1.975001	-3.507778	1.534222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.71
+0
+0
+9
+	-1.975001	-3.507778	1.534222
+	0.474999	-3.507778	1.534222
+	0.474999	-3.492222	1.549778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.72
+0
+0
+9
+	0.474999	-3.492222	1.571778
+	-1.975001	-3.492222	1.571778
+	-1.975001	-3.507778	1.556222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.72
+0
+0
+9
+	-1.975001	-3.507778	1.556222
+	0.474999	-3.507778	1.556222
+	0.474999	-3.492222	1.571778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.73
+0
+0
+9
+	0.474999	-3.492222	1.593778
+	-1.975001	-3.492222	1.593778
+	-1.975001	-3.507778	1.578222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.73
+0
+0
+9
+	-1.975001	-3.507778	1.578222
+	0.474999	-3.507778	1.578222
+	0.474999	-3.492222	1.593778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.74
+0
+0
+9
+	0.474999	-3.492222	1.615778
+	-1.975001	-3.492222	1.615778
+	-1.975001	-3.507778	1.600222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.74
+0
+0
+9
+	-1.975001	-3.507778	1.600222
+	0.474999	-3.507778	1.600222
+	0.474999	-3.492222	1.615778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.75
+0
+0
+9
+	0.474999	-3.492222	1.637778
+	-1.975001	-3.492222	1.637778
+	-1.975001	-3.507778	1.622222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.75
+0
+0
+9
+	-1.975001	-3.507778	1.622222
+	0.474999	-3.507778	1.622222
+	0.474999	-3.492222	1.637778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.76
+0
+0
+9
+	0.474999	-3.492222	1.659778
+	-1.975001	-3.492222	1.659778
+	-1.975001	-3.507778	1.644222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.76
+0
+0
+9
+	-1.975001	-3.507778	1.644222
+	0.474999	-3.507778	1.644222
+	0.474999	-3.492222	1.659778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.77
+0
+0
+9
+	0.474999	-3.492222	1.681778
+	-1.975001	-3.492222	1.681778
+	-1.975001	-3.507778	1.666222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.77
+0
+0
+9
+	-1.975001	-3.507778	1.666222
+	0.474999	-3.507778	1.666222
+	0.474999	-3.492222	1.681778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.78
+0
+0
+9
+	0.474999	-3.492222	1.703778
+	-1.975001	-3.492222	1.703778
+	-1.975001	-3.507778	1.688222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.78
+0
+0
+9
+	-1.975001	-3.507778	1.688222
+	0.474999	-3.507778	1.688222
+	0.474999	-3.492222	1.703778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.79
+0
+0
+9
+	0.474999	-3.492222	1.725778
+	-1.975001	-3.492222	1.725778
+	-1.975001	-3.507778	1.710222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.79
+0
+0
+9
+	-1.975001	-3.507778	1.710222
+	0.474999	-3.507778	1.710222
+	0.474999	-3.492222	1.725778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.80
+0
+0
+9
+	0.474999	-3.492222	1.747778
+	-1.975001	-3.492222	1.747778
+	-1.975001	-3.507778	1.732222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.80
+0
+0
+9
+	-1.975001	-3.507778	1.732222
+	0.474999	-3.507778	1.732222
+	0.474999	-3.492222	1.747778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.81
+0
+0
+9
+	0.474999	-3.492222	1.769778
+	-1.975001	-3.492222	1.769778
+	-1.975001	-3.507778	1.754222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.81
+0
+0
+9
+	-1.975001	-3.507778	1.754222
+	0.474999	-3.507778	1.754222
+	0.474999	-3.492222	1.769778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.82
+0
+0
+9
+	0.474999	-3.492222	1.791778
+	-1.975001	-3.492222	1.791778
+	-1.975001	-3.507778	1.776222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.82
+0
+0
+9
+	-1.975001	-3.507778	1.776222
+	0.474999	-3.507778	1.776222
+	0.474999	-3.492222	1.791778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.83
+0
+0
+9
+	0.474999	-3.492222	1.813778
+	-1.975001	-3.492222	1.813778
+	-1.975001	-3.507778	1.798222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.83
+0
+0
+9
+	-1.975001	-3.507778	1.798222
+	0.474999	-3.507778	1.798222
+	0.474999	-3.492222	1.813778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.84
+0
+0
+9
+	0.474999	-3.492222	1.835778
+	-1.975001	-3.492222	1.835778
+	-1.975001	-3.507778	1.820222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.84
+0
+0
+9
+	-1.975001	-3.507778	1.820222
+	0.474999	-3.507778	1.820222
+	0.474999	-3.492222	1.835778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.85
+0
+0
+9
+	0.474999	-3.492222	1.857778
+	-1.975001	-3.492222	1.857778
+	-1.975001	-3.507778	1.842222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.85
+0
+0
+9
+	-1.975001	-3.507778	1.842222
+	0.474999	-3.507778	1.842222
+	0.474999	-3.492222	1.857778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.86
+0
+0
+9
+	0.474999	-3.492222	1.879778
+	-1.975001	-3.492222	1.879778
+	-1.975001	-3.507778	1.864222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.86
+0
+0
+9
+	-1.975001	-3.507778	1.864222
+	0.474999	-3.507778	1.864222
+	0.474999	-3.492222	1.879778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.87
+0
+0
+9
+	0.474999	-3.492222	1.901778
+	-1.975001	-3.492222	1.901778
+	-1.975001	-3.507778	1.886222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.87
+0
+0
+9
+	-1.975001	-3.507778	1.886222
+	0.474999	-3.507778	1.886222
+	0.474999	-3.492222	1.901778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.88
+0
+0
+9
+	0.474999	-3.492222	1.923778
+	-1.975001	-3.492222	1.923778
+	-1.975001	-3.507778	1.908222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.88
+0
+0
+9
+	-1.975001	-3.507778	1.908222
+	0.474999	-3.507778	1.908222
+	0.474999	-3.492222	1.923778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.89
+0
+0
+9
+	0.474999	-3.492222	1.945778
+	-1.975001	-3.492222	1.945778
+	-1.975001	-3.507778	1.930222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.89
+0
+0
+9
+	-1.975001	-3.507778	1.930222
+	0.474999	-3.507778	1.930222
+	0.474999	-3.492222	1.945778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.90
+0
+0
+9
+	0.474999	-3.492222	1.967778
+	-1.975001	-3.492222	1.967778
+	-1.975001	-3.507778	1.952222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.90
+0
+0
+9
+	-1.975001	-3.507778	1.952222
+	0.474999	-3.507778	1.952222
+	0.474999	-3.492222	1.967778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.91
+0
+0
+9
+	0.474999	-3.492222	1.989778
+	-1.975001	-3.492222	1.989778
+	-1.975001	-3.507778	1.974222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.91
+0
+0
+9
+	-1.975001	-3.507778	1.974222
+	0.474999	-3.507778	1.974222
+	0.474999	-3.492222	1.989778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.92
+0
+0
+9
+	0.474999	-3.492222	2.011778
+	-1.975001	-3.492222	2.011778
+	-1.975001	-3.507778	1.996222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.92
+0
+0
+9
+	-1.975001	-3.507778	1.996222
+	0.474999	-3.507778	1.996222
+	0.474999	-3.492222	2.011778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.93
+0
+0
+9
+	0.474999	-3.492222	2.033778
+	-1.975001	-3.492222	2.033778
+	-1.975001	-3.507778	2.018222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.93
+0
+0
+9
+	-1.975001	-3.507778	2.018222
+	0.474999	-3.507778	2.018222
+	0.474999	-3.492222	2.033778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.94
+0
+0
+9
+	0.474999	-3.492222	2.055778
+	-1.975001	-3.492222	2.055778
+	-1.975001	-3.507778	2.040222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.94
+0
+0
+9
+	-1.975001	-3.507778	2.040222
+	0.474999	-3.507778	2.040222
+	0.474999	-3.492222	2.055778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.95
+0
+0
+9
+	0.474999	-3.492222	2.077778
+	-1.975001	-3.492222	2.077778
+	-1.975001	-3.507778	2.062222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.95
+0
+0
+9
+	-1.975001	-3.507778	2.062222
+	0.474999	-3.507778	2.062222
+	0.474999	-3.492222	2.077778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.96
+0
+0
+9
+	0.474999	-3.492222	2.099778
+	-1.975001	-3.492222	2.099778
+	-1.975001	-3.507778	2.084222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.96
+0
+0
+9
+	-1.975001	-3.507778	2.084222
+	0.474999	-3.507778	2.084222
+	0.474999	-3.492222	2.099778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.97
+0
+0
+9
+	0.474999	-3.492222	2.121778
+	-1.975001	-3.492222	2.121778
+	-1.975001	-3.507778	2.106222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.97
+0
+0
+9
+	-1.975001	-3.507778	2.106222
+	0.474999	-3.507778	2.106222
+	0.474999	-3.492222	2.121778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.98
+0
+0
+9
+	0.474999	-3.492222	2.143778
+	-1.975001	-3.492222	2.143778
+	-1.975001	-3.507778	2.128222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.98
+0
+0
+9
+	-1.975001	-3.507778	2.128222
+	0.474999	-3.507778	2.128222
+	0.474999	-3.492222	2.143778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.99
+0
+0
+9
+	0.474999	-3.492222	2.165778
+	-1.975001	-3.492222	2.165778
+	-1.975001	-3.507778	2.150222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.99
+0
+0
+9
+	-1.975001	-3.507778	2.150222
+	0.474999	-3.507778	2.150222
+	0.474999	-3.492222	2.165778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.100
+0
+0
+9
+	0.474999	-3.492222	2.187778
+	-1.975001	-3.492222	2.187778
+	-1.975001	-3.507778	2.172222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.100
+0
+0
+9
+	-1.975001	-3.507778	2.172222
+	0.474999	-3.507778	2.172222
+	0.474999	-3.492222	2.187778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.101
+0
+0
+9
+	0.474999	-3.492222	2.209778
+	-1.975001	-3.492222	2.209778
+	-1.975001	-3.507778	2.194222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.101
+0
+0
+9
+	-1.975001	-3.507778	2.194222
+	0.474999	-3.507778	2.194222
+	0.474999	-3.492222	2.209778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.102
+0
+0
+9
+	0.474999	-3.492222	2.231778
+	-1.975001	-3.492222	2.231778
+	-1.975001	-3.507778	2.216222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.102
+0
+0
+9
+	-1.975001	-3.507778	2.216222
+	0.474999	-3.507778	2.216222
+	0.474999	-3.492222	2.231778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.103
+0
+0
+9
+	0.474999	-3.492222	2.253778
+	-1.975001	-3.492222	2.253778
+	-1.975001	-3.507778	2.238222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.103
+0
+0
+9
+	-1.975001	-3.507778	2.238222
+	0.474999	-3.507778	2.238222
+	0.474999	-3.492222	2.253778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.104
+0
+0
+9
+	0.474999	-3.492222	2.275778
+	-1.975001	-3.492222	2.275778
+	-1.975001	-3.507778	2.260222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.104
+0
+0
+9
+	-1.975001	-3.507778	2.260222
+	0.474999	-3.507778	2.260222
+	0.474999	-3.492222	2.275778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.105
+0
+0
+9
+	0.474999	-3.492222	2.297778
+	-1.975001	-3.492222	2.297778
+	-1.975001	-3.507778	2.282222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.105
+0
+0
+9
+	-1.975001	-3.507778	2.282222
+	0.474999	-3.507778	2.282222
+	0.474999	-3.492222	2.297778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.106
+0
+0
+9
+	0.474999	-3.492222	2.319778
+	-1.975001	-3.492222	2.319778
+	-1.975001	-3.507778	2.304222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.106
+0
+0
+9
+	-1.975001	-3.507778	2.304222
+	0.474999	-3.507778	2.304222
+	0.474999	-3.492222	2.319778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.107
+0
+0
+9
+	0.474999	-3.492222	2.341778
+	-1.975001	-3.492222	2.341778
+	-1.975001	-3.507778	2.326222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.107
+0
+0
+9
+	-1.975001	-3.507778	2.326222
+	0.474999	-3.507778	2.326222
+	0.474999	-3.492222	2.341778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.108
+0
+0
+9
+	0.474999	-3.492222	2.363778
+	-1.975001	-3.492222	2.363778
+	-1.975001	-3.507778	2.348222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.108
+0
+0
+9
+	-1.975001	-3.507778	2.348222
+	0.474999	-3.507778	2.348222
+	0.474999	-3.492222	2.363778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.109
+0
+0
+9
+	0.474999	-3.492222	2.385778
+	-1.975001	-3.492222	2.385778
+	-1.975001	-3.507778	2.370222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.109
+0
+0
+9
+	-1.975001	-3.507778	2.370222
+	0.474999	-3.507778	2.370222
+	0.474999	-3.492222	2.385778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.110
+0
+0
+9
+	0.474999	-3.492222	2.407778
+	-1.975001	-3.492222	2.407778
+	-1.975001	-3.507778	2.392222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.110
+0
+0
+9
+	-1.975001	-3.507778	2.392222
+	0.474999	-3.507778	2.392222
+	0.474999	-3.492222	2.407778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.111
+0
+0
+9
+	0.474999	-3.492222	2.429778
+	-1.975001	-3.492222	2.429778
+	-1.975001	-3.507778	2.414222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.111
+0
+0
+9
+	-1.975001	-3.507778	2.414222
+	0.474999	-3.507778	2.414222
+	0.474999	-3.492222	2.429778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.112
+0
+0
+9
+	0.474999	-3.492222	2.451778
+	-1.975001	-3.492222	2.451778
+	-1.975001	-3.507778	2.436222
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.112
+0
+0
+9
+	-1.975001	-3.507778	2.436222
+	0.474999	-3.507778	2.436222
+	0.474999	-3.492222	2.451778
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.113
+0
+0
+9
+	0.474999	-3.5	2.451778
+	-1.975001	-3.5	2.451778
+	-1.975001	-3.5	2.475
+
+Rad_Blind_South_R070 polygon Venetian_Blinds_South.113
+0
+0
+9
+	-1.975001	-3.5	2.475
+	0.474999	-3.5	2.475
+	0.474999	-3.5	2.451778
+
+Rad_Glazing_West_T073 polygon Room_Window_West.114
+0
+0
+9
+	-2.075	-2.025	1.025
+	-2.075001	-3.475	1.025
+	-2.075001	-3.475	2.475
+
+Rad_Glazing_West_T073 polygon Room_Window_West.114
+0
+0
+9
+	-2.075001	-3.475	2.475
+	-2.075	-2.025	2.475
+	-2.075	-2.025	1.025
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Sill.115
+0
+0
+9
+	-2.07	-2	1
+	-2.07	-3.5	1
+	-2.08	-3.5	1
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Sill.115
+0
+0
+9
+	-2.08	-3.5	1
+	-2.08	-2	1
+	-2.07	-2	1
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Sill.116
+0
+0
+9
+	-2.07	-2	1.025
+	-2.08	-2	1.025
+	-2.08	-3.5	1.025
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Sill.116
+0
+0
+9
+	-2.08	-3.5	1.025
+	-2.07	-3.5	1.025
+	-2.07	-2	1.025
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Sill.117
+0
+0
+9
+	-2.07	-2	1
+	-2.08	-2	1
+	-2.08	-2	1.025
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Sill.117
+0
+0
+9
+	-2.08	-2	1.025
+	-2.07	-2	1.025
+	-2.07	-2	1
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Sill.118
+0
+0
+9
+	-2.08	-2	1
+	-2.08	-3.5	1
+	-2.08	-3.5	1.025
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Sill.118
+0
+0
+9
+	-2.08	-3.5	1.025
+	-2.08	-2	1.025
+	-2.08	-2	1
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Sill.119
+0
+0
+9
+	-2.08	-3.5	1
+	-2.07	-3.5	1
+	-2.07	-3.5	1.025
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Sill.119
+0
+0
+9
+	-2.07	-3.5	1.025
+	-2.08	-3.5	1.025
+	-2.08	-3.5	1
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Sill.120
+0
+0
+9
+	-2.07	-3.5	1
+	-2.07	-2	1
+	-2.07	-2	1.025
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Sill.120
+0
+0
+9
+	-2.07	-2	1.025
+	-2.07	-3.5	1.025
+	-2.07	-3.5	1
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Head.121
+0
+0
+9
+	-2.07	-2	2.475
+	-2.07	-3.5	2.475
+	-2.08	-3.5	2.475
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Head.121
+0
+0
+9
+	-2.08	-3.5	2.475
+	-2.08	-2	2.475
+	-2.07	-2	2.475
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Head.122
+0
+0
+9
+	-2.07	-2	2.5
+	-2.08	-2	2.5
+	-2.08	-3.5	2.5
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Head.122
+0
+0
+9
+	-2.08	-3.5	2.5
+	-2.07	-3.5	2.5
+	-2.07	-2	2.5
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Head.123
+0
+0
+9
+	-2.07	-2	2.475
+	-2.08	-2	2.475
+	-2.08	-2	2.5
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Head.123
+0
+0
+9
+	-2.08	-2	2.5
+	-2.07	-2	2.5
+	-2.07	-2	2.475
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Head.124
+0
+0
+9
+	-2.08	-2	2.475
+	-2.08	-3.5	2.475
+	-2.08	-3.5	2.5
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Head.124
+0
+0
+9
+	-2.08	-3.5	2.5
+	-2.08	-2	2.5
+	-2.08	-2	2.475
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Head.125
+0
+0
+9
+	-2.08	-3.5	2.475
+	-2.07	-3.5	2.475
+	-2.07	-3.5	2.5
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Head.125
+0
+0
+9
+	-2.07	-3.5	2.5
+	-2.08	-3.5	2.5
+	-2.08	-3.5	2.475
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Head.126
+0
+0
+9
+	-2.07	-3.5	2.475
+	-2.07	-2	2.475
+	-2.07	-2	2.5
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Head.126
+0
+0
+9
+	-2.07	-2	2.5
+	-2.07	-3.5	2.5
+	-2.07	-3.5	2.475
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Jamb.127
+0
+0
+9
+	-2.07	-2	1.025
+	-2.07	-2.025	1.025
+	-2.08	-2.025	1.025
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Jamb.127
+0
+0
+9
+	-2.08	-2.025	1.025
+	-2.08	-2	1.025
+	-2.07	-2	1.025
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Jamb.128
+0
+0
+9
+	-2.07	-2	2.475
+	-2.08	-2	2.475
+	-2.08	-2.025	2.475
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Jamb.128
+0
+0
+9
+	-2.08	-2.025	2.475
+	-2.07	-2.025	2.475
+	-2.07	-2	2.475
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Jamb.129
+0
+0
+9
+	-2.07	-2	1.025
+	-2.08	-2	1.025
+	-2.08	-2	2.475
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Jamb.129
+0
+0
+9
+	-2.08	-2	2.475
+	-2.07	-2	2.475
+	-2.07	-2	1.025
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Jamb.130
+0
+0
+9
+	-2.08	-2	1.025
+	-2.08	-2.025	1.025
+	-2.08	-2.025	2.475
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Jamb.130
+0
+0
+9
+	-2.08	-2.025	2.475
+	-2.08	-2	2.475
+	-2.08	-2	1.025
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Jamb.131
+0
+0
+9
+	-2.08	-2.025	1.025
+	-2.07	-2.025	1.025
+	-2.07	-2.025	2.475
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Jamb.131
+0
+0
+9
+	-2.07	-2.025	2.475
+	-2.08	-2.025	2.475
+	-2.08	-2.025	1.025
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Jamb.132
+0
+0
+9
+	-2.07	-2.025	1.025
+	-2.07	-2	1.025
+	-2.07	-2	2.475
+
+Rad_Frame_West_R050 polygon Room_Window_West_Frame_Jamb.132
+0
+0
+9
+	-2.07	-2	2.475
+	-2.07	-2.025	2.475
+	-2.07	-2.025	1.025
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.133
+0
+0
+9
+	-1.992222	-2.025	1.043778
+	-1.992222	-3.475	1.043778
+	-2.007779	-3.475	1.028222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.133
+0
+0
+9
+	-2.007779	-3.475	1.028222
+	-2.007778	-2.025	1.028222
+	-1.992222	-2.025	1.043778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.134
+0
+0
+9
+	-1.992222	-2.025	1.065778
+	-1.992222	-3.475	1.065778
+	-2.007779	-3.475	1.050222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.134
+0
+0
+9
+	-2.007779	-3.475	1.050222
+	-2.007778	-2.025	1.050222
+	-1.992222	-2.025	1.065778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.135
+0
+0
+9
+	-1.992222	-2.025	1.087778
+	-1.992222	-3.475	1.087778
+	-2.007779	-3.475	1.072222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.135
+0
+0
+9
+	-2.007779	-3.475	1.072222
+	-2.007778	-2.025	1.072222
+	-1.992222	-2.025	1.087778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.136
+0
+0
+9
+	-1.992222	-2.025	1.109778
+	-1.992222	-3.475	1.109778
+	-2.007779	-3.475	1.094222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.136
+0
+0
+9
+	-2.007779	-3.475	1.094222
+	-2.007778	-2.025	1.094222
+	-1.992222	-2.025	1.109778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.137
+0
+0
+9
+	-1.992222	-2.025	1.131778
+	-1.992222	-3.475	1.131778
+	-2.007779	-3.475	1.116222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.137
+0
+0
+9
+	-2.007779	-3.475	1.116222
+	-2.007778	-2.025	1.116222
+	-1.992222	-2.025	1.131778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.138
+0
+0
+9
+	-1.992222	-2.025	1.153778
+	-1.992222	-3.475	1.153778
+	-2.007779	-3.475	1.138222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.138
+0
+0
+9
+	-2.007779	-3.475	1.138222
+	-2.007778	-2.025	1.138222
+	-1.992222	-2.025	1.153778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.139
+0
+0
+9
+	-1.992222	-2.025	1.175778
+	-1.992222	-3.475	1.175778
+	-2.007779	-3.475	1.160222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.139
+0
+0
+9
+	-2.007779	-3.475	1.160222
+	-2.007778	-2.025	1.160222
+	-1.992222	-2.025	1.175778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.140
+0
+0
+9
+	-1.992222	-2.025	1.197778
+	-1.992222	-3.475	1.197778
+	-2.007779	-3.475	1.182222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.140
+0
+0
+9
+	-2.007779	-3.475	1.182222
+	-2.007778	-2.025	1.182222
+	-1.992222	-2.025	1.197778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.141
+0
+0
+9
+	-1.992222	-2.025	1.219778
+	-1.992222	-3.475	1.219778
+	-2.007779	-3.475	1.204222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.141
+0
+0
+9
+	-2.007779	-3.475	1.204222
+	-2.007778	-2.025	1.204222
+	-1.992222	-2.025	1.219778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.142
+0
+0
+9
+	-1.992222	-2.025	1.241778
+	-1.992222	-3.475	1.241778
+	-2.007779	-3.475	1.226222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.142
+0
+0
+9
+	-2.007779	-3.475	1.226222
+	-2.007778	-2.025	1.226222
+	-1.992222	-2.025	1.241778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.143
+0
+0
+9
+	-1.992222	-2.025	1.263778
+	-1.992222	-3.475	1.263778
+	-2.007779	-3.475	1.248222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.143
+0
+0
+9
+	-2.007779	-3.475	1.248222
+	-2.007778	-2.025	1.248222
+	-1.992222	-2.025	1.263778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.144
+0
+0
+9
+	-1.992222	-2.025	1.285778
+	-1.992222	-3.475	1.285778
+	-2.007779	-3.475	1.270222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.144
+0
+0
+9
+	-2.007779	-3.475	1.270222
+	-2.007778	-2.025	1.270222
+	-1.992222	-2.025	1.285778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.145
+0
+0
+9
+	-1.992222	-2.025	1.307778
+	-1.992222	-3.475	1.307778
+	-2.007779	-3.475	1.292222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.145
+0
+0
+9
+	-2.007779	-3.475	1.292222
+	-2.007778	-2.025	1.292222
+	-1.992222	-2.025	1.307778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.146
+0
+0
+9
+	-1.992222	-2.025	1.329778
+	-1.992222	-3.475	1.329778
+	-2.007779	-3.475	1.314222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.146
+0
+0
+9
+	-2.007779	-3.475	1.314222
+	-2.007778	-2.025	1.314222
+	-1.992222	-2.025	1.329778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.147
+0
+0
+9
+	-1.992222	-2.025	1.351778
+	-1.992222	-3.475	1.351778
+	-2.007779	-3.475	1.336222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.147
+0
+0
+9
+	-2.007779	-3.475	1.336222
+	-2.007778	-2.025	1.336222
+	-1.992222	-2.025	1.351778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.148
+0
+0
+9
+	-1.992222	-2.025	1.373778
+	-1.992222	-3.475	1.373778
+	-2.007779	-3.475	1.358222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.148
+0
+0
+9
+	-2.007779	-3.475	1.358222
+	-2.007778	-2.025	1.358222
+	-1.992222	-2.025	1.373778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.149
+0
+0
+9
+	-1.992222	-2.025	1.395778
+	-1.992222	-3.475	1.395778
+	-2.007779	-3.475	1.380222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.149
+0
+0
+9
+	-2.007779	-3.475	1.380222
+	-2.007778	-2.025	1.380222
+	-1.992222	-2.025	1.395778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.150
+0
+0
+9
+	-1.992222	-2.025	1.417778
+	-1.992222	-3.475	1.417778
+	-2.007779	-3.475	1.402222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.150
+0
+0
+9
+	-2.007779	-3.475	1.402222
+	-2.007778	-2.025	1.402222
+	-1.992222	-2.025	1.417778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.151
+0
+0
+9
+	-1.992222	-2.025	1.439778
+	-1.992222	-3.475	1.439778
+	-2.007779	-3.475	1.424222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.151
+0
+0
+9
+	-2.007779	-3.475	1.424222
+	-2.007778	-2.025	1.424222
+	-1.992222	-2.025	1.439778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.152
+0
+0
+9
+	-1.992222	-2.025	1.461778
+	-1.992222	-3.475	1.461778
+	-2.007779	-3.475	1.446222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.152
+0
+0
+9
+	-2.007779	-3.475	1.446222
+	-2.007778	-2.025	1.446222
+	-1.992222	-2.025	1.461778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.153
+0
+0
+9
+	-1.992222	-2.025	1.483778
+	-1.992222	-3.475	1.483778
+	-2.007779	-3.475	1.468222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.153
+0
+0
+9
+	-2.007779	-3.475	1.468222
+	-2.007778	-2.025	1.468222
+	-1.992222	-2.025	1.483778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.154
+0
+0
+9
+	-1.992222	-2.025	1.505778
+	-1.992222	-3.475	1.505778
+	-2.007779	-3.475	1.490222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.154
+0
+0
+9
+	-2.007779	-3.475	1.490222
+	-2.007778	-2.025	1.490222
+	-1.992222	-2.025	1.505778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.155
+0
+0
+9
+	-1.992222	-2.025	1.527778
+	-1.992222	-3.475	1.527778
+	-2.007779	-3.475	1.512222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.155
+0
+0
+9
+	-2.007779	-3.475	1.512222
+	-2.007778	-2.025	1.512222
+	-1.992222	-2.025	1.527778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.156
+0
+0
+9
+	-1.992222	-2.025	1.549778
+	-1.992222	-3.475	1.549778
+	-2.007779	-3.475	1.534222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.156
+0
+0
+9
+	-2.007779	-3.475	1.534222
+	-2.007778	-2.025	1.534222
+	-1.992222	-2.025	1.549778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.157
+0
+0
+9
+	-1.992222	-2.025	1.571778
+	-1.992222	-3.475	1.571778
+	-2.007779	-3.475	1.556222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.157
+0
+0
+9
+	-2.007779	-3.475	1.556222
+	-2.007778	-2.025	1.556222
+	-1.992222	-2.025	1.571778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.158
+0
+0
+9
+	-1.992222	-2.025	1.593778
+	-1.992222	-3.475	1.593778
+	-2.007779	-3.475	1.578222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.158
+0
+0
+9
+	-2.007779	-3.475	1.578222
+	-2.007778	-2.025	1.578222
+	-1.992222	-2.025	1.593778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.159
+0
+0
+9
+	-1.992222	-2.025	1.615778
+	-1.992222	-3.475	1.615778
+	-2.007779	-3.475	1.600222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.159
+0
+0
+9
+	-2.007779	-3.475	1.600222
+	-2.007778	-2.025	1.600222
+	-1.992222	-2.025	1.615778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.160
+0
+0
+9
+	-1.992222	-2.025	1.637778
+	-1.992222	-3.475	1.637778
+	-2.007779	-3.475	1.622222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.160
+0
+0
+9
+	-2.007779	-3.475	1.622222
+	-2.007778	-2.025	1.622222
+	-1.992222	-2.025	1.637778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.161
+0
+0
+9
+	-1.992222	-2.025	1.659778
+	-1.992222	-3.475	1.659778
+	-2.007779	-3.475	1.644222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.161
+0
+0
+9
+	-2.007779	-3.475	1.644222
+	-2.007778	-2.025	1.644222
+	-1.992222	-2.025	1.659778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.162
+0
+0
+9
+	-1.992222	-2.025	1.681778
+	-1.992222	-3.475	1.681778
+	-2.007779	-3.475	1.666222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.162
+0
+0
+9
+	-2.007779	-3.475	1.666222
+	-2.007778	-2.025	1.666222
+	-1.992222	-2.025	1.681778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.163
+0
+0
+9
+	-1.992222	-2.025	1.703778
+	-1.992222	-3.475	1.703778
+	-2.007779	-3.475	1.688222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.163
+0
+0
+9
+	-2.007779	-3.475	1.688222
+	-2.007778	-2.025	1.688222
+	-1.992222	-2.025	1.703778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.164
+0
+0
+9
+	-1.992222	-2.025	1.725778
+	-1.992222	-3.475	1.725778
+	-2.007779	-3.475	1.710222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.164
+0
+0
+9
+	-2.007779	-3.475	1.710222
+	-2.007778	-2.025	1.710222
+	-1.992222	-2.025	1.725778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.165
+0
+0
+9
+	-1.992222	-2.025	1.747778
+	-1.992222	-3.475	1.747778
+	-2.007779	-3.475	1.732222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.165
+0
+0
+9
+	-2.007779	-3.475	1.732222
+	-2.007778	-2.025	1.732222
+	-1.992222	-2.025	1.747778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.166
+0
+0
+9
+	-1.992222	-2.025	1.769778
+	-1.992222	-3.475	1.769778
+	-2.007779	-3.475	1.754222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.166
+0
+0
+9
+	-2.007779	-3.475	1.754222
+	-2.007778	-2.025	1.754222
+	-1.992222	-2.025	1.769778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.167
+0
+0
+9
+	-1.992222	-2.025	1.791778
+	-1.992222	-3.475	1.791778
+	-2.007779	-3.475	1.776222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.167
+0
+0
+9
+	-2.007779	-3.475	1.776222
+	-2.007778	-2.025	1.776222
+	-1.992222	-2.025	1.791778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.168
+0
+0
+9
+	-1.992222	-2.025	1.813778
+	-1.992222	-3.475	1.813778
+	-2.007779	-3.475	1.798222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.168
+0
+0
+9
+	-2.007779	-3.475	1.798222
+	-2.007778	-2.025	1.798222
+	-1.992222	-2.025	1.813778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.169
+0
+0
+9
+	-1.992222	-2.025	1.835778
+	-1.992222	-3.475	1.835778
+	-2.007779	-3.475	1.820222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.169
+0
+0
+9
+	-2.007779	-3.475	1.820222
+	-2.007778	-2.025	1.820222
+	-1.992222	-2.025	1.835778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.170
+0
+0
+9
+	-1.992222	-2.025	1.857778
+	-1.992222	-3.475	1.857778
+	-2.007779	-3.475	1.842222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.170
+0
+0
+9
+	-2.007779	-3.475	1.842222
+	-2.007778	-2.025	1.842222
+	-1.992222	-2.025	1.857778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.171
+0
+0
+9
+	-1.992222	-2.025	1.879778
+	-1.992222	-3.475	1.879778
+	-2.007779	-3.475	1.864222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.171
+0
+0
+9
+	-2.007779	-3.475	1.864222
+	-2.007778	-2.025	1.864222
+	-1.992222	-2.025	1.879778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.172
+0
+0
+9
+	-1.992222	-2.025	1.901778
+	-1.992222	-3.475	1.901778
+	-2.007779	-3.475	1.886222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.172
+0
+0
+9
+	-2.007779	-3.475	1.886222
+	-2.007778	-2.025	1.886222
+	-1.992222	-2.025	1.901778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.173
+0
+0
+9
+	-1.992222	-2.025	1.923778
+	-1.992222	-3.475	1.923778
+	-2.007779	-3.475	1.908222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.173
+0
+0
+9
+	-2.007779	-3.475	1.908222
+	-2.007778	-2.025	1.908222
+	-1.992222	-2.025	1.923778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.174
+0
+0
+9
+	-1.992222	-2.025	1.945778
+	-1.992222	-3.475	1.945778
+	-2.007779	-3.475	1.930222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.174
+0
+0
+9
+	-2.007779	-3.475	1.930222
+	-2.007778	-2.025	1.930222
+	-1.992222	-2.025	1.945778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.175
+0
+0
+9
+	-1.992222	-2.025	1.967778
+	-1.992222	-3.475	1.967778
+	-2.007779	-3.475	1.952222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.175
+0
+0
+9
+	-2.007779	-3.475	1.952222
+	-2.007778	-2.025	1.952222
+	-1.992222	-2.025	1.967778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.176
+0
+0
+9
+	-1.992222	-2.025	1.989778
+	-1.992222	-3.475	1.989778
+	-2.007779	-3.475	1.974222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.176
+0
+0
+9
+	-2.007779	-3.475	1.974222
+	-2.007778	-2.025	1.974222
+	-1.992222	-2.025	1.989778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.177
+0
+0
+9
+	-1.992222	-2.025	2.011778
+	-1.992222	-3.475	2.011778
+	-2.007779	-3.475	1.996222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.177
+0
+0
+9
+	-2.007779	-3.475	1.996222
+	-2.007778	-2.025	1.996222
+	-1.992222	-2.025	2.011778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.178
+0
+0
+9
+	-1.992222	-2.025	2.033778
+	-1.992222	-3.475	2.033778
+	-2.007779	-3.475	2.018222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.178
+0
+0
+9
+	-2.007779	-3.475	2.018222
+	-2.007778	-2.025	2.018222
+	-1.992222	-2.025	2.033778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.179
+0
+0
+9
+	-1.992222	-2.025	2.055778
+	-1.992222	-3.475	2.055778
+	-2.007779	-3.475	2.040222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.179
+0
+0
+9
+	-2.007779	-3.475	2.040222
+	-2.007778	-2.025	2.040222
+	-1.992222	-2.025	2.055778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.180
+0
+0
+9
+	-1.992222	-2.025	2.077778
+	-1.992222	-3.475	2.077778
+	-2.007779	-3.475	2.062222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.180
+0
+0
+9
+	-2.007779	-3.475	2.062222
+	-2.007778	-2.025	2.062222
+	-1.992222	-2.025	2.077778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.181
+0
+0
+9
+	-1.992222	-2.025	2.099778
+	-1.992222	-3.475	2.099778
+	-2.007779	-3.475	2.084222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.181
+0
+0
+9
+	-2.007779	-3.475	2.084222
+	-2.007778	-2.025	2.084222
+	-1.992222	-2.025	2.099778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.182
+0
+0
+9
+	-1.992222	-2.025	2.121778
+	-1.992222	-3.475	2.121778
+	-2.007779	-3.475	2.106222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.182
+0
+0
+9
+	-2.007779	-3.475	2.106222
+	-2.007778	-2.025	2.106222
+	-1.992222	-2.025	2.121778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.183
+0
+0
+9
+	-1.992222	-2.025	2.143778
+	-1.992222	-3.475	2.143778
+	-2.007779	-3.475	2.128222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.183
+0
+0
+9
+	-2.007779	-3.475	2.128222
+	-2.007778	-2.025	2.128222
+	-1.992222	-2.025	2.143778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.184
+0
+0
+9
+	-1.992222	-2.025	2.165778
+	-1.992222	-3.475	2.165778
+	-2.007779	-3.475	2.150222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.184
+0
+0
+9
+	-2.007779	-3.475	2.150222
+	-2.007778	-2.025	2.150222
+	-1.992222	-2.025	2.165778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.185
+0
+0
+9
+	-1.992222	-2.025	2.187778
+	-1.992222	-3.475	2.187778
+	-2.007779	-3.475	2.172222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.185
+0
+0
+9
+	-2.007779	-3.475	2.172222
+	-2.007778	-2.025	2.172222
+	-1.992222	-2.025	2.187778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.186
+0
+0
+9
+	-1.992222	-2.025	2.209778
+	-1.992222	-3.475	2.209778
+	-2.007779	-3.475	2.194222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.186
+0
+0
+9
+	-2.007779	-3.475	2.194222
+	-2.007778	-2.025	2.194222
+	-1.992222	-2.025	2.209778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.187
+0
+0
+9
+	-1.992222	-2.025	2.231778
+	-1.992222	-3.475	2.231778
+	-2.007779	-3.475	2.216222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.187
+0
+0
+9
+	-2.007779	-3.475	2.216222
+	-2.007778	-2.025	2.216222
+	-1.992222	-2.025	2.231778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.188
+0
+0
+9
+	-1.992222	-2.025	2.253778
+	-1.992222	-3.475	2.253778
+	-2.007779	-3.475	2.238222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.188
+0
+0
+9
+	-2.007779	-3.475	2.238222
+	-2.007778	-2.025	2.238222
+	-1.992222	-2.025	2.253778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.189
+0
+0
+9
+	-1.992222	-2.025	2.275778
+	-1.992222	-3.475	2.275778
+	-2.007779	-3.475	2.260222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.189
+0
+0
+9
+	-2.007779	-3.475	2.260222
+	-2.007778	-2.025	2.260222
+	-1.992222	-2.025	2.275778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.190
+0
+0
+9
+	-1.992222	-2.025	2.297778
+	-1.992222	-3.475	2.297778
+	-2.007779	-3.475	2.282222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.190
+0
+0
+9
+	-2.007779	-3.475	2.282222
+	-2.007778	-2.025	2.282222
+	-1.992222	-2.025	2.297778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.191
+0
+0
+9
+	-1.992222	-2.025	2.319778
+	-1.992222	-3.475	2.319778
+	-2.007779	-3.475	2.304222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.191
+0
+0
+9
+	-2.007779	-3.475	2.304222
+	-2.007778	-2.025	2.304222
+	-1.992222	-2.025	2.319778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.192
+0
+0
+9
+	-1.992222	-2.025	2.341778
+	-1.992222	-3.475	2.341778
+	-2.007779	-3.475	2.326222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.192
+0
+0
+9
+	-2.007779	-3.475	2.326222
+	-2.007778	-2.025	2.326222
+	-1.992222	-2.025	2.341778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.193
+0
+0
+9
+	-1.992222	-2.025	2.363778
+	-1.992222	-3.475	2.363778
+	-2.007779	-3.475	2.348222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.193
+0
+0
+9
+	-2.007779	-3.475	2.348222
+	-2.007778	-2.025	2.348222
+	-1.992222	-2.025	2.363778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.194
+0
+0
+9
+	-1.992222	-2.025	2.385778
+	-1.992222	-3.475	2.385778
+	-2.007779	-3.475	2.370222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.194
+0
+0
+9
+	-2.007779	-3.475	2.370222
+	-2.007778	-2.025	2.370222
+	-1.992222	-2.025	2.385778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.195
+0
+0
+9
+	-1.992222	-2.025	2.407778
+	-1.992222	-3.475	2.407778
+	-2.007779	-3.475	2.392222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.195
+0
+0
+9
+	-2.007779	-3.475	2.392222
+	-2.007778	-2.025	2.392222
+	-1.992222	-2.025	2.407778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.196
+0
+0
+9
+	-1.992222	-2.025	2.429778
+	-1.992222	-3.475	2.429778
+	-2.007779	-3.475	2.414222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.196
+0
+0
+9
+	-2.007779	-3.475	2.414222
+	-2.007778	-2.025	2.414222
+	-1.992222	-2.025	2.429778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.197
+0
+0
+9
+	-1.992222	-2.025	2.451778
+	-1.992222	-3.475	2.451778
+	-2.007779	-3.475	2.436222
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.197
+0
+0
+9
+	-2.007779	-3.475	2.436222
+	-2.007778	-2.025	2.436222
+	-1.992222	-2.025	2.451778
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.198
+0
+0
+9
+	-2	-2.025	2.451778
+	-2	-3.475	2.451778
+	-2	-3.475	2.475
+
+Rad_Blind_West_R070 polygon Venetian_Blinds_West.198
+0
+0
+9
+	-2	-3.475	2.475
+	-2	-2.025	2.475
+	-2	-2.025	2.451778
+
+Rad_Frame_Corner_R050 polygon Room_Corner_Mullion.199
+0
+0
+9
+	-1.975001	-3.475	1
+	-1.975001	-3.575	1
+	-2.075001	-3.575	1
+
+Rad_Frame_Corner_R050 polygon Room_Corner_Mullion.199
+0
+0
+9
+	-2.075001	-3.575	1
+	-2.075001	-3.475	1
+	-1.975001	-3.475	1
+
+Rad_Frame_Corner_R050 polygon Room_Corner_Mullion.200
+0
+0
+9
+	-1.975001	-3.475	2.5
+	-2.075001	-3.475	2.5
+	-2.075001	-3.575	2.5
+
+Rad_Frame_Corner_R050 polygon Room_Corner_Mullion.200
+0
+0
+9
+	-2.075001	-3.575	2.5
+	-1.975001	-3.575	2.5
+	-1.975001	-3.475	2.5
+
+Rad_Frame_Corner_R050 polygon Room_Corner_Mullion.201
+0
+0
+9
+	-1.975001	-3.475	1
+	-2.075001	-3.475	1
+	-2.075001	-3.475	2.5
+
+Rad_Frame_Corner_R050 polygon Room_Corner_Mullion.201
+0
+0
+9
+	-2.075001	-3.475	2.5
+	-1.975001	-3.475	2.5
+	-1.975001	-3.475	1
+
+Rad_Frame_Corner_R050 polygon Room_Corner_Mullion.202
+0
+0
+9
+	-2.075001	-3.475	1
+	-2.075001	-3.575	1
+	-2.075001	-3.575	2.5
+
+Rad_Frame_Corner_R050 polygon Room_Corner_Mullion.202
+0
+0
+9
+	-2.075001	-3.575	2.5
+	-2.075001	-3.475	2.5
+	-2.075001	-3.475	1
+
+Rad_Frame_Corner_R050 polygon Room_Corner_Mullion.203
+0
+0
+9
+	-2.075001	-3.575	1
+	-1.975001	-3.575	1
+	-1.975001	-3.575	2.5
+
+Rad_Frame_Corner_R050 polygon Room_Corner_Mullion.203
+0
+0
+9
+	-1.975001	-3.575	2.5
+	-2.075001	-3.575	2.5
+	-2.075001	-3.575	1
+
+Rad_Frame_Corner_R050 polygon Room_Corner_Mullion.204
+0
+0
+9
+	-1.975001	-3.575	1
+	-1.975001	-3.475	1
+	-1.975001	-3.475	2.5
+
+Rad_Frame_Corner_R050 polygon Room_Corner_Mullion.204
+0
+0
+9
+	-1.975001	-3.475	2.5
+	-1.975001	-3.575	2.5
+	-1.975001	-3.575	1
+
+Rad_Furniture_R050 polygon Desk_Top_1.205
+0
+0
+9
+	-1.45	1.9	0.76
+	-1.45	1.9	0.8
+	-0.75	1.9	0.8
+
+Rad_Furniture_R050 polygon Desk_Top_1.205
+0
+0
+9
+	-0.75	1.9	0.8
+	-0.75	1.9	0.76
+	-1.45	1.9	0.76
+
+Rad_Furniture_R050 polygon Desk_Top_1.206
+0
+0
+9
+	-0.75	1.9	0.76
+	-0.75	1.9	0.8
+	-0.75	0.5	0.8
+
+Rad_Furniture_R050 polygon Desk_Top_1.206
+0
+0
+9
+	-0.75	0.5	0.8
+	-0.75	0.5	0.76
+	-0.75	1.9	0.76
+
+Rad_Furniture_R050 polygon Desk_Top_1.207
+0
+0
+9
+	-0.75	0.5	0.76
+	-0.75	0.5	0.8
+	-1.45	0.5	0.8
+
+Rad_Furniture_R050 polygon Desk_Top_1.207
+0
+0
+9
+	-1.45	0.5	0.8
+	-1.45	0.5	0.76
+	-0.75	0.5	0.76
+
+Rad_Furniture_R050 polygon Desk_Top_1.208
+0
+0
+9
+	-1.45	0.5	0.76
+	-1.45	0.5	0.8
+	-1.45	1.9	0.8
+
+Rad_Furniture_R050 polygon Desk_Top_1.208
+0
+0
+9
+	-1.45	1.9	0.8
+	-1.45	1.9	0.76
+	-1.45	0.5	0.76
+
+Rad_Furniture_R050 polygon Desk_Top_1.209
+0
+0
+9
+	-0.75	1.9	0.76
+	-0.75	0.5	0.76
+	-1.45	0.5	0.76
+
+Rad_Furniture_R050 polygon Desk_Top_1.209
+0
+0
+9
+	-1.45	0.5	0.76
+	-1.45	1.9	0.76
+	-0.75	1.9	0.76
+
+Rad_Furniture_R050 polygon Desk_Top_1.210
+0
+0
+9
+	-0.75	0.5	0.8
+	-0.75	1.9	0.8
+	-1.45	1.9	0.8
+
+Rad_Furniture_R050 polygon Desk_Top_1.210
+0
+0
+9
+	-1.45	1.9	0.8
+	-1.45	0.5	0.8
+	-0.75	0.5	0.8
+
+Rad_Furniture_R050 polygon Desk_Leg_1.211
+0
+0
+9
+	-1.425	1.875	0
+	-1.425	1.875	0.76
+	-1.375	1.875	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_1.211
+0
+0
+9
+	-1.375	1.875	0.76
+	-1.375	1.875	0
+	-1.425	1.875	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.212
+0
+0
+9
+	-1.375	1.875	0
+	-1.375	1.875	0.76
+	-1.375	1.825	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_1.212
+0
+0
+9
+	-1.375	1.825	0.76
+	-1.375	1.825	0
+	-1.375	1.875	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.213
+0
+0
+9
+	-1.375	1.825	0
+	-1.375	1.825	0.76
+	-1.425	1.825	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_1.213
+0
+0
+9
+	-1.425	1.825	0.76
+	-1.425	1.825	0
+	-1.375	1.825	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.214
+0
+0
+9
+	-1.425	1.825	0
+	-1.425	1.825	0.76
+	-1.425	1.875	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_1.214
+0
+0
+9
+	-1.425	1.875	0.76
+	-1.425	1.875	0
+	-1.425	1.825	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.215
+0
+0
+9
+	-1.375	1.875	0
+	-1.375	1.825	0
+	-1.425	1.825	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.215
+0
+0
+9
+	-1.425	1.825	0
+	-1.425	1.875	0
+	-1.375	1.875	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.216
+0
+0
+9
+	-1.375	1.825	0.76
+	-1.375	1.875	0.76
+	-1.425	1.875	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_1.216
+0
+0
+9
+	-1.425	1.875	0.76
+	-1.425	1.825	0.76
+	-1.375	1.825	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_1.001.217
+0
+0
+9
+	-0.825	1.875	0
+	-0.825	1.875	0.76
+	-0.775	1.875	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_1.001.217
+0
+0
+9
+	-0.775	1.875	0.76
+	-0.775	1.875	0
+	-0.825	1.875	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.001.218
+0
+0
+9
+	-0.775	1.875	0
+	-0.775	1.875	0.76
+	-0.775	1.825	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_1.001.218
+0
+0
+9
+	-0.775	1.825	0.76
+	-0.775	1.825	0
+	-0.775	1.875	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.001.219
+0
+0
+9
+	-0.775	1.825	0
+	-0.775	1.825	0.76
+	-0.825	1.825	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_1.001.219
+0
+0
+9
+	-0.825	1.825	0.76
+	-0.825	1.825	0
+	-0.775	1.825	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.001.220
+0
+0
+9
+	-0.825	1.825	0
+	-0.825	1.825	0.76
+	-0.825	1.875	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_1.001.220
+0
+0
+9
+	-0.825	1.875	0.76
+	-0.825	1.875	0
+	-0.825	1.825	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.001.221
+0
+0
+9
+	-0.775	1.875	0
+	-0.775	1.825	0
+	-0.825	1.825	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.001.221
+0
+0
+9
+	-0.825	1.825	0
+	-0.825	1.875	0
+	-0.775	1.875	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.001.222
+0
+0
+9
+	-0.775	1.825	0.76
+	-0.775	1.875	0.76
+	-0.825	1.875	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_1.001.222
+0
+0
+9
+	-0.825	1.875	0.76
+	-0.825	1.825	0.76
+	-0.775	1.825	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_1.002.223
+0
+0
+9
+	-1.425	0.575	0
+	-1.425	0.575	0.76
+	-1.375	0.575	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_1.002.223
+0
+0
+9
+	-1.375	0.575	0.76
+	-1.375	0.575	0
+	-1.425	0.575	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.002.224
+0
+0
+9
+	-1.375	0.575	0
+	-1.375	0.575	0.76
+	-1.375	0.525	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_1.002.224
+0
+0
+9
+	-1.375	0.525	0.76
+	-1.375	0.525	0
+	-1.375	0.575	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.002.225
+0
+0
+9
+	-1.375	0.525	0
+	-1.375	0.525	0.76
+	-1.425	0.525	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_1.002.225
+0
+0
+9
+	-1.425	0.525	0.76
+	-1.425	0.525	0
+	-1.375	0.525	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.002.226
+0
+0
+9
+	-1.425	0.525	0
+	-1.425	0.525	0.76
+	-1.425	0.575	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_1.002.226
+0
+0
+9
+	-1.425	0.575	0.76
+	-1.425	0.575	0
+	-1.425	0.525	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.002.227
+0
+0
+9
+	-1.375	0.575	0
+	-1.375	0.525	0
+	-1.425	0.525	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.002.227
+0
+0
+9
+	-1.425	0.525	0
+	-1.425	0.575	0
+	-1.375	0.575	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.002.228
+0
+0
+9
+	-1.375	0.525	0.76
+	-1.375	0.575	0.76
+	-1.425	0.575	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_1.002.228
+0
+0
+9
+	-1.425	0.575	0.76
+	-1.425	0.525	0.76
+	-1.375	0.525	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_1.003.229
+0
+0
+9
+	-0.825	0.575	0
+	-0.825	0.575	0.76
+	-0.775	0.575	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_1.003.229
+0
+0
+9
+	-0.775	0.575	0.76
+	-0.775	0.575	0
+	-0.825	0.575	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.003.230
+0
+0
+9
+	-0.775	0.575	0
+	-0.775	0.575	0.76
+	-0.775	0.525	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_1.003.230
+0
+0
+9
+	-0.775	0.525	0.76
+	-0.775	0.525	0
+	-0.775	0.575	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.003.231
+0
+0
+9
+	-0.775	0.525	0
+	-0.775	0.525	0.76
+	-0.825	0.525	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_1.003.231
+0
+0
+9
+	-0.825	0.525	0.76
+	-0.825	0.525	0
+	-0.775	0.525	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.003.232
+0
+0
+9
+	-0.825	0.525	0
+	-0.825	0.525	0.76
+	-0.825	0.575	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_1.003.232
+0
+0
+9
+	-0.825	0.575	0.76
+	-0.825	0.575	0
+	-0.825	0.525	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.003.233
+0
+0
+9
+	-0.775	0.575	0
+	-0.775	0.525	0
+	-0.825	0.525	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.003.233
+0
+0
+9
+	-0.825	0.525	0
+	-0.825	0.575	0
+	-0.775	0.575	0
+
+Rad_Furniture_R050 polygon Desk_Leg_1.003.234
+0
+0
+9
+	-0.775	0.525	0.76
+	-0.775	0.575	0.76
+	-0.825	0.575	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_1.003.234
+0
+0
+9
+	-0.825	0.575	0.76
+	-0.825	0.525	0.76
+	-0.775	0.525	0.76
+
+Rad_Furniture_R050 polygon Chair_Seat_1.235
+0
+0
+9
+	-1.975	1.425	0.425
+	-1.975	1.425	0.475
+	-1.525	1.425	0.475
+
+Rad_Furniture_R050 polygon Chair_Seat_1.235
+0
+0
+9
+	-1.525	1.425	0.475
+	-1.525	1.425	0.425
+	-1.975	1.425	0.425
+
+Rad_Furniture_R050 polygon Chair_Seat_1.236
+0
+0
+9
+	-1.525	1.425	0.425
+	-1.525	1.425	0.475
+	-1.525	0.975	0.475
+
+Rad_Furniture_R050 polygon Chair_Seat_1.236
+0
+0
+9
+	-1.525	0.975	0.475
+	-1.525	0.975	0.425
+	-1.525	1.425	0.425
+
+Rad_Furniture_R050 polygon Chair_Seat_1.237
+0
+0
+9
+	-1.525	0.975	0.425
+	-1.525	0.975	0.475
+	-1.975	0.975	0.475
+
+Rad_Furniture_R050 polygon Chair_Seat_1.237
+0
+0
+9
+	-1.975	0.975	0.475
+	-1.975	0.975	0.425
+	-1.525	0.975	0.425
+
+Rad_Furniture_R050 polygon Chair_Seat_1.238
+0
+0
+9
+	-1.975	0.975	0.425
+	-1.975	0.975	0.475
+	-1.975	1.425	0.475
+
+Rad_Furniture_R050 polygon Chair_Seat_1.238
+0
+0
+9
+	-1.975	1.425	0.475
+	-1.975	1.425	0.425
+	-1.975	0.975	0.425
+
+Rad_Furniture_R050 polygon Chair_Seat_1.239
+0
+0
+9
+	-1.525	1.425	0.425
+	-1.525	0.975	0.425
+	-1.975	0.975	0.425
+
+Rad_Furniture_R050 polygon Chair_Seat_1.239
+0
+0
+9
+	-1.975	0.975	0.425
+	-1.975	1.425	0.425
+	-1.525	1.425	0.425
+
+Rad_Furniture_R050 polygon Chair_Seat_1.240
+0
+0
+9
+	-1.525	0.975	0.475
+	-1.525	1.425	0.475
+	-1.975	1.425	0.475
+
+Rad_Furniture_R050 polygon Chair_Seat_1.240
+0
+0
+9
+	-1.975	1.425	0.475
+	-1.975	0.975	0.475
+	-1.525	0.975	0.475
+
+Rad_Furniture_R050 polygon Chair_Leg_1.241
+0
+0
+9
+	-1.97	1.42	0
+	-1.97	1.42	0.43
+	-1.93	1.42	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_1.241
+0
+0
+9
+	-1.93	1.42	0.43
+	-1.93	1.42	0
+	-1.97	1.42	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.242
+0
+0
+9
+	-1.93	1.42	0
+	-1.93	1.42	0.43
+	-1.93	1.38	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_1.242
+0
+0
+9
+	-1.93	1.38	0.43
+	-1.93	1.38	0
+	-1.93	1.42	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.243
+0
+0
+9
+	-1.93	1.38	0
+	-1.93	1.38	0.43
+	-1.97	1.38	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_1.243
+0
+0
+9
+	-1.97	1.38	0.43
+	-1.97	1.38	0
+	-1.93	1.38	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.244
+0
+0
+9
+	-1.97	1.38	0
+	-1.97	1.38	0.43
+	-1.97	1.42	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_1.244
+0
+0
+9
+	-1.97	1.42	0.43
+	-1.97	1.42	0
+	-1.97	1.38	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.245
+0
+0
+9
+	-1.93	1.42	0
+	-1.93	1.38	0
+	-1.97	1.38	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.245
+0
+0
+9
+	-1.97	1.38	0
+	-1.97	1.42	0
+	-1.93	1.42	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.246
+0
+0
+9
+	-1.93	1.38	0.43
+	-1.93	1.42	0.43
+	-1.97	1.42	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_1.246
+0
+0
+9
+	-1.97	1.42	0.43
+	-1.97	1.38	0.43
+	-1.93	1.38	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_1.001.247
+0
+0
+9
+	-1.57	1.42	0
+	-1.57	1.42	0.43
+	-1.53	1.42	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_1.001.247
+0
+0
+9
+	-1.53	1.42	0.43
+	-1.53	1.42	0
+	-1.57	1.42	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.001.248
+0
+0
+9
+	-1.53	1.42	0
+	-1.53	1.42	0.43
+	-1.53	1.38	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_1.001.248
+0
+0
+9
+	-1.53	1.38	0.43
+	-1.53	1.38	0
+	-1.53	1.42	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.001.249
+0
+0
+9
+	-1.53	1.38	0
+	-1.53	1.38	0.43
+	-1.57	1.38	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_1.001.249
+0
+0
+9
+	-1.57	1.38	0.43
+	-1.57	1.38	0
+	-1.53	1.38	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.001.250
+0
+0
+9
+	-1.57	1.38	0
+	-1.57	1.38	0.43
+	-1.57	1.42	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_1.001.250
+0
+0
+9
+	-1.57	1.42	0.43
+	-1.57	1.42	0
+	-1.57	1.38	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.001.251
+0
+0
+9
+	-1.53	1.42	0
+	-1.53	1.38	0
+	-1.57	1.38	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.001.251
+0
+0
+9
+	-1.57	1.38	0
+	-1.57	1.42	0
+	-1.53	1.42	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.001.252
+0
+0
+9
+	-1.53	1.38	0.43
+	-1.53	1.42	0.43
+	-1.57	1.42	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_1.001.252
+0
+0
+9
+	-1.57	1.42	0.43
+	-1.57	1.38	0.43
+	-1.53	1.38	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_1.002.253
+0
+0
+9
+	-1.97	1.02	0
+	-1.97	1.02	0.43
+	-1.93	1.02	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_1.002.253
+0
+0
+9
+	-1.93	1.02	0.43
+	-1.93	1.02	0
+	-1.97	1.02	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.002.254
+0
+0
+9
+	-1.93	1.02	0
+	-1.93	1.02	0.43
+	-1.93	0.98	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_1.002.254
+0
+0
+9
+	-1.93	0.98	0.43
+	-1.93	0.98	0
+	-1.93	1.02	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.002.255
+0
+0
+9
+	-1.93	0.98	0
+	-1.93	0.98	0.43
+	-1.97	0.98	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_1.002.255
+0
+0
+9
+	-1.97	0.98	0.43
+	-1.97	0.98	0
+	-1.93	0.98	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.002.256
+0
+0
+9
+	-1.97	0.98	0
+	-1.97	0.98	0.43
+	-1.97	1.02	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_1.002.256
+0
+0
+9
+	-1.97	1.02	0.43
+	-1.97	1.02	0
+	-1.97	0.98	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.002.257
+0
+0
+9
+	-1.93	1.02	0
+	-1.93	0.98	0
+	-1.97	0.98	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.002.257
+0
+0
+9
+	-1.97	0.98	0
+	-1.97	1.02	0
+	-1.93	1.02	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.002.258
+0
+0
+9
+	-1.93	0.98	0.43
+	-1.93	1.02	0.43
+	-1.97	1.02	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_1.002.258
+0
+0
+9
+	-1.97	1.02	0.43
+	-1.97	0.98	0.43
+	-1.93	0.98	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_1.003.259
+0
+0
+9
+	-1.57	1.02	0
+	-1.57	1.02	0.43
+	-1.53	1.02	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_1.003.259
+0
+0
+9
+	-1.53	1.02	0.43
+	-1.53	1.02	0
+	-1.57	1.02	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.003.260
+0
+0
+9
+	-1.53	1.02	0
+	-1.53	1.02	0.43
+	-1.53	0.98	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_1.003.260
+0
+0
+9
+	-1.53	0.98	0.43
+	-1.53	0.98	0
+	-1.53	1.02	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.003.261
+0
+0
+9
+	-1.53	0.98	0
+	-1.53	0.98	0.43
+	-1.57	0.98	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_1.003.261
+0
+0
+9
+	-1.57	0.98	0.43
+	-1.57	0.98	0
+	-1.53	0.98	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.003.262
+0
+0
+9
+	-1.57	0.98	0
+	-1.57	0.98	0.43
+	-1.57	1.02	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_1.003.262
+0
+0
+9
+	-1.57	1.02	0.43
+	-1.57	1.02	0
+	-1.57	0.98	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.003.263
+0
+0
+9
+	-1.53	1.02	0
+	-1.53	0.98	0
+	-1.57	0.98	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.003.263
+0
+0
+9
+	-1.57	0.98	0
+	-1.57	1.02	0
+	-1.53	1.02	0
+
+Rad_Furniture_R050 polygon Chair_Leg_1.003.264
+0
+0
+9
+	-1.53	0.98	0.43
+	-1.53	1.02	0.43
+	-1.57	1.02	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_1.003.264
+0
+0
+9
+	-1.57	1.02	0.43
+	-1.57	0.98	0.43
+	-1.53	0.98	0.43
+
+Rad_Furniture_R050 polygon Chair_Back_1.265
+0
+0
+9
+	-1.975	1.425	0.495
+	-1.975	1.425	0.945
+	-1.925	1.425	0.945
+
+Rad_Furniture_R050 polygon Chair_Back_1.265
+0
+0
+9
+	-1.925	1.425	0.945
+	-1.925	1.425	0.495
+	-1.975	1.425	0.495
+
+Rad_Furniture_R050 polygon Chair_Back_1.266
+0
+0
+9
+	-1.925	1.425	0.495
+	-1.925	1.425	0.945
+	-1.925	0.975	0.945
+
+Rad_Furniture_R050 polygon Chair_Back_1.266
+0
+0
+9
+	-1.925	0.975	0.945
+	-1.925	0.975	0.495
+	-1.925	1.425	0.495
+
+Rad_Furniture_R050 polygon Chair_Back_1.267
+0
+0
+9
+	-1.925	0.975	0.495
+	-1.925	0.975	0.945
+	-1.975	0.975	0.945
+
+Rad_Furniture_R050 polygon Chair_Back_1.267
+0
+0
+9
+	-1.975	0.975	0.945
+	-1.975	0.975	0.495
+	-1.925	0.975	0.495
+
+Rad_Furniture_R050 polygon Chair_Back_1.268
+0
+0
+9
+	-1.975	0.975	0.495
+	-1.975	0.975	0.945
+	-1.975	1.425	0.945
+
+Rad_Furniture_R050 polygon Chair_Back_1.268
+0
+0
+9
+	-1.975	1.425	0.945
+	-1.975	1.425	0.495
+	-1.975	0.975	0.495
+
+Rad_Furniture_R050 polygon Chair_Back_1.269
+0
+0
+9
+	-1.925	1.425	0.495
+	-1.925	0.975	0.495
+	-1.975	0.975	0.495
+
+Rad_Furniture_R050 polygon Chair_Back_1.269
+0
+0
+9
+	-1.975	0.975	0.495
+	-1.975	1.425	0.495
+	-1.925	1.425	0.495
+
+Rad_Furniture_R050 polygon Chair_Back_1.270
+0
+0
+9
+	-1.925	0.975	0.945
+	-1.925	1.425	0.945
+	-1.975	1.425	0.945
+
+Rad_Furniture_R050 polygon Chair_Back_1.270
+0
+0
+9
+	-1.975	1.425	0.945
+	-1.975	0.975	0.945
+	-1.925	0.975	0.945
+
+Rad_Furniture_R050 polygon Disp_Base_1.271
+0
+0
+9
+	-0.97	1.3	0.8
+	-0.97	1.3	0.812
+	-0.83	1.3	0.812
+
+Rad_Furniture_R050 polygon Disp_Base_1.271
+0
+0
+9
+	-0.83	1.3	0.812
+	-0.83	1.3	0.8
+	-0.97	1.3	0.8
+
+Rad_Furniture_R050 polygon Disp_Base_1.272
+0
+0
+9
+	-0.83	1.3	0.8
+	-0.83	1.3	0.812
+	-0.83	1.1	0.812
+
+Rad_Furniture_R050 polygon Disp_Base_1.272
+0
+0
+9
+	-0.83	1.1	0.812
+	-0.83	1.1	0.8
+	-0.83	1.3	0.8
+
+Rad_Furniture_R050 polygon Disp_Base_1.273
+0
+0
+9
+	-0.83	1.1	0.8
+	-0.83	1.1	0.812
+	-0.97	1.1	0.812
+
+Rad_Furniture_R050 polygon Disp_Base_1.273
+0
+0
+9
+	-0.97	1.1	0.812
+	-0.97	1.1	0.8
+	-0.83	1.1	0.8
+
+Rad_Furniture_R050 polygon Disp_Base_1.274
+0
+0
+9
+	-0.97	1.1	0.8
+	-0.97	1.1	0.812
+	-0.97	1.3	0.812
+
+Rad_Furniture_R050 polygon Disp_Base_1.274
+0
+0
+9
+	-0.97	1.3	0.812
+	-0.97	1.3	0.8
+	-0.97	1.1	0.8
+
+Rad_Furniture_R050 polygon Disp_Base_1.275
+0
+0
+9
+	-0.83	1.3	0.8
+	-0.83	1.1	0.8
+	-0.97	1.1	0.8
+
+Rad_Furniture_R050 polygon Disp_Base_1.275
+0
+0
+9
+	-0.97	1.1	0.8
+	-0.97	1.3	0.8
+	-0.83	1.3	0.8
+
+Rad_Furniture_R050 polygon Disp_Base_1.276
+0
+0
+9
+	-0.83	1.1	0.812
+	-0.83	1.3	0.812
+	-0.97	1.3	0.812
+
+Rad_Furniture_R050 polygon Disp_Base_1.276
+0
+0
+9
+	-0.97	1.3	0.812
+	-0.97	1.1	0.812
+	-0.83	1.1	0.812
+
+Rad_Furniture_R050 polygon Disp_Neck_1.277
+0
+0
+9
+	-0.91	1.215	0.8
+	-0.91	1.215	0.92
+	-0.89	1.215	0.92
+
+Rad_Furniture_R050 polygon Disp_Neck_1.277
+0
+0
+9
+	-0.89	1.215	0.92
+	-0.89	1.215	0.8
+	-0.91	1.215	0.8
+
+Rad_Furniture_R050 polygon Disp_Neck_1.278
+0
+0
+9
+	-0.89	1.215	0.8
+	-0.89	1.215	0.92
+	-0.89	1.185	0.92
+
+Rad_Furniture_R050 polygon Disp_Neck_1.278
+0
+0
+9
+	-0.89	1.185	0.92
+	-0.89	1.185	0.8
+	-0.89	1.215	0.8
+
+Rad_Furniture_R050 polygon Disp_Neck_1.279
+0
+0
+9
+	-0.89	1.185	0.8
+	-0.89	1.185	0.92
+	-0.91	1.185	0.92
+
+Rad_Furniture_R050 polygon Disp_Neck_1.279
+0
+0
+9
+	-0.91	1.185	0.92
+	-0.91	1.185	0.8
+	-0.89	1.185	0.8
+
+Rad_Furniture_R050 polygon Disp_Neck_1.280
+0
+0
+9
+	-0.91	1.185	0.8
+	-0.91	1.185	0.92
+	-0.91	1.215	0.92
+
+Rad_Furniture_R050 polygon Disp_Neck_1.280
+0
+0
+9
+	-0.91	1.215	0.92
+	-0.91	1.215	0.8
+	-0.91	1.185	0.8
+
+Rad_Furniture_R050 polygon Disp_Neck_1.281
+0
+0
+9
+	-0.89	1.215	0.8
+	-0.89	1.185	0.8
+	-0.91	1.185	0.8
+
+Rad_Furniture_R050 polygon Disp_Neck_1.281
+0
+0
+9
+	-0.91	1.185	0.8
+	-0.91	1.215	0.8
+	-0.89	1.215	0.8
+
+Rad_Furniture_R050 polygon Disp_Neck_1.282
+0
+0
+9
+	-0.89	1.185	0.92
+	-0.89	1.215	0.92
+	-0.91	1.215	0.92
+
+Rad_Furniture_R050 polygon Disp_Neck_1.282
+0
+0
+9
+	-0.91	1.215	0.92
+	-0.91	1.185	0.92
+	-0.89	1.185	0.92
+
+Rad_Furniture_R050 polygon Disp_Panel_1.283
+0
+0
+9
+	-0.91	1.475	0.92
+	-0.91	1.475	1.26
+	-0.89	1.475	1.26
+
+Rad_Furniture_R050 polygon Disp_Panel_1.283
+0
+0
+9
+	-0.89	1.475	1.26
+	-0.89	1.475	0.92
+	-0.91	1.475	0.92
+
+Rad_Furniture_R050 polygon Disp_Panel_1.284
+0
+0
+9
+	-0.89	1.475	0.92
+	-0.89	1.475	1.26
+	-0.89	0.925	1.26
+
+Rad_Furniture_R050 polygon Disp_Panel_1.284
+0
+0
+9
+	-0.89	0.925	1.26
+	-0.89	0.925	0.92
+	-0.89	1.475	0.92
+
+Rad_Furniture_R050 polygon Disp_Panel_1.285
+0
+0
+9
+	-0.89	0.925	0.92
+	-0.89	0.925	1.26
+	-0.91	0.925	1.26
+
+Rad_Furniture_R050 polygon Disp_Panel_1.285
+0
+0
+9
+	-0.91	0.925	1.26
+	-0.91	0.925	0.92
+	-0.89	0.925	0.92
+
+Rad_Furniture_R050 polygon Disp_Panel_1.286
+0
+0
+9
+	-0.91	0.925	0.92
+	-0.91	0.925	1.26
+	-0.91	1.475	1.26
+
+Rad_Furniture_R050 polygon Disp_Panel_1.286
+0
+0
+9
+	-0.91	1.475	1.26
+	-0.91	1.475	0.92
+	-0.91	0.925	0.92
+
+Rad_Furniture_R050 polygon Disp_Panel_1.287
+0
+0
+9
+	-0.89	1.475	0.92
+	-0.89	0.925	0.92
+	-0.91	0.925	0.92
+
+Rad_Furniture_R050 polygon Disp_Panel_1.287
+0
+0
+9
+	-0.91	0.925	0.92
+	-0.91	1.475	0.92
+	-0.89	1.475	0.92
+
+Rad_Furniture_R050 polygon Disp_Panel_1.288
+0
+0
+9
+	-0.89	0.925	1.26
+	-0.89	1.475	1.26
+	-0.91	1.475	1.26
+
+Rad_Furniture_R050 polygon Disp_Panel_1.288
+0
+0
+9
+	-0.91	1.475	1.26
+	-0.91	0.925	1.26
+	-0.89	0.925	1.26
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_1.289
+0
+0
+9
+	-0.915	1.45	0.94
+	-0.915	1.45	1.24
+	-0.909	1.45	1.24
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_1.289
+0
+0
+9
+	-0.909	1.45	1.24
+	-0.909	1.45	0.94
+	-0.915	1.45	0.94
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_1.290
+0
+0
+9
+	-0.909	1.45	0.94
+	-0.909	1.45	1.24
+	-0.909	0.95	1.24
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_1.290
+0
+0
+9
+	-0.909	0.95	1.24
+	-0.909	0.95	0.94
+	-0.909	1.45	0.94
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_1.291
+0
+0
+9
+	-0.909	0.95	0.94
+	-0.909	0.95	1.24
+	-0.915	0.95	1.24
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_1.291
+0
+0
+9
+	-0.915	0.95	1.24
+	-0.915	0.95	0.94
+	-0.909	0.95	0.94
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_1.292
+0
+0
+9
+	-0.915	0.95	0.94
+	-0.915	0.95	1.24
+	-0.915	1.45	1.24
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_1.292
+0
+0
+9
+	-0.915	1.45	1.24
+	-0.915	1.45	0.94
+	-0.915	0.95	0.94
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_1.293
+0
+0
+9
+	-0.909	1.45	0.94
+	-0.909	0.95	0.94
+	-0.915	0.95	0.94
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_1.293
+0
+0
+9
+	-0.915	0.95	0.94
+	-0.915	1.45	0.94
+	-0.909	1.45	0.94
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_1.294
+0
+0
+9
+	-0.909	0.95	1.24
+	-0.909	1.45	1.24
+	-0.915	1.45	1.24
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_1.294
+0
+0
+9
+	-0.915	1.45	1.24
+	-0.915	0.95	1.24
+	-0.909	0.95	1.24
+
+Rad_Furniture_R050 polygon Keyboard_1.295
+0
+0
+9
+	-1.275	1.35	0.802
+	-1.275	1.35	0.814
+	-1.165	1.35	0.814
+
+Rad_Furniture_R050 polygon Keyboard_1.295
+0
+0
+9
+	-1.165	1.35	0.814
+	-1.165	1.35	0.802
+	-1.275	1.35	0.802
+
+Rad_Furniture_R050 polygon Keyboard_1.296
+0
+0
+9
+	-1.165	1.35	0.802
+	-1.165	1.35	0.814
+	-1.165	1.05	0.814
+
+Rad_Furniture_R050 polygon Keyboard_1.296
+0
+0
+9
+	-1.165	1.05	0.814
+	-1.165	1.05	0.802
+	-1.165	1.35	0.802
+
+Rad_Furniture_R050 polygon Keyboard_1.297
+0
+0
+9
+	-1.165	1.05	0.802
+	-1.165	1.05	0.814
+	-1.275	1.05	0.814
+
+Rad_Furniture_R050 polygon Keyboard_1.297
+0
+0
+9
+	-1.275	1.05	0.814
+	-1.275	1.05	0.802
+	-1.165	1.05	0.802
+
+Rad_Furniture_R050 polygon Keyboard_1.298
+0
+0
+9
+	-1.275	1.05	0.802
+	-1.275	1.05	0.814
+	-1.275	1.35	0.814
+
+Rad_Furniture_R050 polygon Keyboard_1.298
+0
+0
+9
+	-1.275	1.35	0.814
+	-1.275	1.35	0.802
+	-1.275	1.05	0.802
+
+Rad_Furniture_R050 polygon Keyboard_1.299
+0
+0
+9
+	-1.165	1.35	0.802
+	-1.165	1.05	0.802
+	-1.275	1.05	0.802
+
+Rad_Furniture_R050 polygon Keyboard_1.299
+0
+0
+9
+	-1.275	1.05	0.802
+	-1.275	1.35	0.802
+	-1.165	1.35	0.802
+
+Rad_Furniture_R050 polygon Keyboard_1.300
+0
+0
+9
+	-1.165	1.05	0.814
+	-1.165	1.35	0.814
+	-1.275	1.35	0.814
+
+Rad_Furniture_R050 polygon Keyboard_1.300
+0
+0
+9
+	-1.275	1.35	0.814
+	-1.275	1.05	0.814
+	-1.165	1.05	0.814
+
+Rad_Furniture_R050 polygon Desk_Top_2.301
+0
+0
+9
+	1.45	-1.9	0.76
+	1.45	-1.9	0.8
+	0.75	-1.9	0.8
+
+Rad_Furniture_R050 polygon Desk_Top_2.301
+0
+0
+9
+	0.75	-1.9	0.8
+	0.75	-1.9	0.76
+	1.45	-1.9	0.76
+
+Rad_Furniture_R050 polygon Desk_Top_2.302
+0
+0
+9
+	0.75	-1.9	0.76
+	0.75	-1.9	0.8
+	0.75	-0.5	0.8
+
+Rad_Furniture_R050 polygon Desk_Top_2.302
+0
+0
+9
+	0.75	-0.5	0.8
+	0.75	-0.5	0.76
+	0.75	-1.9	0.76
+
+Rad_Furniture_R050 polygon Desk_Top_2.303
+0
+0
+9
+	0.75	-0.5	0.76
+	0.75	-0.5	0.8
+	1.45	-0.5	0.8
+
+Rad_Furniture_R050 polygon Desk_Top_2.303
+0
+0
+9
+	1.45	-0.5	0.8
+	1.45	-0.5	0.76
+	0.75	-0.5	0.76
+
+Rad_Furniture_R050 polygon Desk_Top_2.304
+0
+0
+9
+	1.45	-0.5	0.76
+	1.45	-0.5	0.8
+	1.45	-1.9	0.8
+
+Rad_Furniture_R050 polygon Desk_Top_2.304
+0
+0
+9
+	1.45	-1.9	0.8
+	1.45	-1.9	0.76
+	1.45	-0.5	0.76
+
+Rad_Furniture_R050 polygon Desk_Top_2.305
+0
+0
+9
+	0.75	-1.9	0.76
+	0.75	-0.5	0.76
+	1.45	-0.5	0.76
+
+Rad_Furniture_R050 polygon Desk_Top_2.305
+0
+0
+9
+	1.45	-0.5	0.76
+	1.45	-1.9	0.76
+	0.75	-1.9	0.76
+
+Rad_Furniture_R050 polygon Desk_Top_2.306
+0
+0
+9
+	0.75	-0.5	0.8
+	0.75	-1.9	0.8
+	1.45	-1.9	0.8
+
+Rad_Furniture_R050 polygon Desk_Top_2.306
+0
+0
+9
+	1.45	-1.9	0.8
+	1.45	-0.5	0.8
+	0.75	-0.5	0.8
+
+Rad_Furniture_R050 polygon Desk_Leg_2.307
+0
+0
+9
+	1.425	-1.875	0
+	1.425	-1.875	0.76
+	1.375	-1.875	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_2.307
+0
+0
+9
+	1.375	-1.875	0.76
+	1.375	-1.875	0
+	1.425	-1.875	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.308
+0
+0
+9
+	1.375	-1.875	0
+	1.375	-1.875	0.76
+	1.375	-1.825	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_2.308
+0
+0
+9
+	1.375	-1.825	0.76
+	1.375	-1.825	0
+	1.375	-1.875	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.309
+0
+0
+9
+	1.375	-1.825	0
+	1.375	-1.825	0.76
+	1.425	-1.825	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_2.309
+0
+0
+9
+	1.425	-1.825	0.76
+	1.425	-1.825	0
+	1.375	-1.825	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.310
+0
+0
+9
+	1.425	-1.825	0
+	1.425	-1.825	0.76
+	1.425	-1.875	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_2.310
+0
+0
+9
+	1.425	-1.875	0.76
+	1.425	-1.875	0
+	1.425	-1.825	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.311
+0
+0
+9
+	1.375	-1.875	0
+	1.375	-1.825	0
+	1.425	-1.825	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.311
+0
+0
+9
+	1.425	-1.825	0
+	1.425	-1.875	0
+	1.375	-1.875	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.312
+0
+0
+9
+	1.375	-1.825	0.76
+	1.375	-1.875	0.76
+	1.425	-1.875	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_2.312
+0
+0
+9
+	1.425	-1.875	0.76
+	1.425	-1.825	0.76
+	1.375	-1.825	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_2.001.313
+0
+0
+9
+	0.825	-1.875	0
+	0.825	-1.875	0.76
+	0.775	-1.875	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_2.001.313
+0
+0
+9
+	0.775	-1.875	0.76
+	0.775	-1.875	0
+	0.825	-1.875	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.001.314
+0
+0
+9
+	0.775	-1.875	0
+	0.775	-1.875	0.76
+	0.775	-1.825	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_2.001.314
+0
+0
+9
+	0.775	-1.825	0.76
+	0.775	-1.825	0
+	0.775	-1.875	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.001.315
+0
+0
+9
+	0.775	-1.825	0
+	0.775	-1.825	0.76
+	0.825	-1.825	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_2.001.315
+0
+0
+9
+	0.825	-1.825	0.76
+	0.825	-1.825	0
+	0.775	-1.825	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.001.316
+0
+0
+9
+	0.825	-1.825	0
+	0.825	-1.825	0.76
+	0.825	-1.875	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_2.001.316
+0
+0
+9
+	0.825	-1.875	0.76
+	0.825	-1.875	0
+	0.825	-1.825	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.001.317
+0
+0
+9
+	0.775	-1.875	0
+	0.775	-1.825	0
+	0.825	-1.825	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.001.317
+0
+0
+9
+	0.825	-1.825	0
+	0.825	-1.875	0
+	0.775	-1.875	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.001.318
+0
+0
+9
+	0.775	-1.825	0.76
+	0.775	-1.875	0.76
+	0.825	-1.875	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_2.001.318
+0
+0
+9
+	0.825	-1.875	0.76
+	0.825	-1.825	0.76
+	0.775	-1.825	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_2.002.319
+0
+0
+9
+	1.425	-0.575	0
+	1.425	-0.575	0.76
+	1.375	-0.575	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_2.002.319
+0
+0
+9
+	1.375	-0.575	0.76
+	1.375	-0.575	0
+	1.425	-0.575	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.002.320
+0
+0
+9
+	1.375	-0.575	0
+	1.375	-0.575	0.76
+	1.375	-0.525	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_2.002.320
+0
+0
+9
+	1.375	-0.525	0.76
+	1.375	-0.525	0
+	1.375	-0.575	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.002.321
+0
+0
+9
+	1.375	-0.525	0
+	1.375	-0.525	0.76
+	1.425	-0.525	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_2.002.321
+0
+0
+9
+	1.425	-0.525	0.76
+	1.425	-0.525	0
+	1.375	-0.525	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.002.322
+0
+0
+9
+	1.425	-0.525	0
+	1.425	-0.525	0.76
+	1.425	-0.575	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_2.002.322
+0
+0
+9
+	1.425	-0.575	0.76
+	1.425	-0.575	0
+	1.425	-0.525	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.002.323
+0
+0
+9
+	1.375	-0.575	0
+	1.375	-0.525	0
+	1.425	-0.525	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.002.323
+0
+0
+9
+	1.425	-0.525	0
+	1.425	-0.575	0
+	1.375	-0.575	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.002.324
+0
+0
+9
+	1.375	-0.525	0.76
+	1.375	-0.575	0.76
+	1.425	-0.575	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_2.002.324
+0
+0
+9
+	1.425	-0.575	0.76
+	1.425	-0.525	0.76
+	1.375	-0.525	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_2.003.325
+0
+0
+9
+	0.825	-0.575	0
+	0.825	-0.575	0.76
+	0.775	-0.575	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_2.003.325
+0
+0
+9
+	0.775	-0.575	0.76
+	0.775	-0.575	0
+	0.825	-0.575	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.003.326
+0
+0
+9
+	0.775	-0.575	0
+	0.775	-0.575	0.76
+	0.775	-0.525	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_2.003.326
+0
+0
+9
+	0.775	-0.525	0.76
+	0.775	-0.525	0
+	0.775	-0.575	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.003.327
+0
+0
+9
+	0.775	-0.525	0
+	0.775	-0.525	0.76
+	0.825	-0.525	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_2.003.327
+0
+0
+9
+	0.825	-0.525	0.76
+	0.825	-0.525	0
+	0.775	-0.525	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.003.328
+0
+0
+9
+	0.825	-0.525	0
+	0.825	-0.525	0.76
+	0.825	-0.575	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_2.003.328
+0
+0
+9
+	0.825	-0.575	0.76
+	0.825	-0.575	0
+	0.825	-0.525	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.003.329
+0
+0
+9
+	0.775	-0.575	0
+	0.775	-0.525	0
+	0.825	-0.525	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.003.329
+0
+0
+9
+	0.825	-0.525	0
+	0.825	-0.575	0
+	0.775	-0.575	0
+
+Rad_Furniture_R050 polygon Desk_Leg_2.003.330
+0
+0
+9
+	0.775	-0.525	0.76
+	0.775	-0.575	0.76
+	0.825	-0.575	0.76
+
+Rad_Furniture_R050 polygon Desk_Leg_2.003.330
+0
+0
+9
+	0.825	-0.575	0.76
+	0.825	-0.525	0.76
+	0.775	-0.525	0.76
+
+Rad_Furniture_R050 polygon Chair_Seat_2.331
+0
+0
+9
+	1.975	-1.425	0.425
+	1.975	-1.425	0.475
+	1.525	-1.425	0.475
+
+Rad_Furniture_R050 polygon Chair_Seat_2.331
+0
+0
+9
+	1.525	-1.425	0.475
+	1.525	-1.425	0.425
+	1.975	-1.425	0.425
+
+Rad_Furniture_R050 polygon Chair_Seat_2.332
+0
+0
+9
+	1.525	-1.425	0.425
+	1.525	-1.425	0.475
+	1.525	-0.975	0.475
+
+Rad_Furniture_R050 polygon Chair_Seat_2.332
+0
+0
+9
+	1.525	-0.975	0.475
+	1.525	-0.975	0.425
+	1.525	-1.425	0.425
+
+Rad_Furniture_R050 polygon Chair_Seat_2.333
+0
+0
+9
+	1.525	-0.975	0.425
+	1.525	-0.975	0.475
+	1.975	-0.975	0.475
+
+Rad_Furniture_R050 polygon Chair_Seat_2.333
+0
+0
+9
+	1.975	-0.975	0.475
+	1.975	-0.975	0.425
+	1.525	-0.975	0.425
+
+Rad_Furniture_R050 polygon Chair_Seat_2.334
+0
+0
+9
+	1.975	-0.975	0.425
+	1.975	-0.975	0.475
+	1.975	-1.425	0.475
+
+Rad_Furniture_R050 polygon Chair_Seat_2.334
+0
+0
+9
+	1.975	-1.425	0.475
+	1.975	-1.425	0.425
+	1.975	-0.975	0.425
+
+Rad_Furniture_R050 polygon Chair_Seat_2.335
+0
+0
+9
+	1.525	-1.425	0.425
+	1.525	-0.975	0.425
+	1.975	-0.975	0.425
+
+Rad_Furniture_R050 polygon Chair_Seat_2.335
+0
+0
+9
+	1.975	-0.975	0.425
+	1.975	-1.425	0.425
+	1.525	-1.425	0.425
+
+Rad_Furniture_R050 polygon Chair_Seat_2.336
+0
+0
+9
+	1.525	-0.975	0.475
+	1.525	-1.425	0.475
+	1.975	-1.425	0.475
+
+Rad_Furniture_R050 polygon Chair_Seat_2.336
+0
+0
+9
+	1.975	-1.425	0.475
+	1.975	-0.975	0.475
+	1.525	-0.975	0.475
+
+Rad_Furniture_R050 polygon Chair_Leg_2.337
+0
+0
+9
+	1.97	-1.42	0
+	1.97	-1.42	0.43
+	1.93	-1.42	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_2.337
+0
+0
+9
+	1.93	-1.42	0.43
+	1.93	-1.42	0
+	1.97	-1.42	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.338
+0
+0
+9
+	1.93	-1.42	0
+	1.93	-1.42	0.43
+	1.93	-1.38	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_2.338
+0
+0
+9
+	1.93	-1.38	0.43
+	1.93	-1.38	0
+	1.93	-1.42	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.339
+0
+0
+9
+	1.93	-1.38	0
+	1.93	-1.38	0.43
+	1.97	-1.38	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_2.339
+0
+0
+9
+	1.97	-1.38	0.43
+	1.97	-1.38	0
+	1.93	-1.38	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.340
+0
+0
+9
+	1.97	-1.38	0
+	1.97	-1.38	0.43
+	1.97	-1.42	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_2.340
+0
+0
+9
+	1.97	-1.42	0.43
+	1.97	-1.42	0
+	1.97	-1.38	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.341
+0
+0
+9
+	1.93	-1.42	0
+	1.93	-1.38	0
+	1.97	-1.38	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.341
+0
+0
+9
+	1.97	-1.38	0
+	1.97	-1.42	0
+	1.93	-1.42	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.342
+0
+0
+9
+	1.93	-1.38	0.43
+	1.93	-1.42	0.43
+	1.97	-1.42	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_2.342
+0
+0
+9
+	1.97	-1.42	0.43
+	1.97	-1.38	0.43
+	1.93	-1.38	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_2.001.343
+0
+0
+9
+	1.57	-1.42	0
+	1.57	-1.42	0.43
+	1.53	-1.42	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_2.001.343
+0
+0
+9
+	1.53	-1.42	0.43
+	1.53	-1.42	0
+	1.57	-1.42	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.001.344
+0
+0
+9
+	1.53	-1.42	0
+	1.53	-1.42	0.43
+	1.53	-1.38	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_2.001.344
+0
+0
+9
+	1.53	-1.38	0.43
+	1.53	-1.38	0
+	1.53	-1.42	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.001.345
+0
+0
+9
+	1.53	-1.38	0
+	1.53	-1.38	0.43
+	1.57	-1.38	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_2.001.345
+0
+0
+9
+	1.57	-1.38	0.43
+	1.57	-1.38	0
+	1.53	-1.38	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.001.346
+0
+0
+9
+	1.57	-1.38	0
+	1.57	-1.38	0.43
+	1.57	-1.42	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_2.001.346
+0
+0
+9
+	1.57	-1.42	0.43
+	1.57	-1.42	0
+	1.57	-1.38	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.001.347
+0
+0
+9
+	1.53	-1.42	0
+	1.53	-1.38	0
+	1.57	-1.38	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.001.347
+0
+0
+9
+	1.57	-1.38	0
+	1.57	-1.42	0
+	1.53	-1.42	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.001.348
+0
+0
+9
+	1.53	-1.38	0.43
+	1.53	-1.42	0.43
+	1.57	-1.42	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_2.001.348
+0
+0
+9
+	1.57	-1.42	0.43
+	1.57	-1.38	0.43
+	1.53	-1.38	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_2.002.349
+0
+0
+9
+	1.97	-1.02	0
+	1.97	-1.02	0.43
+	1.93	-1.02	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_2.002.349
+0
+0
+9
+	1.93	-1.02	0.43
+	1.93	-1.02	0
+	1.97	-1.02	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.002.350
+0
+0
+9
+	1.93	-1.02	0
+	1.93	-1.02	0.43
+	1.93	-0.98	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_2.002.350
+0
+0
+9
+	1.93	-0.98	0.43
+	1.93	-0.98	0
+	1.93	-1.02	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.002.351
+0
+0
+9
+	1.93	-0.98	0
+	1.93	-0.98	0.43
+	1.97	-0.98	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_2.002.351
+0
+0
+9
+	1.97	-0.98	0.43
+	1.97	-0.98	0
+	1.93	-0.98	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.002.352
+0
+0
+9
+	1.97	-0.98	0
+	1.97	-0.98	0.43
+	1.97	-1.02	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_2.002.352
+0
+0
+9
+	1.97	-1.02	0.43
+	1.97	-1.02	0
+	1.97	-0.98	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.002.353
+0
+0
+9
+	1.93	-1.02	0
+	1.93	-0.98	0
+	1.97	-0.98	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.002.353
+0
+0
+9
+	1.97	-0.98	0
+	1.97	-1.02	0
+	1.93	-1.02	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.002.354
+0
+0
+9
+	1.93	-0.98	0.43
+	1.93	-1.02	0.43
+	1.97	-1.02	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_2.002.354
+0
+0
+9
+	1.97	-1.02	0.43
+	1.97	-0.98	0.43
+	1.93	-0.98	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_2.003.355
+0
+0
+9
+	1.57	-1.02	0
+	1.57	-1.02	0.43
+	1.53	-1.02	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_2.003.355
+0
+0
+9
+	1.53	-1.02	0.43
+	1.53	-1.02	0
+	1.57	-1.02	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.003.356
+0
+0
+9
+	1.53	-1.02	0
+	1.53	-1.02	0.43
+	1.53	-0.98	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_2.003.356
+0
+0
+9
+	1.53	-0.98	0.43
+	1.53	-0.98	0
+	1.53	-1.02	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.003.357
+0
+0
+9
+	1.53	-0.98	0
+	1.53	-0.98	0.43
+	1.57	-0.98	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_2.003.357
+0
+0
+9
+	1.57	-0.98	0.43
+	1.57	-0.98	0
+	1.53	-0.98	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.003.358
+0
+0
+9
+	1.57	-0.98	0
+	1.57	-0.98	0.43
+	1.57	-1.02	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_2.003.358
+0
+0
+9
+	1.57	-1.02	0.43
+	1.57	-1.02	0
+	1.57	-0.98	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.003.359
+0
+0
+9
+	1.53	-1.02	0
+	1.53	-0.98	0
+	1.57	-0.98	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.003.359
+0
+0
+9
+	1.57	-0.98	0
+	1.57	-1.02	0
+	1.53	-1.02	0
+
+Rad_Furniture_R050 polygon Chair_Leg_2.003.360
+0
+0
+9
+	1.53	-0.98	0.43
+	1.53	-1.02	0.43
+	1.57	-1.02	0.43
+
+Rad_Furniture_R050 polygon Chair_Leg_2.003.360
+0
+0
+9
+	1.57	-1.02	0.43
+	1.57	-0.98	0.43
+	1.53	-0.98	0.43
+
+Rad_Furniture_R050 polygon Chair_Back_2.361
+0
+0
+9
+	1.975	-1.425	0.495
+	1.975	-1.425	0.945
+	1.925	-1.425	0.945
+
+Rad_Furniture_R050 polygon Chair_Back_2.361
+0
+0
+9
+	1.925	-1.425	0.945
+	1.925	-1.425	0.495
+	1.975	-1.425	0.495
+
+Rad_Furniture_R050 polygon Chair_Back_2.362
+0
+0
+9
+	1.925	-1.425	0.495
+	1.925	-1.425	0.945
+	1.925	-0.975	0.945
+
+Rad_Furniture_R050 polygon Chair_Back_2.362
+0
+0
+9
+	1.925	-0.975	0.945
+	1.925	-0.975	0.495
+	1.925	-1.425	0.495
+
+Rad_Furniture_R050 polygon Chair_Back_2.363
+0
+0
+9
+	1.925	-0.975	0.495
+	1.925	-0.975	0.945
+	1.975	-0.975	0.945
+
+Rad_Furniture_R050 polygon Chair_Back_2.363
+0
+0
+9
+	1.975	-0.975	0.945
+	1.975	-0.975	0.495
+	1.925	-0.975	0.495
+
+Rad_Furniture_R050 polygon Chair_Back_2.364
+0
+0
+9
+	1.975	-0.975	0.495
+	1.975	-0.975	0.945
+	1.975	-1.425	0.945
+
+Rad_Furniture_R050 polygon Chair_Back_2.364
+0
+0
+9
+	1.975	-1.425	0.945
+	1.975	-1.425	0.495
+	1.975	-0.975	0.495
+
+Rad_Furniture_R050 polygon Chair_Back_2.365
+0
+0
+9
+	1.925	-1.425	0.495
+	1.925	-0.975	0.495
+	1.975	-0.975	0.495
+
+Rad_Furniture_R050 polygon Chair_Back_2.365
+0
+0
+9
+	1.975	-0.975	0.495
+	1.975	-1.425	0.495
+	1.925	-1.425	0.495
+
+Rad_Furniture_R050 polygon Chair_Back_2.366
+0
+0
+9
+	1.925	-0.975	0.945
+	1.925	-1.425	0.945
+	1.975	-1.425	0.945
+
+Rad_Furniture_R050 polygon Chair_Back_2.366
+0
+0
+9
+	1.975	-1.425	0.945
+	1.975	-0.975	0.945
+	1.925	-0.975	0.945
+
+Rad_Furniture_R050 polygon Disp_Base_2.367
+0
+0
+9
+	0.97	-1.3	0.8
+	0.97	-1.3	0.812
+	0.83	-1.3	0.812
+
+Rad_Furniture_R050 polygon Disp_Base_2.367
+0
+0
+9
+	0.83	-1.3	0.812
+	0.83	-1.3	0.8
+	0.97	-1.3	0.8
+
+Rad_Furniture_R050 polygon Disp_Base_2.368
+0
+0
+9
+	0.83	-1.3	0.8
+	0.83	-1.3	0.812
+	0.83	-1.1	0.812
+
+Rad_Furniture_R050 polygon Disp_Base_2.368
+0
+0
+9
+	0.83	-1.1	0.812
+	0.83	-1.1	0.8
+	0.83	-1.3	0.8
+
+Rad_Furniture_R050 polygon Disp_Base_2.369
+0
+0
+9
+	0.83	-1.1	0.8
+	0.83	-1.1	0.812
+	0.97	-1.1	0.812
+
+Rad_Furniture_R050 polygon Disp_Base_2.369
+0
+0
+9
+	0.97	-1.1	0.812
+	0.97	-1.1	0.8
+	0.83	-1.1	0.8
+
+Rad_Furniture_R050 polygon Disp_Base_2.370
+0
+0
+9
+	0.97	-1.1	0.8
+	0.97	-1.1	0.812
+	0.97	-1.3	0.812
+
+Rad_Furniture_R050 polygon Disp_Base_2.370
+0
+0
+9
+	0.97	-1.3	0.812
+	0.97	-1.3	0.8
+	0.97	-1.1	0.8
+
+Rad_Furniture_R050 polygon Disp_Base_2.371
+0
+0
+9
+	0.83	-1.3	0.8
+	0.83	-1.1	0.8
+	0.97	-1.1	0.8
+
+Rad_Furniture_R050 polygon Disp_Base_2.371
+0
+0
+9
+	0.97	-1.1	0.8
+	0.97	-1.3	0.8
+	0.83	-1.3	0.8
+
+Rad_Furniture_R050 polygon Disp_Base_2.372
+0
+0
+9
+	0.83	-1.1	0.812
+	0.83	-1.3	0.812
+	0.97	-1.3	0.812
+
+Rad_Furniture_R050 polygon Disp_Base_2.372
+0
+0
+9
+	0.97	-1.3	0.812
+	0.97	-1.1	0.812
+	0.83	-1.1	0.812
+
+Rad_Furniture_R050 polygon Disp_Neck_2.373
+0
+0
+9
+	0.91	-1.215	0.8
+	0.91	-1.215	0.92
+	0.89	-1.215	0.92
+
+Rad_Furniture_R050 polygon Disp_Neck_2.373
+0
+0
+9
+	0.89	-1.215	0.92
+	0.89	-1.215	0.8
+	0.91	-1.215	0.8
+
+Rad_Furniture_R050 polygon Disp_Neck_2.374
+0
+0
+9
+	0.89	-1.215	0.8
+	0.89	-1.215	0.92
+	0.89	-1.185	0.92
+
+Rad_Furniture_R050 polygon Disp_Neck_2.374
+0
+0
+9
+	0.89	-1.185	0.92
+	0.89	-1.185	0.8
+	0.89	-1.215	0.8
+
+Rad_Furniture_R050 polygon Disp_Neck_2.375
+0
+0
+9
+	0.89	-1.185	0.8
+	0.89	-1.185	0.92
+	0.91	-1.185	0.92
+
+Rad_Furniture_R050 polygon Disp_Neck_2.375
+0
+0
+9
+	0.91	-1.185	0.92
+	0.91	-1.185	0.8
+	0.89	-1.185	0.8
+
+Rad_Furniture_R050 polygon Disp_Neck_2.376
+0
+0
+9
+	0.91	-1.185	0.8
+	0.91	-1.185	0.92
+	0.91	-1.215	0.92
+
+Rad_Furniture_R050 polygon Disp_Neck_2.376
+0
+0
+9
+	0.91	-1.215	0.92
+	0.91	-1.215	0.8
+	0.91	-1.185	0.8
+
+Rad_Furniture_R050 polygon Disp_Neck_2.377
+0
+0
+9
+	0.89	-1.215	0.8
+	0.89	-1.185	0.8
+	0.91	-1.185	0.8
+
+Rad_Furniture_R050 polygon Disp_Neck_2.377
+0
+0
+9
+	0.91	-1.185	0.8
+	0.91	-1.215	0.8
+	0.89	-1.215	0.8
+
+Rad_Furniture_R050 polygon Disp_Neck_2.378
+0
+0
+9
+	0.89	-1.185	0.92
+	0.89	-1.215	0.92
+	0.91	-1.215	0.92
+
+Rad_Furniture_R050 polygon Disp_Neck_2.378
+0
+0
+9
+	0.91	-1.215	0.92
+	0.91	-1.185	0.92
+	0.89	-1.185	0.92
+
+Rad_Furniture_R050 polygon Disp_Panel_2.379
+0
+0
+9
+	0.91	-1.475	0.92
+	0.91	-1.475	1.26
+	0.89	-1.475	1.26
+
+Rad_Furniture_R050 polygon Disp_Panel_2.379
+0
+0
+9
+	0.89	-1.475	1.26
+	0.89	-1.475	0.92
+	0.91	-1.475	0.92
+
+Rad_Furniture_R050 polygon Disp_Panel_2.380
+0
+0
+9
+	0.89	-1.475	0.92
+	0.89	-1.475	1.26
+	0.89	-0.925	1.26
+
+Rad_Furniture_R050 polygon Disp_Panel_2.380
+0
+0
+9
+	0.89	-0.925	1.26
+	0.89	-0.925	0.92
+	0.89	-1.475	0.92
+
+Rad_Furniture_R050 polygon Disp_Panel_2.381
+0
+0
+9
+	0.89	-0.925	0.92
+	0.89	-0.925	1.26
+	0.91	-0.925	1.26
+
+Rad_Furniture_R050 polygon Disp_Panel_2.381
+0
+0
+9
+	0.91	-0.925	1.26
+	0.91	-0.925	0.92
+	0.89	-0.925	0.92
+
+Rad_Furniture_R050 polygon Disp_Panel_2.382
+0
+0
+9
+	0.91	-0.925	0.92
+	0.91	-0.925	1.26
+	0.91	-1.475	1.26
+
+Rad_Furniture_R050 polygon Disp_Panel_2.382
+0
+0
+9
+	0.91	-1.475	1.26
+	0.91	-1.475	0.92
+	0.91	-0.925	0.92
+
+Rad_Furniture_R050 polygon Disp_Panel_2.383
+0
+0
+9
+	0.89	-1.475	0.92
+	0.89	-0.925	0.92
+	0.91	-0.925	0.92
+
+Rad_Furniture_R050 polygon Disp_Panel_2.383
+0
+0
+9
+	0.91	-0.925	0.92
+	0.91	-1.475	0.92
+	0.89	-1.475	0.92
+
+Rad_Furniture_R050 polygon Disp_Panel_2.384
+0
+0
+9
+	0.89	-0.925	1.26
+	0.89	-1.475	1.26
+	0.91	-1.475	1.26
+
+Rad_Furniture_R050 polygon Disp_Panel_2.384
+0
+0
+9
+	0.91	-1.475	1.26
+	0.91	-0.925	1.26
+	0.89	-0.925	1.26
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_2.385
+0
+0
+9
+	0.915	-1.45	0.94
+	0.915	-1.45	1.24
+	0.909	-1.45	1.24
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_2.385
+0
+0
+9
+	0.909	-1.45	1.24
+	0.909	-1.45	0.94
+	0.915	-1.45	0.94
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_2.386
+0
+0
+9
+	0.909	-1.45	0.94
+	0.909	-1.45	1.24
+	0.909	-0.95	1.24
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_2.386
+0
+0
+9
+	0.909	-0.95	1.24
+	0.909	-0.95	0.94
+	0.909	-1.45	0.94
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_2.387
+0
+0
+9
+	0.909	-0.95	0.94
+	0.909	-0.95	1.24
+	0.915	-0.95	1.24
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_2.387
+0
+0
+9
+	0.915	-0.95	1.24
+	0.915	-0.95	0.94
+	0.909	-0.95	0.94
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_2.388
+0
+0
+9
+	0.915	-0.95	0.94
+	0.915	-0.95	1.24
+	0.915	-1.45	1.24
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_2.388
+0
+0
+9
+	0.915	-1.45	1.24
+	0.915	-1.45	0.94
+	0.915	-0.95	0.94
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_2.389
+0
+0
+9
+	0.909	-1.45	0.94
+	0.909	-0.95	0.94
+	0.915	-0.95	0.94
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_2.389
+0
+0
+9
+	0.915	-0.95	0.94
+	0.915	-1.45	0.94
+	0.909	-1.45	0.94
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_2.390
+0
+0
+9
+	0.909	-0.95	1.24
+	0.909	-1.45	1.24
+	0.915	-1.45	1.24
+
+Rad_ScreenGlass_R004 polygon Disp_Glass_2.390
+0
+0
+9
+	0.915	-1.45	1.24
+	0.915	-0.95	1.24
+	0.909	-0.95	1.24
+
+Rad_Furniture_R050 polygon Keyboard_2.391
+0
+0
+9
+	1.275	-1.35	0.802
+	1.275	-1.35	0.814
+	1.165	-1.35	0.814
+
+Rad_Furniture_R050 polygon Keyboard_2.391
+0
+0
+9
+	1.165	-1.35	0.814
+	1.165	-1.35	0.802
+	1.275	-1.35	0.802
+
+Rad_Furniture_R050 polygon Keyboard_2.392
+0
+0
+9
+	1.165	-1.35	0.802
+	1.165	-1.35	0.814
+	1.165	-1.05	0.814
+
+Rad_Furniture_R050 polygon Keyboard_2.392
+0
+0
+9
+	1.165	-1.05	0.814
+	1.165	-1.05	0.802
+	1.165	-1.35	0.802
+
+Rad_Furniture_R050 polygon Keyboard_2.393
+0
+0
+9
+	1.165	-1.05	0.802
+	1.165	-1.05	0.814
+	1.275	-1.05	0.814
+
+Rad_Furniture_R050 polygon Keyboard_2.393
+0
+0
+9
+	1.275	-1.05	0.814
+	1.275	-1.05	0.802
+	1.165	-1.05	0.802
+
+Rad_Furniture_R050 polygon Keyboard_2.394
+0
+0
+9
+	1.275	-1.05	0.802
+	1.275	-1.05	0.814
+	1.275	-1.35	0.814
+
+Rad_Furniture_R050 polygon Keyboard_2.394
+0
+0
+9
+	1.275	-1.35	0.814
+	1.275	-1.35	0.802
+	1.275	-1.05	0.802
+
+Rad_Furniture_R050 polygon Keyboard_2.395
+0
+0
+9
+	1.165	-1.35	0.802
+	1.165	-1.05	0.802
+	1.275	-1.05	0.802
+
+Rad_Furniture_R050 polygon Keyboard_2.395
+0
+0
+9
+	1.275	-1.05	0.802
+	1.275	-1.35	0.802
+	1.165	-1.35	0.802
+
+Rad_Furniture_R050 polygon Keyboard_2.396
+0
+0
+9
+	1.165	-1.05	0.814
+	1.165	-1.35	0.814
+	1.275	-1.35	0.814
+
+Rad_Furniture_R050 polygon Keyboard_2.396
+0
+0
+9
+	1.275	-1.35	0.814
+	1.275	-1.05	0.814
+	1.165	-1.05	0.814
+
+Rad_Wall_R050 polygon Room_Wall_South.397
+0
+0
+9
+	2	-3.5	0
+	1.999999	-3.65	0
+	-2	-3.65	0
+
+Rad_Wall_R050 polygon Room_Wall_South.397
+0
+0
+9
+	-2	-3.65	0
+	-2	-3.5	0
+	2	-3.5	0
+
+Rad_Wall_R050 polygon Room_Wall_South.398
+0
+0
+9
+	2	-3.5	3
+	-2	-3.5	3
+	-2	-3.65	3
+
+Rad_Wall_R050 polygon Room_Wall_South.398
+0
+0
+9
+	-2	-3.65	3
+	1.999999	-3.65	3
+	2	-3.5	3
+
+Rad_Wall_R050 polygon Room_Wall_South.399
+0
+0
+9
+	-2	-3.5	2.5
+	-2	-3.5	3
+	2	-3.5	3
+
+Rad_Wall_R050 polygon Room_Wall_South.399
+0
+0
+9
+	2	-3.5	3
+	2	-3.5	0
+	-2	-3.5	0
+
+Rad_Wall_R050 polygon Room_Wall_South.399
+0
+0
+9
+	-2	-3.5	0
+	-2	-3.5	1
+	0.499999	-3.5	1
+
+Rad_Wall_R050 polygon Room_Wall_South.399
+0
+0
+9
+	-2	-3.5	2.5
+	0.499999	-3.5	2.5
+	0.499999	-3.5	1
+
+Rad_Wall_R050 polygon Room_Wall_South.399
+0
+0
+9
+	-2	-3.5	2.5
+	2	-3.5	3
+	-2	-3.5	0
+
+Rad_Wall_R050 polygon Room_Wall_South.399
+0
+0
+9
+	-2	-3.5	2.5
+	0.499999	-3.5	1
+	-2	-3.5	0
+
+Rad_Wall_R050 polygon Room_Wall_South.400
+0
+0
+9
+	-2	-3.65	2.5
+	-2	-3.65	3
+	-2	-3.5	3
+
+Rad_Wall_R050 polygon Room_Wall_South.400
+0
+0
+9
+	-2	-3.5	3
+	-2	-3.5	2.5
+	-2	-3.65	2.5
+
+Rad_Wall_R050 polygon Room_Wall_South.401
+0
+0
+9
+	-2	-3.5	1
+	-2	-3.5	0
+	-2	-3.65	0
+
+Rad_Wall_R050 polygon Room_Wall_South.401
+0
+0
+9
+	-2	-3.65	0
+	-2	-3.65	1
+	-2	-3.5	1
+
+Rad_Wall_R050 polygon Room_Wall_South.402
+0
+0
+9
+	-2	-3.65	0
+	1.999999	-3.65	0
+	1.999999	-3.65	3
+
+Rad_Wall_R050 polygon Room_Wall_South.402
+0
+0
+9
+	1.999999	-3.65	3
+	-2	-3.65	3
+	-2	-3.65	2.5
+
+Rad_Wall_R050 polygon Room_Wall_South.402
+0
+0
+9
+	0.499999	-3.65	1
+	0.499999	-3.65	2.5
+	-2	-3.65	2.5
+
+Rad_Wall_R050 polygon Room_Wall_South.402
+0
+0
+9
+	0.499999	-3.65	1
+	-2	-3.65	1
+	-2	-3.65	0
+
+Rad_Wall_R050 polygon Room_Wall_South.402
+0
+0
+9
+	-2	-3.65	0
+	1.999999	-3.65	3
+	-2	-3.65	2.5
+
+Rad_Wall_R050 polygon Room_Wall_South.402
+0
+0
+9
+	-2	-3.65	0
+	0.499999	-3.65	1
+	-2	-3.65	2.5
+
+Rad_Wall_R050 polygon Room_Wall_South.403
+0
+0
+9
+	1.999999	-3.65	0
+	2	-3.5	0
+	2	-3.5	3
+
+Rad_Wall_R050 polygon Room_Wall_South.403
+0
+0
+9
+	2	-3.5	3
+	1.999999	-3.65	3
+	1.999999	-3.65	0
+
+Rad_Wall_R050 polygon Room_Wall_South.404
+0
+0
+9
+	-2	-3.65	1
+	0.499999	-3.65	1
+	0.499999	-3.5	1
+
+Rad_Wall_R050 polygon Room_Wall_South.404
+0
+0
+9
+	0.499999	-3.5	1
+	-2	-3.5	1
+	-2	-3.65	1
+
+Rad_Wall_R050 polygon Room_Wall_South.405
+0
+0
+9
+	-2	-3.5	2.5
+	0.499999	-3.5	2.5
+	0.499999	-3.65	2.5
+
+Rad_Wall_R050 polygon Room_Wall_South.405
+0
+0
+9
+	0.499999	-3.65	2.5
+	-2	-3.65	2.5
+	-2	-3.5	2.5
+
+Rad_Wall_R050 polygon Room_Wall_South.406
+0
+0
+9
+	0.499999	-3.5	2.5
+	0.499999	-3.5	1
+	0.499999	-3.65	1
+
+Rad_Wall_R050 polygon Room_Wall_South.406
+0
+0
+9
+	0.499999	-3.65	1
+	0.499999	-3.65	2.5
+	0.499999	-3.5	2.5
+
+Rad_Wall_R050 polygon Room_Wall_West.407
+0
+0
+9
+	-1.999999	3.65	0
+	-2	-3.65	0
+	-2.150001	-3.65	0
+
+Rad_Wall_R050 polygon Room_Wall_West.407
+0
+0
+9
+	-2.150001	-3.65	0
+	-2.15	3.65	0
+	-1.999999	3.65	0
+
+Rad_Wall_R050 polygon Room_Wall_West.408
+0
+0
+9
+	-1.999999	3.65	3
+	-2.15	3.65	3
+	-2.150001	-3.65	3
+
+Rad_Wall_R050 polygon Room_Wall_West.408
+0
+0
+9
+	-2.150001	-3.65	3
+	-2	-3.65	3
+	-1.999999	3.65	3
+
+Rad_Wall_R050 polygon Room_Wall_West.409
+0
+0
+9
+	-1.999999	3.65	0
+	-2.15	3.65	0
+	-2.15	3.65	3
+
+Rad_Wall_R050 polygon Room_Wall_West.409
+0
+0
+9
+	-2.15	3.65	3
+	-1.999999	3.65	3
+	-1.999999	3.65	0
+
+Rad_Wall_R050 polygon Room_Wall_West.410
+0
+0
+9
+	-2.150001	-3.5	1
+	-2.150001	-3.65	0
+	-2.150001	-3.65	3
+
+Rad_Wall_R050 polygon Room_Wall_West.410
+0
+0
+9
+	-2.150001	-3.65	3
+	-2.150001	-3.5	2.5
+	-2.150001	-3.5	1
+
+Rad_Wall_R050 polygon Room_Wall_West.411
+0
+0
+9
+	-2.150001	-3.5	2.5
+	-2.150001	-3.65	3
+	-2.15	3.65	3
+
+Rad_Wall_R050 polygon Room_Wall_West.411
+0
+0
+9
+	-2.15	3.65	3
+	-2.15	3.65	0
+	-2.150001	-3.65	0
+
+Rad_Wall_R050 polygon Room_Wall_West.411
+0
+0
+9
+	-2.150001	-3.65	0
+	-2.150001	-3.5	1
+	-2.15	-2	1
+
+Rad_Wall_R050 polygon Room_Wall_West.411
+0
+0
+9
+	-2.150001	-3.5	2.5
+	-2.15	-2	2.5
+	-2.15	-2	1
+
+Rad_Wall_R050 polygon Room_Wall_West.411
+0
+0
+9
+	-2.150001	-3.5	2.5
+	-2.15	3.65	3
+	-2.150001	-3.65	0
+
+Rad_Wall_R050 polygon Room_Wall_West.411
+0
+0
+9
+	-2.150001	-3.5	2.5
+	-2.15	-2	1
+	-2.150001	-3.65	0
+
+Rad_Wall_R050 polygon Room_Wall_West.412
+0
+0
+9
+	-2.150001	-3.65	0
+	-2	-3.65	0
+	-2	-3.65	3
+
+Rad_Wall_R050 polygon Room_Wall_West.412
+0
+0
+9
+	-2	-3.65	3
+	-2.150001	-3.65	3
+	-2.150001	-3.65	0
+
+Rad_Wall_R050 polygon Room_Wall_West.413
+0
+0
+9
+	-2	-3.65	3
+	-2	-3.65	0
+	-2	-3.5	1
+
+Rad_Wall_R050 polygon Room_Wall_West.413
+0
+0
+9
+	-2	-3.5	1
+	-2	-3.5	2.5
+	-2	-3.65	3
+
+Rad_Wall_R050 polygon Room_Wall_West.414
+0
+0
+9
+	-2	-3.65	0
+	-1.999999	3.65	0
+	-1.999999	3.65	3
+
+Rad_Wall_R050 polygon Room_Wall_West.414
+0
+0
+9
+	-1.999999	3.65	3
+	-2	-3.65	3
+	-2	-3.5	2.5
+
+Rad_Wall_R050 polygon Room_Wall_West.414
+0
+0
+9
+	-2	-2	1
+	-2	-2	2.5
+	-2	-3.5	2.5
+
+Rad_Wall_R050 polygon Room_Wall_West.414
+0
+0
+9
+	-2	-2	1
+	-2	-3.5	1
+	-2	-3.65	0
+
+Rad_Wall_R050 polygon Room_Wall_West.414
+0
+0
+9
+	-2	-3.65	0
+	-1.999999	3.65	3
+	-2	-3.5	2.5
+
+Rad_Wall_R050 polygon Room_Wall_West.414
+0
+0
+9
+	-2	-3.65	0
+	-2	-2	1
+	-2	-3.5	2.5
+
+Rad_Wall_R050 polygon Room_Wall_West.415
+0
+0
+9
+	-2	-2	1
+	-2.15	-2	1
+	-2.150001	-3.5	1
+
+Rad_Wall_R050 polygon Room_Wall_West.415
+0
+0
+9
+	-2.150001	-3.5	1
+	-2	-3.5	1
+	-2	-2	1
+
+Rad_Wall_R050 polygon Room_Wall_West.416
+0
+0
+9
+	-2	-3.5	2.5
+	-2.150001	-3.5	2.5
+	-2.15	-2	2.5
+
+Rad_Wall_R050 polygon Room_Wall_West.416
+0
+0
+9
+	-2.15	-2	2.5
+	-2	-2	2.5
+	-2	-3.5	2.5
+
+Rad_Wall_R050 polygon Room_Wall_West.417
+0
+0
+9
+	-2.15	-2	1
+	-2	-2	1
+	-2	-2	2.5
+
+Rad_Wall_R050 polygon Room_Wall_West.417
+0
+0
+9
+	-2	-2	2.5
+	-2.15	-2	2.5
+	-2.15	-2	1
+
+Rad_Wall_R050 polygon Room_Wall_West.418
+0
+0
+9
+	-2.150001	-3.5	1
+	-2.150001	-3.5	2.5
+	-2	-3.5	2.5
+
+Rad_Wall_R050 polygon Room_Wall_West.418
+0
+0
+9
+	-2	-3.5	2.5
+	-2	-3.5	1
+	-2.150001	-3.5	1

@@ -1,0 +1,7 @@
+newmtl painted_gypsum
+Kd 0.700 0.700 0.680
+map_Kd textures/gypsum.png
+newmtl clear_glass
+Kd 0.100 0.100 0.120
+newmtl oak_floor
+Kd 0.300 0.200 0.100

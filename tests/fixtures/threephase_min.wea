@@ -1,0 +1,9 @@
+place ATHENS_GRC
+latitude 37.9
+longitude -23.7
+time_zone -30
+site_elevation 28.0
+weather_data_file_units 1
+6 21 10.5 800 100
+6 21 11.5 800 100
+6 21 12.5 800 100

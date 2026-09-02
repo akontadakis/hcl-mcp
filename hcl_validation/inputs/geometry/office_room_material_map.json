@@ -1,0 +1,19 @@
+{
+  "_README": "Pinned material map for office_room.obj. Keys are the OBJ's usemtl group names; values encode the reflectance/transmittance the names carry (R020 -> refl 0.20, T073 -> glass tvis 0.73, etc.). An on-disk map that covers every group wins over the tester's auto-generated map, so these EXACT values are used (the auto-map would otherwise default glazing to tvis 0.65 and mis-type Rad_ScreenGlass as a window). units/up_axis/north_angle_deg are read alongside the group specs. This Blender export is Z-up (height on +Z), so up_axis is Z. ORIENTATION (re-authored 2026-07-05): the geometry is now modelled directly in the true-north frame, so north_angle_deg is 0. The single window sits in the wall named South (model -Y), so at north_angle_deg 0 it is a SOUTH-facing window (its outward -Y normal points true south). This mirrors the compass-named materials in radiance/materials.rad. Rad_Luminaire_L09 is type:luminaire bound to the L09_neutral fixture (IES photometry + measured SPD) so import_geometry returns a drop-in electric_lights payload for run_grid/run_image; the ies/spd are ABSOLUTE paths so import_geometry(sidecar=...) resolves them irrespective of cwd (edit if you relocate the repo or swap CCT L09_warm/L09_cool). NOTE: the pre-authored radiance/office_room.rad scene is the equivalent hand-built path (materials in radiance/materials.rad, IES emitters in radiance/luminaires_L09.rad).",
+  "units": "m",
+  "up_axis": "Z",
+  "north_angle_deg": 0,
+
+  "Rad_Floor_R020": { "type": "floor", "refl": 0.20 },
+  "Rad_Wall_R050": { "type": "plastic", "refl": 0.50 },
+  "Rad_Ceiling_R080": { "type": "plastic", "refl": 0.80 },
+  "Rad_Frame_R050": { "type": "plastic", "refl": 0.50 },
+  "Rad_Furniture_R050": { "type": "plastic", "refl": 0.50 },
+  "Rad_ScreenGlass_R004": { "type": "plastic", "refl": 0.04 },
+  "Rad_Glazing_T073": { "type": "glass", "tvis": 0.73 },
+  "Rad_Luminaire_L09": {
+    "type": "luminaire",
+    "ies": "/abs/path/to/hcl-mcp/hcl_validation/inputs/luminaires/L09_neutral.ies",
+    "spd": "/abs/path/to/hcl-mcp/hcl_validation/inputs/spd/L09_neutral.spd"
+  }
+}

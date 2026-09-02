@@ -1,0 +1,24 @@
+{
+  "_meta": {
+    "date": "2026-07-18",
+    "what": "Post-patch verification of the electric path THROUGH THE MCP TOOL after applying the source.cal A1 fix (sudo apply_source_cal_patch.sh).",
+    "tool": "mcp__hcl-mcp__run_grid (electric_lights, channel_type=0)",
+    "scene": "office_room + materials, 4x L09_neutral at (+/-1, +/-1.8, 2.9)"
+  },
+  "source_cal_patched": true,
+  "electric_photopic_lux": {
+    "under_fixture_(1,-1.8)": 622.74,
+    "room_center_(0,0)": 497.20,
+    "far_corner_(1.4,2.89)": 412.46
+  },
+  "melanopic_over_photopic": 0.765,
+  "total_wattage": 152,
+  "before_patch_for_comparison": {"under_fixture": 43.4, "room_center": 34.6},
+  "glare_ugr_postpatch": {
+    "tool": "mcp__hcl-mcp__glare_ugr (seated eye 0,0,1.2 facing -Y window)",
+    "UGR": 19.24, "DGP": 0.199, "n_glare_sources": 2, "source_luminance_cd_m2": 5609,
+    "before_patch": {"UGR": 0, "DGP": 0.16},
+    "note": "The pre-patch UGR=0 was NOT a separate bug -- it was the same A1 under-emission (fixtures 14x too dim -> below evalglare's glare threshold -> UGR clamped to 0). Post-patch UGR=19.24 (= the standard office glare limit) and DGP=0.199 (<0.35 imperceptible) are realistic and consistent."
+  },
+  "verdict": "Electric path fully validated on this machine end-to-end via the MCP tool: ~14x illuminance correction confirmed (412-623 lux), and glare (UGR 19.24 / DGP 0.199) now sane. Closes BOTH the electric magnitude item AND the UGR=0 anomaly (same root cause)."
+}
