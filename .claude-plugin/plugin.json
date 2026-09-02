@@ -12,13 +12,19 @@
   "keywords": [
     "mcp",
     "model-context-protocol",
+    "claude-code",
+    "anthropic",
+    "agent-skills",
     "lighting",
-    "daylight",
+    "daylighting",
     "radiance",
-    "circadian",
+    "circadian-rhythm",
     "melanopic",
     "human-centric-lighting",
     "building-physics",
-    "epw"
+    "building-simulation",
+    "spectral-analysis",
+    "epw",
+    "python"
   ]
 }
