@@ -56,11 +56,6 @@ def test_presets_resource_includes_illustrative_leds():
     out = json.loads(res.preset_resource("LED_4000K"))
     assert len(out["spd"]) == 401
 
-def test_record_client_caps_at_init_smoke():
-    # The init hook populates CLIENT_CAPS; with no real client it stays all-False by default.
-    import hcl_mcp.server as srv
-    assert set(srv.CLIENT_CAPS) == {"roots", "elicitation", "sampling"}
-
 def test_resource_templates_present():
     import hcl_mcp.server as srv
     tmpls = asyncio.run(srv.mcp.list_resource_templates())
@@ -514,34 +509,6 @@ def test_build_report_tool_writes_files(tmp_path):
     assert os.path.exists(out["html_path"])
 
 
-def test_ensure_caps_records_once_for_any_ctx_wrapper(tmp_path, monkeypatch):
-    # MCP-5: caps must record via ANY ctx-bearing wrapper (not just write_material), once, idempotently.
-    import asyncio, hcl_mcp.server as srv
-    calls = []
-    monkeypatch.setattr(srv, "record_client_caps", lambda ctx: calls.append(ctx))
-    srv._CAPS_RECORDED = False
-
-    class Ctx:
-        session = None
-        async def list_roots(self):
-            return []
-
-    ctx = Ctx()
-    asyncio.run(srv.load_brief(study="t", work_dir=str(tmp_path), ctx=ctx))
-    assert len(calls) == 1
-    asyncio.run(srv.load_brief(study="t", work_dir=str(tmp_path), ctx=ctx))
-    assert len(calls) == 1   # idempotent
-
-
-def test_ensure_caps_noop_without_ctx(monkeypatch):
-    import hcl_mcp.server as srv
-    calls = []
-    monkeypatch.setattr(srv, "record_client_caps", lambda ctx: calls.append(ctx))
-    srv._CAPS_RECORDED = False
-    srv._ensure_caps(None)
-    assert calls == []
-
-
 def test_weather_rejects_malformed_period():
     import pytest, hcl_mcp.server as srv
     with pytest.raises(ValueError, match="period must be"):
@@ -816,7 +783,6 @@ def test_annual_nvrd_mcp_forwards_physical_sky(monkeypatch):
         return work_dir or "/tmp/x"
     monkeypatch.setattr(srv, "_annual_nvrd", fake_core)
     monkeypatch.setattr(srv, "resolve_work_dir", fake_wd)
-    monkeypatch.setattr(srv, "_ensure_caps", lambda ctx: None)
     asyncio.run(srv.annual_nvrd(point_xyz=[1, 2, 3], view_vec=[0, 0, 1], epw=None,
                                 channel_scenes=None, points=None, run=False,
                                 physical_sky=True, ctx=None))
@@ -834,7 +800,6 @@ def test_annual_nvrd_mcp_materializes_inline_points(monkeypatch, tmp_path):
         return work_dir or str(tmp_path)
     monkeypatch.setattr(srv, "_annual_nvrd", fake_core)
     monkeypatch.setattr(srv, "resolve_work_dir", fake_wd)
-    monkeypatch.setattr(srv, "_ensure_caps", lambda ctx: None)
     asyncio.run(srv.annual_nvrd(point_xyz=[1, 2, 3], view_vec=[0, 0, 1], epw=None,
                                 channel_scenes=None, points=[[0, 0, 0.8, 0, 0, 1]],
                                 run=False, work_dir=str(tmp_path), ctx=None))
@@ -898,7 +863,6 @@ def test_server_annual_nvrd_smarts_no_binary_only_raises_when_physical(monkeypat
         return work_dir or "/tmp/x"
     monkeypatch.setattr(srv, "_annual_nvrd", fake_core)
     monkeypatch.setattr(srv, "resolve_work_dir", fake_wd)
-    monkeypatch.setattr(srv, "_ensure_caps", lambda ctx: None)
 
     # physical_sky=False -> engine unused -> must NOT raise; engine_obj passed down as None.
     out = asyncio.run(srv.annual_nvrd(point_xyz=[1, 2, 3], view_vec=[0, 0, 1], epw=None,

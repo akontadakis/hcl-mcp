@@ -62,8 +62,9 @@ from hcl_radiance.daylight_factor import run_daylight_factor as _run_daylight_fa
 from hcl_radiance.lm83_run import run_lm83 as _run_lm83
 from hcl_core.daylight_metrics import daylight_metrics as _daylight_metrics  # noqa: F401 (used by Tasks 12-13)
 from hcl_core.lighting_controls import default_schedule as _default_schedule  # noqa: F401 (used by Task 12)
-from hcl_mcp.clientfeatures import (  # noqa: F401 (elicit_value used by later plans)
-    resolve_work_dir, elicit_value, record_client_caps, CLIENT_CAPS)
+from mcp.types import InputRequiredResult
+from hcl_mcp import __version__
+from hcl_mcp.clientfeatures import resolve_work_dir, confirm_run
 from hcl_mcp.studio import (save_brief_to_dir as _save_brief, load_brief_from_dir as _load_brief,
                             build_report_to_dir as _build_report)
 from hcl_mcp import resources as _resources
@@ -124,7 +125,7 @@ ADVISORIES
   circadian_metrics with multi-point input — inspect `mel_der_source` per point there.
 """
 
-mcp = FastMCP("hcl-mcp", instructions=INSTRUCTIONS)
+mcp = FastMCP("hcl-mcp", instructions=INSTRUCTIONS, version=__version__)
 
 # ============================================================================
 # TOOL WRAPPERS (grouped by backend). Definitions stay in this module so the
@@ -157,18 +158,6 @@ def glass_transmissivity(transmittance: float | list[float]) -> dict:
     delivers the value as a string, so the core's transmittance-squared term would raise (DEF-1)."""
     return {"transmissivity": _glass(transmittance)}
 
-_CAPS_RECORDED = False
-
-
-def _ensure_caps(ctx) -> None:
-    """Record negotiated client capabilities the first time any tool runs with a real ctx.
-    FastMCP has no on_initialize hook, so we record once and cache via _CAPS_RECORDED.
-    No-op when ctx is None or already recorded."""
-    global _CAPS_RECORDED
-    if ctx is not None and not _CAPS_RECORDED:
-        record_client_caps(ctx)
-        _CAPS_RECORDED = True
-
 
 def emit_envelope(ran: bool, *, commands=None, result=None, reason=None, **extra) -> dict:
     """Uniform run-or-emit envelope. ran=False -> {ran, commands?, reason?, **extra};
@@ -188,8 +177,7 @@ def emit_envelope(ran: bool, *, commands=None, result=None, reason=None, **extra
 async def write_material(channels: list, material_type: int, channel_type: int, name: str,
                          roughness: float = 0.0, specularity: float = 0.0,
                          work_dir: str | None = None, ctx: Context | None = None) -> dict:
-    """Write Radiance material .rad file(s). material_type 0=glass,1=plastic. Honors client roots for work_dir."""
-    _ensure_caps(ctx)
+    """Write Radiance material .rad file(s). material_type 0=glass,1=plastic. Written to work_dir (default: HCL_WORK_ROOT, else ~/hcl_work)."""
     wd = await resolve_work_dir(ctx, work_dir)
     return _write_material(channels, material_type=material_type, channel_type=channel_type,
                            name=name, roughness=roughness, specularity=specularity, work_dir=wd)
@@ -397,7 +385,6 @@ async def colored_sky(diffuse_channels: list, direct_channels: list, channel_typ
     Both are required together; supplied, they emit gendaylit's `-ang` form and make the record's
     position authoritative for the traced geometry. Omitted, behaviour is unchanged.
     """
-    _ensure_caps(ctx)
     wd = await resolve_work_dir(ctx, work_dir)
     return _colored_sky(diffuse_channels, direct_channels, channel_type, month=month, day=day, hour=hour,
                         irrad_mode=irrad_mode, mode=mode, lat=lat, lon=lon, utc=utc,
@@ -409,10 +396,9 @@ async def colored_luminaire(rad_path: str, channels9: list, count: int, name: st
     """Inject a channel triplet into a luminaire .rad, writing a NEW file (never edits the input).
 
     count: 0=blue,1=green,2=red third of 9 values. The colored definition is written to work_dir
-    (client-roots aware) as <name>.rad — the source rad_path is left untouched — and its absolute
+    (default: HCL_WORK_ROOT, else ~/hcl_work) as <name>.rad — the source rad_path is left untouched — and its absolute
     path is returned. rad_path may be a .rad file path or raw .rad text. Returns {file, rad}.
     """
-    _ensure_caps(ctx)
     rad_text = _color_luminaire(rad_path, channels9, count, in_place=False)
     wd = await resolve_work_dir(ctx, work_dir)
     os.makedirs(wd, exist_ok=True)
@@ -453,7 +439,6 @@ async def run_grid(scene_sets: list, points: str | list, channel_type: int = 1,
     inside the electric octree. A leak here reports daylight as electric light; the `electric` block
     carries a `lumen_bound` (sum of luminaire lumens / grid area) so an over-count is visible.
     """
-    _ensure_caps(ctx)
     wd = await resolve_work_dir(ctx, work_dir)
     kwargs = {"work_dir": wd, "run": run}
     _rp = _resolve_rad_params(rad_params, quality)
@@ -476,7 +461,6 @@ async def run_image(scene_sets: list, channel_type: int = 1, view: str = "-vta -
     """Fisheye HCL image workflow: rpict -> mel/neuropic greyscale luminance maps (falsecolor-ready)
     -> optional ipRGC FOV weighting -> RGB-from-HDR eye irradiance. Runs Radiance if present, else
     returns the commands."""
-    _ensure_caps(ctx)
     wd = await resolve_work_dir(ctx, work_dir)
     kw = {"channel_type": channel_type, "view": view, "x": x, "y": y,
           "fov_weighting": fov_weighting, "mask_dir": mask_dir, "work_dir": wd, "run": run}
@@ -535,7 +519,6 @@ async def import_geometry(obj_path: str, material_map: dict | None = None,
     payload for run_grid/run_image, which run ies2rad + colorize); `context_groups` (type:"context"
     exterior-shading groups); and grid_points/observer_sets/observer_points/glare_views (derive_sensors).
     """
-    _ensure_caps(ctx)
     wd = await resolve_work_dir(ctx, work_dir)
     extra = {} if eye_heights is None else {"eye_heights": tuple(eye_heights)}
     from hcl_radiance.geometry_import import _normalize_up_axis
@@ -636,7 +619,6 @@ async def workplane_grid(obj_path: str, material_map: dict | None = None, sideca
     from hcl_radiance.sensor_methodology import detect_interior, floor_top_z, en12464_grid
     from hcl_radiance.footprint import floor_polygons
 
-    _ensure_caps(ctx)
     wd = await resolve_work_dir(ctx, work_dir)
 
     if sidecar is not None:
@@ -747,7 +729,6 @@ async def observer_points(obj_path: str, material_map: dict | None = None, sidec
     from hcl_radiance.sensor_methodology import build_observers, detect_workstations, floor_top_z
     from hcl_radiance.footprint import floor_polygons, point_in_footprint
 
-    _ensure_caps(ctx)
     wd = await resolve_work_dir(ctx, work_dir)
 
     if sidecar is not None:
@@ -875,7 +856,6 @@ async def photosensors(obj_path: str, material_map: dict | None = None, sidecar:
     from hcl_radiance.geometry_import import scale_factor, load_sidecar, resolve_spec, _rotate_north
     from hcl_radiance.sensor_daylight import place_photosensors
 
-    _ensure_caps(ctx)
     wd = await resolve_work_dir(ctx, work_dir)
 
     if sidecar is not None:
@@ -945,7 +925,6 @@ async def preview_scene(obj_path: str, material_map: dict | None = None, sidecar
     from hcl_radiance.geometry_import import scale_factor, load_sidecar, resolve_spec
     from hcl_radiance.scene_preview import build_scene, render_plan, render_3d
 
-    _ensure_caps(ctx)
     wd = await resolve_work_dir(ctx, work_dir)
 
     if sidecar is not None:
@@ -1147,7 +1126,6 @@ async def run_annual(channel_scenes: list, wea: str, points: str | list, channel
     period before the run and real HOY drives dosimetry (omit to run the full year).
     Runs Radiance if present, else returns the exact command sequence.
     """
-    _ensure_caps(ctx)
     wd = await resolve_work_dir(ctx, work_dir)
     points = _ensure_points_path(points, wd)
     kw = {"work_dir": wd, "run": run, "dosimetry_threshold": dosimetry_threshold,
@@ -1181,13 +1159,14 @@ async def annual_daylight(channel_scenes: list, wea: str, points: str | list | N
       sDA or only the underlying DA-based spatial fraction. Left undeclared it reports
       'undeclared' and `lm83_conformant: false` -- the metric is never assumed conformant.
     """
-    _ensure_caps(ctx)
     wd = await resolve_work_dir(ctx, work_dir)
     pts = _resolve_points(points, sensor_set, wd)
     if run:
-        proceed = await elicit_value(
+        proceed = await confirm_run(
             ctx, "annual_daylight runs an 8760-hour 2-phase DDS simulation plus a direct-only ASE "
-                 "pass (minutes-to-hours). Proceed?", bool)
+                 "pass (minutes-to-hours). Proceed?")
+        if isinstance(proceed, InputRequiredResult):
+            return proceed  # the question itself: the client answers by calling again
         if proceed is False:
             run = False
     kw = {"work_dir": wd, "run": run}
@@ -1273,7 +1252,6 @@ async def lm83_daylight(obj_path: str, material_map: dict, wea: str,
     on an unknown-frame vertical window. Read `metrics.conditions.departures` before quoting
     a number; this is not by itself an LM-83 or LEED submission.
     """
-    _ensure_caps(ctx)
     wd = await resolve_work_dir(ctx, work_dir)
     pts = _resolve_points(points, sensor_set, wd, name="lm83_points.pts")
     n_pts = _count_points_for(points, sensor_set, wd)
@@ -1294,10 +1272,12 @@ async def lm83_daylight(obj_path: str, material_map: dict, wea: str,
                   "point_indices": list(range(len(point_rows)))}]
 
     if run:
-        proceed = await elicit_value(
+        proceed = await confirm_run(
             ctx, "lm83_daylight traces a three-phase V and D matrix per window group, then "
                  "runs an 8760-hour multiply per shading state plus a zero-bounce sun pass "
-                 "(minutes-to-hours). Proceed?", bool)
+                 "(minutes-to-hours). Proceed?")
+        if isinstance(proceed, InputRequiredResult):
+            return proceed  # the question itself: the client answers by calling again
         if proceed is False:
             run = False
 
@@ -1358,7 +1338,6 @@ async def daylight_factor(scene_sets: list, points: str | list | None = None,
     the overcast sky is added internally. points: inline rows or a .pts path, OR sensor_set='name'.
     Returns df_per_point + df_avg/df_min/uniformity + e_outdoor, or the command plan when not run.
     """
-    _ensure_caps(ctx)
     wd = await resolve_work_dir(ctx, work_dir)
     pts = _resolve_points(points, sensor_set, wd)
     indoor_points = _read_pts_rows(pts)
@@ -1413,7 +1392,6 @@ async def ies_to_radiance(ies: str, placement: dict | None = None, color: list |
     -m carries user scaling only (multiplier * maintenance_factor); ies2rad applies the IES
     candela/ballast/pfactor itself. Runs ies2rad if Radiance is present, else returns the commands.
     """
-    _ensure_caps(ctx)
     wd = await resolve_work_dir(ctx, work_dir)
     prefix = out_prefix or "luminaire"
     steps = [{"cmd": build_ies2rad(ies, multiplier=multiplier, maintenance_factor=maintenance_factor,
@@ -1437,7 +1415,6 @@ async def glare_ugr(scene_sets: list, channel_type: int = 0, view: str = "-vta -
 
     Delegates to run_image with glare=True. Runs Radiance if present, else returns the commands.
     """
-    _ensure_caps(ctx)
     wd = await resolve_work_dir(ctx, work_dir)
     kw = {"channel_type": channel_type, "view": view, "x": x, "y": y,
           "electric_lights": electric_lights, "glare": True, "glare_params": glare_params,
@@ -1516,7 +1493,6 @@ async def daylight_savings(scene_sets: list | None = None, channel_scenes: list 
     length run_annual returns and assumes an 8760-h, Monday-anchored (HOY 0 = Mon 00:00) series. If
     run_annual is run over a sub-period or a non-Monday-anchored year, pass an explicit `schedule`.
     """
-    _ensure_caps(ctx)
     wd = await resolve_work_dir(ctx, work_dir)
     if mode not in {"point_in_time", "annual"}:
         raise ValueError(f"mode must be 'point_in_time' or 'annual', got {mode!r}")
@@ -1544,9 +1520,11 @@ async def daylight_savings(scene_sets: list | None = None, channel_scenes: list 
                              f"weight(s) for {n_pts} point(s)")
 
     if mode == "annual" and run:
-        proceed = await elicit_value(
+        proceed = await confirm_run(
             ctx, "Annual daylight_savings runs an 8760-hour 2-phase DDS simulation (minutes-to-hours). "
-                 "Proceed?", bool)
+                 "Proceed?")
+        if isinstance(proceed, InputRequiredResult):
+            return proceed  # the question itself: the client answers by calling again
         if proceed is False:
             run = False  # declined -> fall through to the emit path
 
@@ -1658,7 +1636,6 @@ async def generate_subhourly_wea(epw: str, timestep_min: int = 6, latitude: floa
     East-positive coordinates. Runs Daysim if present, else returns the command plan + the written .hea
     so you can build Daysim and run it yourself.
     """
-    _ensure_caps(ctx)
     wd = await resolve_work_dir(ctx, work_dir)
     res = _generate_subhourly_wea(epw, timestep_min=timestep_min, latitude=latitude,
                                   longitude=longitude, time_zone=time_zone,
@@ -1716,14 +1693,15 @@ async def annual_nvrd(point_xyz: list, view_vec: list, epw: str | None = None,
     the tool takes no caller-supplied coordinates, so wrong-convention coordinates cannot silently
     corrupt the solar geometry.
     """
-    _ensure_caps(ctx)
     wd = await resolve_work_dir(ctx, work_dir)
     if run:
         # Elicit confirmation before the long run (scope = timesteps x channels x DDS transport).
-        confirm = await elicit_value(
+        proceed = await confirm_run(
             ctx, "annual_nvrd runs Daysim sub-hourly generation + a full 2-phase DDS annual transport "
-                 "(potentially long). Proceed? (set run=false to only emit the command plan)", bool)
-        if confirm is False:
+                 "(potentially long). Proceed? (set run=false to only emit the command plan)")
+        if isinstance(proceed, InputRequiredResult):
+            return proceed  # the question itself: the client answers by calling again
+        if proceed is False:
             run = False  # user declined -> fall through to emit
     # Engine only matters on the physical_sky path; resolve lazily so engine="smarts" without a
     # binary does not raise on a call that never uses it.
@@ -1764,7 +1742,6 @@ def recommend_fixtures(length_m: float, width_m: float, height_m: float, mount_h
 async def save_brief(study: str, brief: dict, work_dir: str | None = None,
                      ctx: Context | None = None) -> dict:
     """Persist (shallow-merge) a study brief to <work_dir>/<study>/brief.json. Call after each phase."""
-    _ensure_caps(ctx)
     base = await resolve_work_dir(ctx, work_dir)
     path = _save_brief(base, study, brief)
     return {"saved": True, "path": path}
@@ -1772,7 +1749,6 @@ async def save_brief(study: str, brief: dict, work_dir: str | None = None,
 
 async def load_brief(study: str, work_dir: str | None = None, ctx: Context | None = None) -> dict:
     """Load a study brief (empty skeleton if none). Call at journey start to resume where you left off."""
-    _ensure_caps(ctx)
     base = await resolve_work_dir(ctx, work_dir)
     return _load_brief(base, study)
 
@@ -1781,7 +1757,6 @@ async def build_report(study: str, brief: dict, work_dir: str | None = None,
                        ctx: Context | None = None) -> dict:
     """Render a study brief to <work_dir>/<study>/report.{md,html}: goal recap, fixture spec,
     target-vs-achieved table with pass/fail, circadian↔glare cross-check, compliance. Always runs."""
-    _ensure_caps(ctx)
     base = await resolve_work_dir(ctx, work_dir)
     return _build_report(base, study, brief)
 
@@ -1891,7 +1866,6 @@ async def spectral_epw(epw: str, forms: list | None = None, hours: list | None =
     9-anchor seed) | 'local' (your own locally-fitted CCM, requires ccm_coeffs).
     ccm_coeffs: path to a fitted CCM CSV (from sedes1_fit) — required when cloud_variant='local'.
     """
-    _ensure_caps(ctx)
     wd = await resolve_work_dir(ctx, work_dir)
     os.makedirs(wd, exist_ok=True)
     forms = forms or ["spd_set", "band_matrix", "spectral_wea", "sidecar"]
@@ -1936,7 +1910,6 @@ async def spectral_sky_native(epw: str, mf: int = 1, mode: str = "all",
     grows steeply with the Reinhart subdivision mf (minutes at mf>=4); on expiry the tool returns
     {ok: False, timed_out: True} rather than raising. Trim the EPW, or raise mf only as needed.
     """
-    _ensure_caps(ctx)
     wd = await resolve_work_dir(ctx, work_dir)
     return _run_gensdaymtx(epw, wd, mf=mf, mode=mode, run=run, timeout=timeout)
 
@@ -1954,7 +1927,6 @@ async def sensors(action: str, name: str | None = None, points: list | None = No
       get:    name -> the set's points + .pts path.
       delete: name -> remove the set.
     """
-    _ensure_caps(ctx)
     wd = await resolve_work_dir(ctx, work_dir)
     if action == "create":
         if not name:

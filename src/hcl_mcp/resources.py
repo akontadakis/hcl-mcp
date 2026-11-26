@@ -456,4 +456,4 @@ def register_resources(mcp):
     for r in RESOURCES:
         mcp.resource(r.uri, name=r.name, title=r.title, description=r.description,
                      mime_type=r.mime_type, tags=set(r.tags))(r.handler)
-    mcp._mcp_server.completion()(_complete)
+    mcp.completion(_complete)

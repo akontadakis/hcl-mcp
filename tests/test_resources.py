@@ -105,6 +105,16 @@ def test_complete_unmapped_and_prompt_ref_return_none():
     pref = mt.PromptReference(type="ref/prompt", name="explain_concept")
     assert asyncio.run(res._complete(pref, _arg("topic", ""), None)) is None
 
-def test_register_resources_wires_completion_handler():
-    m = _fresh_server()
-    assert mt.CompleteRequest in m._mcp_server.request_handlers
+def test_a_client_gets_template_argument_completions_from_a_registered_server():
+    """End to end through a real client: registering the resources must leave a server that
+    answers completion/complete. Asserting on a private handler table instead is what let a
+    FastMCP major remove that table and take the whole server down on import."""
+    from fastmcp import Client
+
+    async def complete():
+        async with Client(_fresh_server()) as client:
+            return await client.complete(
+                {"type": "ref/resource", "uri": "hcl://preset/{name}"},
+                {"name": "name", "value": "D"})
+
+    assert set(asyncio.run(complete()).values) == {"D65", "D50"}

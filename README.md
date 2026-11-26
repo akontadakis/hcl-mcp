@@ -96,7 +96,8 @@ the manual route are under [Installation](#installation).
 | --- | --- | --- |
 | **Python** | ≥ 3.11 | from [`pyproject.toml`](pyproject.toml) |
 | **[`uv`](https://docs.astral.sh/uv/)** | current | installs deps and launches the server |
-| `fastmcp` · `pydantic` · `colour-science` · `matplotlib` | ≥ 2.0, < 4 · ≥ 2 · ≥ 0.4.4 · ≥ 3.7 | installed automatically; all four are hard dependencies |
+| **MCP client** | protocol 2026-07-28 or 2025-11-25 | the server answers both: per-request metadata, or the older `initialize` handshake |
+| `fastmcp` · `pydantic` · `colour-science` · `matplotlib` | ≥ 4.2, < 5 · ≥ 2 · ≥ 0.4.4 · ≥ 3.7 | installed automatically; all four are hard dependencies |
 
 External engines are optional — see [External Engines](#external-engines).
 

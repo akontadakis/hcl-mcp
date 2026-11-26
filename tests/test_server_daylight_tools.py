@@ -76,7 +76,7 @@ def test_daylight_savings_annual_multipoint(monkeypatch, tmp_path):
         return {"ran": True, "n_points": 2, "n_timesteps": 3,
                 "lux_matrix": [[600, 600, 0], [600, 0, 0]], "sun_lux_matrix": [[0] * 3, [0] * 3]}
     monkeypatch.setattr(server, "_run_annual_daylight", fake_runner)
-    # avoid the elicitation prompt: ctx=None makes elicit_value return None (no override)
+    # no confirmation prompt: with ctx=None confirm_run proceeds without asking
     out = asyncio.run(server.daylight_savings(
         channel_scenes=[{"materials": ["m.rad"], "geometry": "g.rad", "sky_color": [1, 1, 1]}],
         wea="in.wea", points=[[0, 0, 0.8, 0, 0, 1], [1, 0, 0.8, 0, 0, 1]],

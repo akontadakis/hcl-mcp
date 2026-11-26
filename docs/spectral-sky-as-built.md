@@ -1117,7 +1117,7 @@ year" figure was wrong — that magnitude only appears at higher `mf` or under h
 **File:** `src/hcl_mcp/server.py` · **Spec:** §9.7 · **Tests:** `tests/test_server.py` (+1)
 
 `spectral_sky_native(epw, mf=1, mode="all", work_dir=None, run=True, timeout=None, ctx=None)` follows the standard
-tool shape (`_ensure_caps(ctx)` → `await resolve_work_dir(ctx, work_dir)`) and returns `run_gensdaymtx`'s dict
+tool shape (`await resolve_work_dir(ctx, work_dir)`) and returns `run_gensdaymtx`'s dict
 verbatim (the `ok`/`timed_out` fields flow through). The `timeout` param (added 2026-06-21, **D-29**) is passed
 straight to `run_gensdaymtx` — default `None` = no cap, because a full-year EPW matrix is many minutes of CPU.
 Registered additively in the `for _tool in (...)` loop alongside the Phase-5 spectral tools. The `+1` server test
