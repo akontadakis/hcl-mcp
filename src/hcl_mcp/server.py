@@ -2,10 +2,22 @@
 import functools
 import inspect
 import os
+import signal
+import threading
+from datetime import timedelta
+
+import anyio
+import anyio.from_thread
+import anyio.to_thread
 
 from fastmcp import FastMCP, Context
+from pydantic import TypeAdapter, ValidationError
+from fastmcp.server.middleware import Middleware
+from fastmcp.tools import InputRequiredToolResult
+from fastmcp_tasks import TasksExtension
 
 from hcl_core import data
+from hcl_core import jobcontrol
 from hcl_mcp.advisories import advise as _advise
 from hcl_core.spd import parse_spd, bin_average
 from hcl_core.materials import glass_transmissivity as _glass, write_material as _write_material
@@ -64,7 +76,7 @@ from hcl_core.daylight_metrics import daylight_metrics as _daylight_metrics  # n
 from hcl_core.lighting_controls import default_schedule as _default_schedule  # noqa: F401 (used by Task 12)
 from mcp.types import InputRequiredResult
 from hcl_mcp import __version__
-from hcl_mcp.clientfeatures import resolve_work_dir, confirm_run
+from hcl_mcp.clientfeatures import resolve_work_dir, confirm_run, is_modern_protocol
 from hcl_mcp.studio import (save_brief_to_dir as _save_brief, load_brief_from_dir as _load_brief,
                             build_report_to_dir as _build_report)
 from hcl_mcp import resources as _resources
@@ -125,7 +137,22 @@ ADVISORIES
   circadian_metrics with multi-point input — inspect `mel_der_source` per point there.
 """
 
-mcp = FastMCP("hcl-mcp", instructions=INSTRUCTIONS, version=__version__)
+# Everything this server lists (tools, prompts, resources, reference texts) is fixed for the life
+# of the process and none of it is specific to a user, so clients on MCP 2026-07-28 are told they
+# may cache it: ttlMs = one hour, cacheScope = "public". Handshake-era clients never see the hint.
+CACHE_TTL_SECONDS = 3600
+
+mcp = FastMCP("hcl-mcp", instructions=INSTRUCTIONS, version=__version__,
+              cache_ttl=CACHE_TTL_SECONDS, cache_scope="public")
+
+# Background tasks (MCP tasks extension, SEP-2663) for the tools in _TASK_TOOLS below. A client
+# that declared the extension gets a task handle back at once and polls it; every other client
+# keeps getting the plain inline call. The backend is in-process (memory://), so nothing has to
+# be installed or started and a task lives exactly as long as this server process does.
+# Kept for a day: an annual run can take hours, and its result is fetched after it ends.
+TASK_TTL = timedelta(hours=24)
+_TASKS_EXTENSION = "io.modelcontextprotocol/tasks"   # the extension's identifier in the spec
+mcp.add_extension(TasksExtension(execution_ttl=TASK_TTL))
 
 # ============================================================================
 # TOOL WRAPPERS (grouped by backend). Definitions stay in this module so the
@@ -157,6 +184,59 @@ def glass_transmissivity(transmittance: float | list[float]) -> dict:
     The float|list annotation is load-bearing: without it FastMCP emits an empty arg schema and
     delivers the value as a string, so the core's transmittance-squared term would raise (DEF-1)."""
     return {"transmissivity": _glass(transmittance)}
+
+
+# One simulation at a time. Engines write fixed file names into the work directory (points.pts,
+# daylight0.oct, img0.hdr, ...). While an engine held the event loop two calls could not overlap;
+# now that it runs on a worker thread, this lock is what keeps parallel calls from silently
+# overwriting each other's octrees and results. It is a thread lock on purpose: it is held by
+# the thread doing the work, so it also covers the last moments of a cancelled run whose thread
+# is still shutting its process down when the next call arrives.
+_ENGINE_TURN = threading.Lock()
+
+
+def _take_turn(fn, args, kwargs):
+    with _ENGINE_TURN:
+        jobcontrol.raise_if_cancelled()      # cancelled while waiting: never start
+        return fn(*args, **kwargs)
+
+
+async def _offload(fn, /, *args, **kwargs):
+    """Run a blocking engine call on a worker thread and wait for it.
+
+    Every simulation entry point goes through here. Called straight from a coroutine it would
+    hold the event loop for as long as Radiance runs, and a held loop cannot read a
+    cancellation, send progress, or answer another request.
+
+    The thread inherits this coroutine's context, so the engine runs inside the tool call's
+    `hcl_core.jobcontrol` job (opened in `_with_advisories`). If the call is cancelled the wait
+    is abandoned at once -- a thread cannot be interrupted -- and leaving the job is what stops
+    the thread: the process it is waiting on is killed and its next step raises. That takes a
+    moment (a poll interval, plus a grace period for a process that ignores the request), so
+    "stopped" means within seconds, not at the instant the call returns.
+
+    Engines take turns (`_ENGINE_TURN`): a second simulation waits for the first, while every
+    other request -- status, validation, task polling, cancellation -- is still answered.
+    """
+    return await anyio.to_thread.run_sync(functools.partial(_take_turn, fn, args, kwargs),
+                                          abandon_on_cancel=True)
+
+
+def _progress_reporter(ctx):
+    """A job's `on_step` callback: forward an engine step to the client as MCP progress.
+
+    Called on the worker thread; `report_progress` belongs to the event loop, hence the hop.
+    It sends `notifications/progress` when the request carried a progress token, updates the
+    task's status message inside a background task, and is silent otherwise. `total` is left
+    out: a tool may run several command sequences, and only the running count is monotonic.
+    """
+    if ctx is None:
+        return None
+
+    def report(count, message):
+        anyio.from_thread.run(ctx.report_progress, count, None, message)
+
+    return report
 
 
 def emit_envelope(ran: bool, *, commands=None, result=None, reason=None, **extra) -> dict:
@@ -386,7 +466,7 @@ async def colored_sky(diffuse_channels: list, direct_channels: list, channel_typ
     position authoritative for the traced geometry. Omitted, behaviour is unchanged.
     """
     wd = await resolve_work_dir(ctx, work_dir)
-    return _colored_sky(diffuse_channels, direct_channels, channel_type, month=month, day=day, hour=hour,
+    return await _offload(_colored_sky, diffuse_channels, direct_channels, channel_type, month=month, day=day, hour=hour,
                         irrad_mode=irrad_mode, mode=mode, lat=lat, lon=lon, utc=utc,
                         direct=direct, diffuse=diffuse, globl=globl, name=name, work_dir=wd, run=run,
                         sun_zenith_deg=sun_zenith_deg, sun_azimuth_deg=sun_azimuth_deg)
@@ -450,7 +530,7 @@ async def run_grid(scene_sets: list, points: str | list, channel_type: int = 1,
         kwargs["electric_lights"] = electric_lights
     if sky_files:
         kwargs["sky_files"] = sky_files
-    return _run_grid(scene_sets, points, channel_type, **kwargs)
+    return await _offload(_run_grid, scene_sets, points, channel_type, **kwargs)
 
 async def run_image(scene_sets: list, channel_type: int = 1, view: str = "-vta -vh 180 -vv 180",
                     x: int = 800, y: int = 800, rad_params: str | None = None, quality: str | None = None,
@@ -473,7 +553,7 @@ async def run_image(scene_sets: list, channel_type: int = 1, view: str = "-vta -
     _rp = _resolve_rad_params(rad_params, quality)
     if _rp:
         kw["rad_params"] = _rp
-    return _run_image(scene_sets, **kw)
+    return await _offload(_run_image, scene_sets, **kw)
 
 
 async def import_geometry(obj_path: str, material_map: dict | None = None,
@@ -524,11 +604,12 @@ async def import_geometry(obj_path: str, material_map: dict | None = None,
     from hcl_radiance.geometry_import import _normalize_up_axis
     if up_axis is not None:
         up_axis = _normalize_up_axis(up_axis)
-    return _import_geometry(obj_path, material_map=material_map, units=units, up_axis=up_axis,
-                            channel_type=channel_type, work_dir=wd, run=run,
-                            north_angle_deg=north_angle_deg, dry_run=dry_run, sidecar=sidecar,
-                            derive_sensors=derive_sensors, annotate=annotate, strict=strict,
-                            workplane_h=workplane_h, spacing=spacing, **extra)
+    return await _offload(
+        _import_geometry, obj_path, material_map=material_map, units=units, up_axis=up_axis,
+        channel_type=channel_type, work_dir=wd, run=run,
+        north_angle_deg=north_angle_deg, dry_run=dry_run, sidecar=sidecar,
+        derive_sensors=derive_sensors, annotate=annotate, strict=strict,
+        workplane_h=workplane_h, spacing=spacing, **extra)
 
 
 async def check_geometry(obj_path: str, material_map: dict | None = None,
@@ -1133,7 +1214,7 @@ async def run_annual(channel_scenes: list, wea: str, points: str | list, channel
     _rp = _resolve_rad_params(rad_params, quality)
     if _rp:
         kw["rad_params"] = _rp
-    return _run_annual(channel_scenes, wea, points, channel_type, **kw)
+    return await _offload(_run_annual, channel_scenes, wea, points, channel_type, **kw)
 
 async def annual_daylight(channel_scenes: list, wea: str, points: str | list | None = None,
                           sensor_set: str | None = None, channel_type: int = 1,
@@ -1162,9 +1243,7 @@ async def annual_daylight(channel_scenes: list, wea: str, points: str | list | N
     wd = await resolve_work_dir(ctx, work_dir)
     pts = _resolve_points(points, sensor_set, wd)
     if run:
-        proceed = await confirm_run(
-            ctx, "annual_daylight runs an 8760-hour 2-phase DDS simulation plus a direct-only ASE "
-                 "pass (minutes-to-hours). Proceed?")
+        proceed = await confirm_run(ctx, _LONG_RUN_QUESTIONS["annual_daylight"])
         if isinstance(proceed, InputRequiredResult):
             return proceed  # the question itself: the client answers by calling again
         if proceed is False:
@@ -1173,7 +1252,7 @@ async def annual_daylight(channel_scenes: list, wea: str, points: str | list | N
     _rp = _resolve_rad_params(rad_params, quality)
     if _rp:
         kw["rad_params"] = _rp
-    sim = _run_annual_daylight(channel_scenes, wea, pts, channel_type, **kw)
+    sim = await _offload(_run_annual_daylight, channel_scenes, wea, pts, channel_type, **kw)
     if not sim.get("ran"):
         return emit_envelope(False, commands=sim.get("commands"), reason=sim.get("reason"))
     if "lux_matrix" not in sim:
@@ -1272,10 +1351,7 @@ async def lm83_daylight(obj_path: str, material_map: dict, wea: str,
                   "point_indices": list(range(len(point_rows)))}]
 
     if run:
-        proceed = await confirm_run(
-            ctx, "lm83_daylight traces a three-phase V and D matrix per window group, then "
-                 "runs an 8760-hour multiply per shading state plus a zero-bounce sun pass "
-                 "(minutes-to-hours). Proceed?")
+        proceed = await confirm_run(ctx, _LONG_RUN_QUESTIONS["lm83_daylight"])
         if isinstance(proceed, InputRequiredResult):
             return proceed  # the question itself: the client answers by calling again
         if proceed is False:
@@ -1284,9 +1360,9 @@ async def lm83_daylight(obj_path: str, material_map: dict, wea: str,
     from hcl_radiance.geometry_obj import parse_obj
     with open(obj_path) as fh:
         parsed = parse_obj(fh.read())
-    scene = _import_geometry(obj_path, material_map=material_map, units=units,
-                             up_axis=up_axis, north_angle_deg=north_angle_deg,
-                             work_dir=wd, run=run)
+    scene = await _offload(_import_geometry, obj_path, material_map=material_map, units=units,
+                           up_axis=up_axis, north_angle_deg=north_angle_deg,
+                           work_dir=wd, run=run)
     geometry_set = scene.get("geometry_set") or []
     material_sets = scene.get("material_sets") or []
     if not geometry_set or not material_sets:
@@ -1308,7 +1384,7 @@ async def lm83_daylight(obj_path: str, material_map: dict, wea: str,
     if _resolve_rad_params(d_params, quality):
         kw["d_params"] = _resolve_rad_params(d_params, quality)
 
-    out = _run_lm83(lm_scene, parsed, material_map, wea, pts, n_pts, **kw)
+    out = await _offload(_run_lm83, lm_scene, parsed, material_map, wea, pts, n_pts, **kw)
     if not out.get("ran"):
         # Forward the grouping on the emit path too. How the windows were grouped is the
         # main thing a dry run is for -- 2.2.6 grouping drives both the trigger and the
@@ -1345,7 +1421,7 @@ async def daylight_factor(scene_sets: list, points: str | list | None = None,
     _rp = _resolve_rad_params(rad_params, quality)
     if _rp:
         kw["rad_params"] = _rp
-    out = _run_daylight_factor(scene_sets, indoor_points, **kw)
+    out = await _offload(_run_daylight_factor, scene_sets, indoor_points, **kw)
     if not out.get("ran"):
         return emit_envelope(False, commands=out.get("commands"), reason=out.get("reason"))
     if "df_per_point" not in out:
@@ -1404,7 +1480,7 @@ async def ies_to_radiance(ies: str, placement: dict | None = None, color: list |
             fh.write(block)
         steps.append({"cmd": ["xform", f"{prefix}_placed.rad"], "stdout": f"{prefix}_instances.rad"})
     available = run and _radiance_status()["available"]
-    return run_sequence(steps, work_dir=wd, available=available)
+    return await _offload(run_sequence, steps, work_dir=wd, available=available)
 
 
 async def glare_ugr(scene_sets: list, channel_type: int = 0, view: str = "-vta -vh 180 -vv 180",
@@ -1422,7 +1498,7 @@ async def glare_ugr(scene_sets: list, channel_type: int = 0, view: str = "-vta -
     _rp = _resolve_rad_params(rad_params, quality)
     if _rp:
         kw["rad_params"] = _rp
-    return _run_image(scene_sets, **kw)
+    return await _offload(_run_image, scene_sets, **kw)
 
 # ---- Controls / energy (hcl_core.lighting_controls + daylight_savings orchestration) ----
 def lighting_controls(itot_per_point: list | None = None, itot_series: list | None = None,
@@ -1520,9 +1596,7 @@ async def daylight_savings(scene_sets: list | None = None, channel_scenes: list 
                              f"weight(s) for {n_pts} point(s)")
 
     if mode == "annual" and run:
-        proceed = await confirm_run(
-            ctx, "Annual daylight_savings runs an 8760-hour 2-phase DDS simulation (minutes-to-hours). "
-                 "Proceed?")
+        proceed = await confirm_run(ctx, _LONG_RUN_QUESTIONS["daylight_savings"])
         if isinstance(proceed, InputRequiredResult):
             return proceed  # the question itself: the client answers by calling again
         if proceed is False:
@@ -1534,7 +1608,7 @@ async def daylight_savings(scene_sets: list | None = None, channel_scenes: list 
         _rp = _resolve_rad_params(rad_params, quality)
         if _rp:
             kw["rad_params"] = _rp
-        sim = _run_annual_daylight(channel_scenes, wea, pts, channel_type, **kw)
+        sim = await _offload(_run_annual_daylight, channel_scenes, wea, pts, channel_type, **kw)
         if not sim.get("ran"):
             return emit_envelope(False, mode="annual", commands=sim.get("commands"),
                                  reason=sim.get("reason"))
@@ -1555,7 +1629,7 @@ async def daylight_savings(scene_sets: list | None = None, channel_scenes: list 
     _rp = _resolve_rad_params(rad_params, quality)
     if _rp:
         gkw["rad_params"] = _rp
-    sim = _run_grid(scene_sets, points, channel_type, **gkw)
+    sim = await _offload(_run_grid, scene_sets, points, channel_type, **gkw)
     if not sim.get("ran"):
         return emit_envelope(False, mode="point_in_time", commands=sim.get("commands"),
                              reason=sim.get("reason"))
@@ -1582,15 +1656,15 @@ def daysim_status() -> dict:
     return _daysim_status()
 
 
-def build_daysim(src_dir: str | None = None, run: bool = True,
-                 work_dir: str | None = None) -> dict:
+async def build_daysim(src_dir: str | None = None, run: bool = True,
+                       work_dir: str | None = None, ctx: Context | None = None) -> dict:
     """Build Daysim (ds_shortterm + epw2wea) from source: clone master + headless arm64 CMake.
 
     run=True executes if git+cmake are present; otherwise returns the ordered command plan + a reason.
     On success, bin_dir is the build/bin directory — set it as HCL_DAYSIM_BIN. Daysim is NOT bundled
     (NRC/Fraunhofer ISE source-available EULA); this clones+builds on your machine.
     """
-    return _build_daysim(src_dir=src_dir, run=run, work_dir=work_dir)
+    return await _offload(_build_daysim, src_dir=src_dir, run=run, work_dir=work_dir)
 
 
 _MAX_INLINE_TIMESTEPS = 2000  # ~ a few days at 6-min; a full year (87600) is written to a sidecar
@@ -1637,10 +1711,10 @@ async def generate_subhourly_wea(epw: str, timestep_min: int = 6, latitude: floa
     so you can build Daysim and run it yourself.
     """
     wd = await resolve_work_dir(ctx, work_dir)
-    res = _generate_subhourly_wea(epw, timestep_min=timestep_min, latitude=latitude,
-                                  longitude=longitude, time_zone=time_zone,
-                                  site_elevation=site_elevation, solar_time=solar_time,
-                                  work_dir=wd, run=run)
+    res = await _offload(_generate_subhourly_wea, epw, timestep_min=timestep_min,
+                         latitude=latitude, longitude=longitude, time_zone=time_zone,
+                         site_elevation=site_elevation, solar_time=solar_time,
+                         work_dir=wd, run=run)
     return _trim_subhourly_result(res, wd)
 
 
@@ -1696,9 +1770,7 @@ async def annual_nvrd(point_xyz: list, view_vec: list, epw: str | None = None,
     wd = await resolve_work_dir(ctx, work_dir)
     if run:
         # Elicit confirmation before the long run (scope = timesteps x channels x DDS transport).
-        proceed = await confirm_run(
-            ctx, "annual_nvrd runs Daysim sub-hourly generation + a full 2-phase DDS annual transport "
-                 "(potentially long). Proceed? (set run=false to only emit the command plan)")
+        proceed = await confirm_run(ctx, _LONG_RUN_QUESTIONS["annual_nvrd"])
         if isinstance(proceed, InputRequiredResult):
             return proceed  # the question itself: the client answers by calling again
         if proceed is False:
@@ -1710,12 +1782,13 @@ async def annual_nvrd(point_xyz: list, view_vec: list, epw: str | None = None,
     # (the DDS transport streams a path), materializing a list to a .pts under work_dir.
     if points is not None:
         points = _ensure_points_path(points, wd, name="nvrd_points.pts")
-    return _annual_nvrd(point_xyz=point_xyz, view_vec=view_vec, timestep_min=timestep_min,
-                        reconstruction=reconstruction, sky_reconstruction=sky_reconstruction,
-                        sun_spectral=sun_spectral, sky_cct=sky_cct, epw=epw,
-                        channel_scenes=channel_scenes, points=points, channel_type=channel_type,
-                        rad_params=rad_params, work_dir=wd, run=run, physical_sky=physical_sky,
-                        engine=engine_obj)
+    return await _offload(
+        _annual_nvrd, point_xyz=point_xyz, view_vec=view_vec, timestep_min=timestep_min,
+        reconstruction=reconstruction, sky_reconstruction=sky_reconstruction,
+        sun_spectral=sun_spectral, sky_cct=sky_cct, epw=epw,
+        channel_scenes=channel_scenes, points=points, channel_type=channel_type,
+        rad_params=rad_params, work_dir=wd, run=run, physical_sky=physical_sky,
+        engine=engine_obj)
 
 
 # ---- Studio (hcl_core.fixtures + hcl_mcp.studio: sizing + resumable brief/report) ----
@@ -1871,30 +1944,35 @@ async def spectral_epw(epw: str, forms: list | None = None, hours: list | None =
     forms = forms or ["spd_set", "band_matrix", "spectral_wea", "sidecar"]
     hset = [tuple(h) for h in hours] if hours else None
     modifier = _build_modifier(cloud_variant, ccm_coeffs)
-    recs = _annual_records(epw, hours=hset,
-                           engine=_resolve_engine(engine, smarts_aerosol=smarts_aerosol),
-                           ozone_mode=ozone_mode, aerosol_g=aerosol_g,
-                           aod_anchor_nm=aod_anchor_nm,
-                           modifier=modifier)
+    def compute_and_write():
+        recs = _annual_records(epw, hours=hset,
+                               engine=_resolve_engine(engine, smarts_aerosol=smarts_aerosol),
+                               ozone_mode=ozone_mode, aerosol_g=aerosol_g,
+                               aod_anchor_nm=aod_anchor_nm,
+                               modifier=modifier)
 
-    def _write(name, text):
-        p = os.path.join(wd, name)
-        with open(p, "w") as fh:        # context-managed: flush/close deterministically
-            fh.write(text)
-        return p
+        def _write(name, text):
+            jobcontrol.raise_if_cancelled()   # a cancelled call must not leave late files behind
+            p = os.path.join(wd, name)
+            with open(p, "w") as fh:        # context-managed: flush/close deterministically
+                fh.write(text)
+            return p
 
-    written = {}
-    if "spd_set" in forms:
-        # one combined CSV: blocks per record separated by a timestamp comment
-        blocks = [f"# {r.timestamp[0]} {r.timestamp[1]} {r.timestamp[2]}\n" + _emit_spd_set(r) for r in recs]
-        written["spd_set"] = _write("spectral_spd_set.csv", "".join(blocks))
-    if "band_matrix" in forms:
-        written["band_matrix"] = _write("spectral_band_matrix.txt", _emit_band_matrix(recs))
-    if "spectral_wea" in forms:
-        written["spectral_wea"] = _write("spectral_sky.wea", _emit_spectral_wea(recs))
-    if "sidecar" in forms:
-        written["sidecar"] = _write("spectral_epw_sidecar.csv", _emit_sidecar(recs))
-    return {"files": written, "n_records": len(recs)}
+        written = {}
+        if "spd_set" in forms:
+            # one combined CSV: blocks per record separated by a timestamp comment
+            blocks = [f"# {r.timestamp[0]} {r.timestamp[1]} {r.timestamp[2]}\n" + _emit_spd_set(r) for r in recs]
+            written["spd_set"] = _write("spectral_spd_set.csv", "".join(blocks))
+        if "band_matrix" in forms:
+            written["band_matrix"] = _write("spectral_band_matrix.txt", _emit_band_matrix(recs))
+        if "spectral_wea" in forms:
+            written["spectral_wea"] = _write("spectral_sky.wea", _emit_spectral_wea(recs))
+        if "sidecar" in forms:
+            written["sidecar"] = _write("spectral_epw_sidecar.csv", _emit_sidecar(recs))
+        return {"files": written, "n_records": len(recs)}
+
+    # A full year is 8760 spectra and four files: minutes of pure Python, so off the loop too.
+    return await _offload(compute_and_write)
 
 
 async def spectral_sky_native(epw: str, mf: int = 1, mode: str = "all",
@@ -1911,7 +1989,7 @@ async def spectral_sky_native(epw: str, mf: int = 1, mode: str = "all",
     {ok: False, timed_out: True} rather than raising. Trim the EPW, or raise mf only as needed.
     """
     wd = await resolve_work_dir(ctx, work_dir)
-    return _run_gensdaymtx(epw, wd, mf=mf, mode=mode, run=run, timeout=timeout)
+    return await _offload(_run_gensdaymtx, epw, wd, mf=mf, mode=mode, run=run, timeout=timeout)
 
 
 async def sensors(action: str, name: str | None = None, points: list | None = None,
@@ -1961,12 +2039,19 @@ def _attach(tool, args, result):
 
 
 def _with_advisories(fn):
-    """Wrap a tool so successful dict results carry advisories.
+    """Wrap a tool for registration: successful dict results carry advisories, and every
+    async tool call runs as one `hcl_core.jobcontrol` job.
 
-    Branches on iscoroutinefunction: 26 of the registered tools are async and 21 are
-    sync, and returning the wrong wrapper type changes how FastMCP invokes them.
-    functools.wraps keeps __name__, __doc__ and __wrapped__, which is what preserves the
-    published JSON schema — guarded by tests/test_tool_registration.py.
+    The job is what makes a call stoppable and observable. Whatever the tool hands to
+    `_offload` runs inside it, so each command-sequence step is forwarded to the client as
+    progress, and leaving the job -- normally, on an error, or because the client cancelled,
+    timed out or went away -- kills the process a worker thread is still waiting on.
+
+    Branches on iscoroutinefunction: 27 of the registered tools are async and 20 are sync
+    (the sync ones are pure computation and start no process), and returning the wrong
+    wrapper type changes how FastMCP invokes them. functools.wraps keeps __name__, __doc__
+    and __wrapped__, which is what preserves the published JSON schema -- guarded by
+    tests/test_tool_registration.py.
 
     Only successful returns are wrapped; an exception propagates so FastMCP still marks
     the call is_error.
@@ -1974,7 +2059,9 @@ def _with_advisories(fn):
     if inspect.iscoroutinefunction(fn):
         @functools.wraps(fn)
         async def _async_wrapper(*a, **kw):
-            return _attach(fn.__name__, kw, await fn(*a, **kw))
+            with jobcontrol.job(on_step=_progress_reporter(kw.get("ctx"))):
+                result = await fn(*a, **kw)
+            return _attach(fn.__name__, kw, result)
         return _async_wrapper
 
     @functools.wraps(fn)
@@ -2008,8 +2095,93 @@ _TOOL_ALIASES = (
     ("run_validation", validate),
 )
 
+# The question put to the user before a run that takes minutes to hours. One text per tool, used
+# both by the tool itself (an inline call) and by `_ConfirmBeforeTask` (a call about to become a
+# background task).
+_LONG_RUN_QUESTIONS = {
+    "annual_daylight": (
+        "annual_daylight runs an 8760-hour 2-phase DDS simulation plus a direct-only ASE "
+        "pass (minutes-to-hours). Proceed?"),
+    "lm83_daylight": (
+        "lm83_daylight traces a three-phase V and D matrix per window group, then "
+        "runs an 8760-hour multiply per shading state plus a zero-bounce sun pass "
+        "(minutes-to-hours). Proceed?"),
+    "daylight_savings": (
+        "Annual daylight_savings runs an 8760-hour 2-phase DDS simulation (minutes-to-hours). "
+        "Proceed?"),
+    "annual_nvrd": (
+        "annual_nvrd runs Daysim sub-hourly generation + a full 2-phase DDS annual transport "
+        "(potentially long). Proceed? (set run=false to only emit the command plan)"),
+}
+
+
+_AS_BOOL = TypeAdapter(bool)
+
+
+def _would_simulate(tool, arguments):
+    """Would this call start the long simulation? Mirrors each tool's own condition for asking;
+    absent arguments take the tool's defaults (run=True, daylight_savings mode="point_in_time").
+
+    `run` is read the way the tool's signature reads it. Clients that do not type their
+    arguments send the string "false", which the tool accepts as False; a truthiness test here
+    would ask about a dry run. A value the tool would reject is not asked about either: the
+    call is about to fail on its own.
+    """
+    try:
+        run = _AS_BOOL.validate_python(arguments.get("run", True))
+    except ValidationError:
+        return False
+    if not run:
+        return False
+    return tool != "daylight_savings" or arguments.get("mode", "point_in_time") == "annual"
+
+
+class _ConfirmBeforeTask(Middleware):
+    """Settle the long-run question in the foreground, before a call becomes a background task.
+
+    A task body runs without a request or a session: it cannot see which capabilities its
+    client declared, so it cannot tell a client that can be asked from one that cannot, and
+    asking the second kind would leave the task waiting for input for ever. The tasks extension
+    says the same thing from the other side: resolve input requests before answering with a
+    task. Middleware is the place: it wraps every call and runs ahead of task creation.
+
+    Only calls that are about to become tasks are handled here (MCP 2026-07-28, client declared
+    the extension, tool is one of the four that ask). Every other call asks from inside the
+    tool, as before. A yes creates the task; a no creates it with run=False, so the task
+    returns the command plan; the task body itself then asks nothing.
+
+    One difference from the inline path: the question comes BEFORE the tool has checked its
+    other arguments (a weights/points mismatch, a missing file), because those checks live in
+    the tool body and the body runs in the task. A user can therefore say yes to a call that
+    then fails at once. Nothing is simulated in that case.
+    """
+
+    async def on_call_tool(self, context, call_next):
+        ctx = context.fastmcp_context
+        name = context.message.name
+        arguments = context.message.arguments or {}
+        if (name not in _LONG_RUN_QUESTIONS or ctx is None or not is_modern_protocol(ctx)
+                or ctx.client_extension_settings(_TASKS_EXTENSION) is None
+                or not _would_simulate(name, arguments)):
+            return await call_next(context)
+        answer = await confirm_run(ctx, _LONG_RUN_QUESTIONS[name])
+        if isinstance(answer, InputRequiredResult):
+            return InputRequiredToolResult(input_required=answer)
+        if answer is False:
+            declined = context.message.model_copy(update={"arguments": {**arguments, "run": False}})
+            context = context.copy(message=declined)
+        return await call_next(context)
+
+
+mcp.add_middleware(_ConfirmBeforeTask())
+
+# The tools that run for minutes to hours. Only these are offered as background tasks: a task
+# costs the client a polling round trip, which is wasted on a call that returns in a second.
+_TASK_TOOLS = (run_annual, annual_daylight, lm83_daylight, daylight_savings, annual_nvrd,
+               spectral_epw, spectral_sky_native, build_daysim)
+
 for _tool in _TOOL_FUNCS:
-    mcp.tool(_with_advisories(_tool))
+    mcp.tool(_with_advisories(_tool), task=_tool in _TASK_TOOLS)
 
 for _alias_name, _alias_fn in _TOOL_ALIASES:
     mcp.tool(_with_advisories(_alias_fn), name=_alias_name)
@@ -2022,7 +2194,33 @@ for _prompt in (spd_to_circadian, hcl_grid_study, fisheye_eye_analysis, annual_c
                 annual_daylight_study, visualize_scene):
     mcp.prompt(_prompt)
 
+def _stop_simulations_when_signalled():
+    """Take running simulations down with the server when it is terminated or hung up.
+
+    An MCP client stops a stdio server by closing its stdin and then, if it has not gone,
+    by signal. Python's default action for SIGTERM and SIGHUP is to die on the spot: no
+    cancellation reaches the tool call, no exit hook runs. Each command runs in its own process
+    group (so that cancelling a call can kill what the command forked), which also means the
+    signal that kills the server never reaches it. Without this handler a client that closes
+    its window leaves Radiance running for hours with no owner.
+
+    The handler kills the groups outright -- the server may have no time for a grace period --
+    then lets the signal do what it would have done. SIGINT is left alone: it becomes
+    KeyboardInterrupt, which unwinds the tool call and the exit hook normally. SIGKILL cannot be
+    handled by anyone.
+    """
+    def handler(signum, frame):
+        jobcontrol.terminate_all(force=True)
+        signal.signal(signum, signal.SIG_DFL)
+        os.kill(os.getpid(), signum)
+
+    for name in ("SIGTERM", "SIGHUP"):
+        if hasattr(signal, name):
+            signal.signal(getattr(signal, name), handler)
+
+
 def main():
+    _stop_simulations_when_signalled()
     mcp.run()
 
 if __name__ == "__main__":

@@ -130,6 +130,17 @@ def test_on_the_modern_era_the_retry_carries_the_answer(answer, proceeds):
     assert _confirm(FakeCtx(MODERN, answers={key: answer})) is proceeds
 
 
+def test_inside_a_background_task_nothing_is_asked():
+    """A task cannot see what its client declared, so it cannot know whether asking is allowed.
+    The question is settled in the foreground, before the task is created (the server's
+    `_ConfirmBeforeTask` middleware); by the time a task body runs there is nothing left to ask."""
+    ctx = FakeCtx(MODERN)
+    ctx.request_context = None
+    ctx.is_background_task = True
+    assert _confirm(ctx) is True
+    assert ctx.asked == []
+
+
 def test_an_answer_to_some_other_question_does_not_count_and_the_question_is_asked_again():
     yes = mt.ElicitResult(action="accept", content={"value": True})
     ask = _confirm(FakeCtx(MODERN, answers={"not_our_question": yes}))

@@ -8,7 +8,7 @@ def test_daysim_status_tool_shape():
     assert set(["available", "bin_dir", "version", "found", "missing"]) <= set(st.keys())
 
 def test_build_daysim_tool_emits_plan():
-    out = srv.build_daysim(src_dir="/tmp/Daysim", run=False)
+    out = asyncio.run(srv.build_daysim(src_dir="/tmp/Daysim", run=False))
     assert out["ran"] is False
     assert any("MITSustainableDesignLab/Daysim" in c for c in out["commands"])
     assert any("-DBUILD_HEADLESS=ON" in c for c in out["commands"])

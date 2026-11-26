@@ -14,6 +14,8 @@ import platform
 import shutil
 import subprocess
 
+from hcl_core import jobcontrol
+
 REPO = "https://github.com/MITSustainableDesignLab/Daysim.git"
 BRANCH = "master"
 # cmake --build can compile for several minutes; cap each step so a hang can't block forever.
@@ -72,9 +74,12 @@ def build_daysim(src_dir=None, *, run=True, work_dir=None, build_timeout=_BUILD_
             ["git", "-C", src_dir, "fetch", "origin", BRANCH],
             ["git", "-C", src_dir, "checkout", BRANCH],
         ] + argvs[1:]
-    for argv in argvs:
+    for i, argv in enumerate(argvs, 1):
+        # Clone, configure and compile are minutes each: report them, and stop between or
+        # during them if the caller gave up (no-ops outside a job).
+        jobcontrol.step(f"{' '.join(argv[:2])} ({i}/{len(argvs)})")
         try:
-            proc = subprocess.run(argv, cwd=work, stdout=subprocess.PIPE,
+            proc = jobcontrol.run(argv, cwd=work, stdout=subprocess.PIPE,
                                   stderr=subprocess.STDOUT, timeout=build_timeout)
         except subprocess.TimeoutExpired:
             return {"commands": commands, "ran": False, "bin_dir": bin_dir,

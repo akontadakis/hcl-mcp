@@ -3,6 +3,7 @@
 Chains Phase 1–3: parse the EPW hourly row + LOCATION header → derive atmosphere → solar geometry at
 the MID-INTERVAL hour (EPW is hour-ending) → build_record (engine → cloud modifier → resample).
 """
+from hcl_core import jobcontrol
 from hcl_core import epw_hourly, atmosphere, solpos
 from hcl_core.spectral_sky import build_record
 from hcl_core.spectral_engine.spectrl2 import Spectrl2Engine
@@ -82,6 +83,9 @@ def annual_records(epw_path, *, engine=None, modifier=None, hours=None, override
 
     out = []
     for row in rows:
+        # A year is 8760 spectra of pure Python, with no command to kill: stop here if the
+        # caller's job was cancelled (a no-op outside a job).
+        jobcontrol.raise_if_cancelled()
         key = (row["month"], row["day"], row["hour"])
         if wanted is not None and key not in wanted:
             continue

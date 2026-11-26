@@ -42,7 +42,8 @@ def test_emit_path_offline(tmp_path, monkeypatch):
 def test_live_build_then_generate(tmp_path):
     # Build once if needed (opt-in), then generate a sub-hourly .wea from the fixture EPW.
     if not daysim_status()["available"]:
-        res = srv.build_daysim(src_dir=str(tmp_path / "Daysim"), run=True, work_dir=str(tmp_path))
+        res = asyncio.run(srv.build_daysim(src_dir=str(tmp_path / "Daysim"), run=True,
+                                           work_dir=str(tmp_path)))
         assert res["ran"], f"build_daysim failed: {res.get('reason')}"
         os.environ["HCL_DAYSIM_BIN"] = res["bin_dir"]
     assert daysim_status()["available"]

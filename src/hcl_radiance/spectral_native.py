@@ -8,6 +8,7 @@ Only IMPLEMENTED gensdaymtx flags are used (the binary's usage string advertises
 import os
 import subprocess
 
+from hcl_core import jobcontrol
 from hcl_core._spectra import ACTION_MEL
 
 _MODE_FLAG = {"all": [], "sun": ["-d"], "sky": ["-s"]}
@@ -131,7 +132,9 @@ def run_gensdaymtx(epw_path, work_dir, *, mf=1, mode="all", ground_refl=None, ru
                           "then run the commands; re-call with run=True once available."}
     try:
         with open(smx, "w") as fh:
-            proc = subprocess.run(cmd, stdout=fh, stderr=subprocess.PIPE, timeout=timeout)
+            # Stoppable inside a job (the MCP server opens one per tool call); plain
+            # subprocess.run outside one.
+            proc = jobcontrol.run(cmd, stdout=fh, stderr=subprocess.PIPE, timeout=timeout)
     except subprocess.TimeoutExpired:
         return {"ran": True, "ok": False, "timed_out": True, "smx": smx,
                 "error": f"gensdaymtx exceeded the {timeout}s timeout. A full-year EPW matrix is many "

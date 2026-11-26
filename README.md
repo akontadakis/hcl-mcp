@@ -97,7 +97,7 @@ the manual route are under [Installation](#installation).
 | **Python** | ≥ 3.11 | from [`pyproject.toml`](pyproject.toml) |
 | **[`uv`](https://docs.astral.sh/uv/)** | current | installs deps and launches the server |
 | **MCP client** | protocol 2026-07-28 or 2025-11-25 | the server answers both: per-request metadata, or the older `initialize` handshake |
-| `fastmcp` · `pydantic` · `colour-science` · `matplotlib` | ≥ 4.2, < 5 · ≥ 2 · ≥ 0.4.4 · ≥ 3.7 | installed automatically; all four are hard dependencies |
+| `fastmcp` · `fastmcp-tasks` · `pydantic` · `colour-science` · `matplotlib` | ≥ 4.2, < 5 · ≥ 4.2, < 5 · ≥ 2 · ≥ 0.4.4 · ≥ 3.7 | installed automatically; all five are hard dependencies |
 
 External engines are optional — see [External Engines](#external-engines).
 
@@ -169,6 +169,28 @@ matrix multiplication — on any machine, then run the identical commands where 
 Call `validate()`, `radiance_status()` and `daysim_status()` first to see which layers will execute.
 
 ---
+
+## Long runs: progress, cancel, background tasks
+
+A simulation tool call is a *job*. The engine runs on a worker thread, so the server keeps
+answering other requests while Radiance works.
+
+| What the client does | What the server does |
+| --- | --- |
+| Sends a `progressToken` | Reports each pipeline step as `notifications/progress`: a running count and a message such as `rtrace (3/15)` |
+| Cancels the request (`notifications/cancelled`), times out, or goes away | Kills the command it is waiting on, together with the children that command started (`rfluxmtx`, `rtrace -n`), and runs no further step |
+| Declares the tasks extension (`io.modelcontextprotocol/tasks`, MCP 2026-07-28) | Returns a task handle at once for the eight long tools; `tasks/get` shows the current step, `tasks/cancel` stops the run, the result is kept for 24 h |
+| Honours cache hints (MCP 2026-07-28) | Marks its tool, prompt and resource lists and its reference texts `ttlMs` = 1 h, `cacheScope` = `public` |
+
+The eight long tools are `run_annual`, `annual_daylight`, `lm83_daylight`, `daylight_savings`,
+`annual_nvrd`, `spectral_epw`, `spectral_sky_native` and `build_daysim`. A client that does not
+declare the tasks extension gets the same tools as plain calls, with progress and cancellation.
+Tasks live in the server process (no Redis, nothing to install): they end when the server does.
+Simulations take turns: a second one waits for the first, because engines write fixed file names
+into the work directory. Status calls, task polling and cancellation are answered meanwhile.
+
+Four of those tools ask *"this takes minutes to hours, proceed?"* first, when the client can show
+a form. Answering no, declining or cancelling returns the command plan instead of running.
 
 ## Capabilities
 

@@ -56,7 +56,7 @@ def _client_can_be_asked(ctx):
     return form is not None or url is None
 
 
-def _is_modern_protocol(ctx):
+def is_modern_protocol(ctx):
     """True when the request arrived on a revision without server-initiated requests."""
     rc = getattr(ctx, "request_context", None)
     return rc is not None and rc.protocol_version in MODERN_PROTOCOL_VERSIONS
@@ -87,11 +87,15 @@ async def confirm_run(ctx, message):
     exist (SEP-2322), so the question is returned instead. Nothing is kept between the two
     rounds: the retry carries everything needed.
 
+    Inside a background task nothing is asked. A task body has no request and no session, so it
+    cannot see what its client declared and cannot know whether asking is allowed. The server
+    settles the question in the foreground before it creates the task (`_ConfirmBeforeTask`).
+
     This is a courtesy prompt about cost, not an authorization check: a caller can always pass
     run=False, and a client that cannot be asked runs unasked. So an answer supplied without the
     question having been put is simply taken at its word.
     """
-    if ctx is None:
+    if ctx is None or getattr(ctx, "is_background_task", False) is True:
         return True
     # An answer in hand wins over everything else. Capabilities are per request, so the retry
     # may declare less than the first call did; a no that was given must still be a no.
@@ -100,7 +104,7 @@ async def confirm_run(ctx, message):
         return _is_yes(answers[_CONFIRM_KEY])
     if not _client_can_be_asked(ctx):
         return True
-    if _is_modern_protocol(ctx):
+    if is_modern_protocol(ctx):
         return mcp_types.InputRequiredResult(input_requests={
             _CONFIRM_KEY: mcp_types.ElicitRequest(params=mcp_types.ElicitRequestFormParams(
                 message=message, requested_schema=_CONFIRM_SCHEMA))})

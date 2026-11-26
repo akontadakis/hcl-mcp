@@ -11,6 +11,7 @@ import shutil
 import subprocess
 import tempfile
 
+from hcl_core import jobcontrol
 from hcl_core.spectral_engine.base import ClearSkySpectra
 
 
@@ -163,7 +164,9 @@ class SmartsEngine:
                         pass
             with open(os.path.join(run_dir, "smarts295.inp.txt"), "w", newline="\n") as fh:
                 fh.write(build_deck(atm, geo, aerosol=self.aerosol))
-            subprocess.run([binary], cwd=run_dir, check=True,
+            # One call per timestep: inside a job each can be stopped, so an annual SMARTS
+            # run ends when its tool call does instead of working through the year.
+            jobcontrol.run([binary], cwd=run_dir, check=True,
                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=120)
             with open(os.path.join(run_dir, "smarts295.ext.txt")) as fh:
                 wl, direct, diffuse = parse_ext_output(fh.read())

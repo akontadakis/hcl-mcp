@@ -7,6 +7,11 @@ superset: it handles multi-stage pipes (a "|" token in cmd), a {"write": (path, 
 file-write pseudo-step, per-step stdin/stdout redirection, and an optional per-step
 timeout (seconds) passed to subprocess.run.
 
+Inside a `hcl_core.jobcontrol` job (the MCP server opens one per tool call) every step is
+reported as progress and the whole sequence can be stopped: the command being waited on is
+killed with its children and `jobcontrol.JobCancelled` propagates. Outside a job nothing
+changes.
+
 Cross-platform (hcl_platform compat): pipes run via chained Popen (NO shell), so nothing
 depends on POSIX shell quoting or Unix-only shell builtins on Windows; write pseudo-steps
 materialize via write_text (UTF-8 / LF) on the run path and render a reproducible here-doc
@@ -16,6 +21,7 @@ import os
 import shlex
 import subprocess
 
+from hcl_core import jobcontrol
 from hcl_platform import write_text
 
 
@@ -34,6 +40,20 @@ def render(step):
         op = ">>" if step.get("append") else ">"
         line += f" {op} {shlex.quote(step['stdout'])}"
     return line
+
+
+def _label(step):
+    """A short name for a step, for progress messages: `rtrace`, `gendaymtx | rmtxop`, ..."""
+    if "write" in step:
+        return "write " + os.path.basename(step["write"][0])
+    names, first = [], True
+    for tok in step["cmd"]:
+        if tok == "|":
+            first = True
+        elif first:
+            names.append(os.path.basename(tok))
+            first = False
+    return " | ".join(names)
 
 
 def _run_pipe(cmd, work_dir, run_env, stdin_path, stdout_path, append, timeout):
@@ -57,22 +77,25 @@ def _run_pipe(cmd, work_dir, run_env, stdin_path, stdout_path, append, timeout):
     procs = []
     try:
         prev = infile
-        for i, stage in enumerate(stages):
-            last = i == len(stages) - 1
-            p = subprocess.Popen(
-                stage, cwd=work_dir, env=run_env, stdin=prev,
-                stdout=(outfile if last else subprocess.PIPE),
-                stderr=(subprocess.PIPE if last else subprocess.DEVNULL))
-            if prev is not None and prev is not infile:
-                prev.close()  # let the upstream stage receive SIGPIPE
-            prev = p.stdout
-            procs.append(p)
         try:
-            _, err = procs[-1].communicate(timeout=timeout)
-        except subprocess.TimeoutExpired:
-            for p in procs:
-                p.kill()
+            for i, stage in enumerate(stages):
+                last = i == len(stages) - 1
+                p = jobcontrol.popen(
+                    stage, cwd=work_dir, env=run_env, stdin=prev,
+                    stdout=(outfile if last else subprocess.PIPE),
+                    stderr=(subprocess.PIPE if last else subprocess.DEVNULL))
+                if prev is not None and prev is not infile:
+                    prev.close()  # let the upstream stage receive SIGPIPE
+                prev = p.stdout
+                procs.append(p)
+        except BaseException:
+            # A later stage could not be started (a missing binary on a partial install is the
+            # usual reason). The stages that did start have nobody to read them and nobody
+            # waiting for them: stop them before reporting the failure.
+            jobcontrol.stop(procs)
             raise
+        # Stops every stage, then raises, on a timeout or when the job is cancelled.
+        _, err = jobcontrol.communicate(procs, timeout=timeout)
         for p in procs[:-1]:
             p.wait()
         rc = next((p.returncode for p in procs if p.returncode not in (0, None)), 0)
@@ -107,7 +130,9 @@ def run_sequence(steps, work_dir, available, *, unavailable_reason, timeout=None
         run_env = {**os.environ, **(env_extra or {})}
         if dirs:
             run_env["PATH"] = os.pathsep.join(dirs + [os.environ.get("PATH", "")])
-    for s in steps:
+    for i, s in enumerate(steps, 1):
+        # Raises JobCancelled if the caller gave up; otherwise reports "rtrace (3/15)".
+        jobcontrol.step(f"{_label(s)} ({i}/{len(steps)})")
         try:
             if "write" in s:
                 path, text = s["write"]
@@ -124,7 +149,7 @@ def run_sequence(steps, work_dir, available, *, unavailable_reason, timeout=None
             stdout = (open(os.path.join(work_dir, s["stdout"]), "ab" if s.get("append") else "wb")
                       if s.get("stdout") else None)
             try:
-                proc = subprocess.run(s["cmd"], cwd=work_dir, stdin=stdin, stdout=stdout,
+                proc = jobcontrol.run(s["cmd"], cwd=work_dir, stdin=stdin, stdout=stdout,
                                       env=run_env, stderr=subprocess.PIPE, timeout=timeout)
             finally:
                 if stdin:
