@@ -7,7 +7,7 @@ import os
 
 from hcl_core.proc import render as _render, run_sequence as _run_sequence
 
-_REASON = ("Daysim not available; build it (build_daysim) or set HCL_DAYSIM_BIN, "
+_REASON = ("Daysim not available; build it (build_daysim(run=True)) or set HCL_DAYSIM_BIN, "
            "or run the commands yourself.")
 
 def run_sequence(steps, work_dir, available, *, timeout=None):

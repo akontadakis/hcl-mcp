@@ -143,14 +143,23 @@ Preferred — let the server do it:
 build_daysim(run=True)
 ```
 
-It clones <https://github.com/MITSustainableDesignLab/Daysim>, applies a one-line `time_step` source
-patch where needed, builds headless with CMake, and returns `bin_dir`. With `run=False`, or if
-`git`/`cmake` are missing, it returns the ordered command plan and a reason instead.
+It fetches ONE pinned commit of <https://github.com/MITSustainableDesignLab/Daysim>
+(`27df1dfc98b6a75e209f787bef98374ce86ca077`, `master` as of 2025-01-19), checks that the checkout is that commit, builds headless
+with CMake, and returns `bin_dir` plus a `source` block naming what was built. The default is
+`run=False`: without `run=True`, or if `git`/`cmake` are missing, it returns the ordered command
+plan and a reason instead. Where the client can ask, the user is asked before the download.
+
+An existing `src_dir` is built only if it is a Daysim checkout at that commit. Local edits there
+are allowed and reported (if `ds_shortterm.c` fails on its `time_step` extern, fix that one line
+and call `build_daysim(run=True)` again). Any other folder is refused with a reason. To build
+another commit or a branch, set `HCL_DAYSIM_REF` in the server's environment.
 
 By hand (equivalent):
 
 ```bash
-git clone https://github.com/MITSustainableDesignLab/Daysim
+git init Daysim && git -C Daysim remote add origin https://github.com/MITSustainableDesignLab/Daysim.git
+git -C Daysim fetch --depth 1 origin 27df1dfc98b6a75e209f787bef98374ce86ca077
+git -C Daysim checkout --detach FETCH_HEAD
 cmake -S Daysim -B build -DBUILD_HEADLESS=ON -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 cmake --build build --target ds_shortterm epw2wea

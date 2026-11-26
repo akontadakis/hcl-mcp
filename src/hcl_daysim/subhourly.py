@@ -99,7 +99,7 @@ def generate_subhourly_wea(epw, *, timestep_min=6, latitude=None, longitude=None
             reason = ("run=False (dry run): wrote the .hea and emitted the epw2wea -> ds_shortterm "
                       "command plan. Set run=True (with Daysim available) to execute.")
         else:
-            reason = ("Daysim not available — run build_daysim (clones+builds from source) or set "
+            reason = ("Daysim not available — call build_daysim(run=True) (fetches and builds one pinned commit from source) or set "
                       "HCL_DAYSIM_BIN to a directory with ds_shortterm + epw2wea, then retry. "
                       "The .hea and command plan were written so you can run them yourself.")
         return {"wea": wea_path, "ran": False, "commands": result["commands"], "reason": reason}

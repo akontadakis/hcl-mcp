@@ -233,9 +233,12 @@ def test_the_emitted_daysim_build_plan_survives_a_space_in_a_path():
     from hcl_daysim.build import _plan
     commands, bin_dir = _plan("/Users/me/My Work/daysim-src")
     assert bin_dir == "/Users/me/My Work/daysim-src/build/bin"
-    assert shlex.split(commands[0])[-1] == "/Users/me/My Work/daysim-src"
-    assert shlex.split(commands[1])[1:5] == ["-S", "/Users/me/My Work/daysim-src",
-                                             "-B", "/Users/me/My Work/daysim-src/build"]
+    assert shlex.split(commands[0]) == ["git", "init", "-q", "/Users/me/My Work/daysim-src"]
+    configure = next(shlex.split(c) for c in commands if c.startswith("cmake -S"))
+    assert configure[1:5] == ["-S", "/Users/me/My Work/daysim-src",
+                              "-B", "/Users/me/My Work/daysim-src/build"]
+    for command in commands:                       # every line is one path, never two words
+        assert "/Users/me/My" not in [w for w in shlex.split(command) if w.endswith("/My")]
 
 
 def test_a_weather_file_name_with_a_space_gives_daysim_names_without_one(tmp_path):

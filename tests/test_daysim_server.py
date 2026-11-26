@@ -46,3 +46,33 @@ def test_daysim_reference_resource_text():
     txt = res.reference_daysim()
     assert "ds_shortterm" in txt and "epw2wea" in txt
     assert "NRC" in txt or "Fraunhofer" in txt
+
+
+# ---- 2026-11-26, review S6: a build is asked for, and asked about ----
+
+def test_build_daysim_does_nothing_but_plan_by_default():
+    out = asyncio.run(srv.build_daysim(src_dir="/tmp/Daysim"))
+    assert out["ran"] is False and "run=True" in out["reason"]
+    assert out["source"]["pinned"] is True
+
+
+def test_a_real_build_is_one_of_the_runs_the_user_is_asked_about():
+    assert "build_daysim" in srv._LONG_RUN_QUESTIONS
+    assert "download" in srv._LONG_RUN_QUESTIONS["build_daysim"]
+    # its default is a dry run, unlike the simulation tools, and a dry run is not asked about
+    assert srv._would_simulate("build_daysim", {}) is False
+    assert srv._would_simulate("build_daysim", {"run": True}) is True
+    assert srv._would_simulate("build_daysim", {"run": "false"}) is False
+    assert srv._would_simulate("annual_daylight", {}) is True
+
+
+def test_a_no_from_the_user_turns_the_build_into_a_plan(monkeypatch):
+    async def says_no(ctx, message):
+        assert "Daysim" in message
+        return False
+    started = []
+    monkeypatch.setattr(srv, "confirm_run", says_no)
+    monkeypatch.setattr(srv, "_build_daysim",
+                        lambda **kw: started.append(kw) or {"ran": False, "commands": []})
+    asyncio.run(srv.build_daysim(src_dir="/tmp/Daysim", run=True, ctx=object()))
+    assert started and started[0]["run"] is False

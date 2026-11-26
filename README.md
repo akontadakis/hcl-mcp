@@ -158,7 +158,9 @@ uv run pytest -q         # full test suite
 
 ## The run/emit contract
 
-Every tool that touches Radiance or Daysim takes `run: bool = True` and behaves identically:
+Every tool that touches Radiance or Daysim takes a `run` flag and behaves identically. It defaults
+to `True`, with one exception: `build_daysim`, which downloads and compiles code, defaults to
+`False` and has to be asked to run.
 
 - **`run=True` and the binary is available** → it **executes** and returns results.
 - **`run=False`, or the binary is missing** → it does **not** execute and returns
@@ -189,8 +191,24 @@ Tasks live in the server process (no Redis, nothing to install): they end when t
 Simulations take turns: a second one waits for the first, because engines write fixed file names
 into the work directory. Status calls, task polling and cancellation are answered meanwhile.
 
-Four of those tools ask *"this takes minutes to hours, proceed?"* first, when the client can show
-a form. Answering no, declining or cancelling returns the command plan instead of running.
+Five of those tools ask before they start, when the client can show a form: `annual_daylight`,
+`lm83_daylight`, `daylight_savings` and `annual_nvrd` ask *"this takes minutes to hours, proceed?"*,
+and `build_daysim(run=True)` asks before it downloads and compiles the Daysim source. Answering no,
+declining or cancelling returns the command plan instead of running.
+
+### What a client is told about each tool
+
+Every tool carries the four MCP annotation hints, so a client can decide what to run without asking.
+
+| Hint | Which tools |
+| --- | --- |
+| `readOnlyHint: true` | 20 tools and 3 aliases that only compute and return: the spectral maths, `compliance`, `check_geometry`, the status and reference tools, `load_brief`. They write no file and start no program. |
+| `destructiveHint: true` | Every other tool. Each writes into the work folder and replaces its own earlier output of the same name; `sensors` can delete a saved sensor set. |
+| `openWorldHint: true` | `build_daysim` only. With `run=True` it fetches source code from GitHub. Nothing else in the server reaches the network. |
+
+Names that become file names (OBJ groups and materials, sky, luminaire and sensor-set names) are
+checked first: a name with a path separator, a quote, `;` or a shell character is refused, so a
+model file cannot make the server write outside its work folder.
 
 ## Capabilities
 
@@ -386,6 +404,7 @@ All environment variables are optional.
 | `HCL_ATMOS_CACHE` | Where `gensdaymtx` keeps its pre-computed scattering tables (`atmos_data/`); filled once, reused after | `<HCL_WORK_ROOT>/atmos_cache` |
 | `HCL_RADIANCE_BIN` | Radiance `bin` directory, if not on `PATH` | auto-discovered on `PATH` |
 | `HCL_DAYSIM_BIN` | Daysim `bin` directory (`ds_shortterm`, `epw2wea`) | auto-discovered on `PATH` |
+| `HCL_DAYSIM_REF` | Daysim commit or branch that `build_daysim` builds, in place of the pinned commit. Set by you, never by a tool argument | the pinned commit |
 | `SMARTSPATH` | SMARTS executable — **the file, not its directory** | unset (SMARTS engine unavailable) |
 | `PYTHONPATH` | Only for a local clone launched from source — set to the `src` dir | — |
 
@@ -399,7 +418,7 @@ All environment variables are optional.
 | --- | --- | --- |
 | **Spectral core** | nothing | Pure Python — always runs. |
 | **Daylight / electric / glare + native spectral** | [Radiance](https://www.radiance-online.org/) **6.1a** | One build is a superset of the old `≥ 5.4` floor: `oconv`, `rtrace`, `rpict`, `gendaylit`, `gendaymtx`, `rfluxmtx`, `rcontrib`, `dctimestep`, `ies2rad`, `evalglare`, `obj2rad`, `xform`, and the spectral `gensdaymtx` / `rcomb`. **Not bundled.** Without it, tools emit their command plans. |
-| **Sub-hourly weather** | [Daysim](https://github.com/MITSustainableDesignLab/Daysim) | `ds_shortterm` + `epw2wea`. Source-available (NRC / Fraunhofer ISE), **not bundled** — build via `build_daysim`. Only the `annual_nvrd` alertness bridge needs it. |
+| **Sub-hourly weather** | [Daysim](https://github.com/MITSustainableDesignLab/Daysim) | `ds_shortterm` + `epw2wea`. Source-available (NRC / Fraunhofer ISE), **not bundled** — build via `build_daysim(run=True)`, which fetches one pinned commit, checks it, and only then runs cmake. Only the `annual_nvrd` alertness bridge needs it. |
 | **Spectral oracle** | [SMARTS](https://www.nrel.gov/grid/solar-resource/smarts.html) 2.9.5 | Optional; only for `engine="smarts"`. Needs `$SMARTSPATH`. The default `engine="spectrl2"` needs nothing. |
 
 **→ Get-source → build → set-env → verify checklist for all three: [`docs/engines-install.md`](docs/engines-install.md).**
@@ -416,6 +435,9 @@ All environment variables are optional.
 | **`compliance(standard="en_12464_1")` returns `"incomplete"`** | EN 12464-1 is judged on task parameters, not a `mel_edi` — pass `task` plus measured `em`/`ugr`/`uo`/`ra`. With none, the verdict is `"incomplete"` by design, never a vacuous pass. |
 | **A relative file path fails oddly** | Every file-shaped argument resolves against the **server's** working directory, not your shell's. Pass absolute paths — a bad relative path can surface as a parse error rather than "missing". |
 | **Files written somewhere unexpected** | Output goes to `work_dir`: explicit arg → `HCL_WORK_ROOT` → first MCP client root → `~/hcl_work`. |
+| **`spectral_sky_native` takes minutes the first time** | `gensdaymtx` pre-computes its scattering tables once into the atmosphere cache (`HCL_ATMOS_CACHE`, else `<work root>/atmos_cache`). Later runs take seconds. The result names the folder as `atmosphere_cache`. |
+| **`spectral_sky_native` fails with "stopped by SIGSEGV"** | `gensdaymtx` cannot find `mie_ca.dat`. The server looks in the `lib` folder beside the Radiance `bin` by itself; if your install keeps it elsewhere, set `RAYPATH` in the server's `env` block. |
+| **`build_daysim` returns a plan and builds nothing** | That is its default. Call `build_daysim(run=True)`. It refuses a `src_dir` that is not a Daysim checkout at the pinned commit, and says why. |
 
 ---
 
@@ -429,6 +451,7 @@ and [`docs/technical-reference.md`](docs/technical-reference.md) §12–13.
 
 - ✅ **The spectral math.** `validate()` anchors `K_D65` against CIE S 026 published values (within 0.05%), checks weight-sum and scale-invariance properties, and confirms mel-DER(D65) ≈ 1.0. Two deliberate fixes over the Lark source are applied (Python-2 integer division; a 3-channel bin-ordering misalignment).
 - ✅ **The grid daylight pipeline.** A unit-radiance hemisphere reproduces `562.345 lux = 179 × π` on both the 3- and 9-channel paths under live Radiance.
+- ✅ **The LM-83 three-phase engine** (`lm83_daylight`) — corrected on 2026-11-26 and checked against an independent `rtrace` / `gendaylit` reference on a 4 × 4 × 3 m test room: mean work-plane illuminance within 0.99–1.12 of the reference with blinds open, 1.05–1.25 behind the default blind, 1.00–1.01 for the direct beam (`tests/test_lm83_reference.py`). **Results from before that date are far too low and must not be used**: the sky receiver was mis-oriented, the Klems matrix carried half its transmittance, and direct sun was missing from sDA. On the reference office the corrected sDA is 64% where the old engine gave 29%.
 - ✅ **OBJ geometry import** — live-checked on Radiance 6.1a: the `obj2rad → xform → oconv → rtrace` round-trip, a north-rotation round-trip, an IES-luminaire octree build, and the colored-by-material `annotate` render.
 - ✅ **The offline spectral stack.** EPW → atmosphere/solar geometry → SPECTRL2 → SEDES1 → `SpectralSkyRecord` → artifacts is unit-tested end to end; the SPECTRL2 constants are transcribed verbatim from the NREL `spectrl2_2.c` source.
 
@@ -445,6 +468,8 @@ and [`docs/technical-reference.md`](docs/technical-reference.md) §12–13.
 - ⚠️ **The SEDES1 cloud CCM carries real spectral-shape uncertainty.** Only the always-on energy rescale is exact. Per-wavelength regression uncertainty is surfaced as `ccm_sigma`; the CCM can be locally re-fit ([`docs/recalibrating-cloud-ccm.md`](docs/recalibrating-cloud-ccm.md)). The opt-in **SEDES2** tabulated alternative closes the *digitization* caveat but remains a German-site fit, and its independent variable is NGH, not `Kt` — it is not a drop-in.
 - ⚠️ **Spectral physics is opt-in.** Without `physical_sky=True` the enhanced reconstruction uses the reference-sky template with an air-mass-colored sun. The seam is wired, not on by default.
 - ⚠️ **`lm83_method_conformant` is always false by design.** §§2.2.8–2.2.11 are out of scope, so glazing runs at raw `tvis`, biasing sDA up. Read `conditions.departures` before quoting.
+- ⚠️ **An sDA near a threshold moves between runs.** Radiance's sampling is not seeded. On the reference office one grid row sits on the 50% line, and five identical `lm83_daylight` runs gave 64.4% three times and 62.2% twice. Report a range, or repeat the run, when a point count decides the verdict.
+- ⚠️ **The LM-83 glazing matrix has no angular dependence.** Sky light through clear glazing reads about 10–12% high against a ray trace; the direct beam is traced through the real glass and is not affected. It is a recorded departure.
 - ⚠️ **The OBJ carries no spectral data.** Reflectances are user-assigned; `.mtl` is a hint. The measured-SPD path exists, but the shipped catalog is illustrative scalars pending data.
 - 📐 **Accuracy envelope** (Lark, Pierson 2023): daylight mel-EDI within ±20%, validated for neutral-colored interiors — chromatic or strongly inter-reflecting scenes degrade. 3-channel is an approximation; **9-channel is recommended**, and the exact-from-SPD α-opic path is provided for validation.
 

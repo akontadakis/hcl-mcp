@@ -126,7 +126,9 @@ README's install section and [`INSTALL.md`](../INSTALL.md) are the authoritative
 Optional environment:
 
 - `HCL_RADIANCE_BIN` — directory of the Radiance binaries (else `PATH`).
-- `HCL_DAYSIM_BIN` — directory of `ds_shortterm`/`epw2wea` (else `PATH`; build via `build_daysim`).
+- `HCL_DAYSIM_BIN` — directory of `ds_shortterm`/`epw2wea` (else `PATH`; build via `build_daysim(run=True)`).
+- `HCL_DAYSIM_REF` — the Daysim commit or branch `build_daysim` builds, in place of its pinned commit.
+  Only this variable can change what is built; the tool takes no such argument.
 - `HCL_WORK_ROOT` — default output directory (else a client root, else `~/hcl_work`).
 - `HCL_ATMOS_CACHE` — where `spectral_sky_native` (`gensdaymtx`) keeps its pre-computed
   scattering tables (else `<HCL_WORK_ROOT>/atmos_cache`). The first run in an empty cache takes

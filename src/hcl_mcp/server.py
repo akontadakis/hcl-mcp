@@ -1669,14 +1669,26 @@ def daysim_status() -> dict:
     return _daysim_status()
 
 
-async def build_daysim(src_dir: str | None = None, run: bool = True,
+async def build_daysim(src_dir: str | None = None, run: bool = False,
                        work_dir: str | None = None, ctx: Context | None = None) -> dict:
-    """Build Daysim (ds_shortterm + epw2wea) from source: clone master + headless arm64 CMake.
+    """Build Daysim (ds_shortterm + epw2wea) from source: one pinned commit + headless CMake.
 
-    run=True executes if git+cmake are present; otherwise returns the ordered command plan + a reason.
-    On success, bin_dir is the build/bin directory — set it as HCL_DAYSIM_BIN. Daysim is NOT bundled
-    (NRC/Fraunhofer ISE source-available EULA); this clones+builds on your machine.
+    run=False (the DEFAULT) only returns the ordered command plan. run=True downloads the source
+    from GitHub and compiles it on this machine (git + cmake needed, several minutes); the user
+    is asked first where the client can ask. On success, bin_dir is the build/bin directory —
+    set it as HCL_DAYSIM_BIN. Daysim is NOT bundled (NRC/Fraunhofer ISE source-available EULA).
+
+    What is built is one fixed commit, checked before cmake starts; `source` in the result
+    names it ({repo, ref, pinned, commit, local_changes?}). An existing src_dir is built only
+    if it is a Daysim checkout at that commit; any other folder is refused with a reason. Only
+    the server's environment (HCL_DAYSIM_REF) can select another commit or branch.
     """
+    if run:
+        proceed = await confirm_run(ctx, _LONG_RUN_QUESTIONS["build_daysim"])
+        if isinstance(proceed, InputRequiredResult):
+            return proceed  # the question itself: the client answers by calling again
+        if proceed is False:
+            run = False
     return await _offload(_build_daysim, src_dir=src_dir, run=run, work_dir=work_dir)
 
 
@@ -2125,7 +2137,15 @@ _LONG_RUN_QUESTIONS = {
     "annual_nvrd": (
         "annual_nvrd runs Daysim sub-hourly generation + a full 2-phase DDS annual transport "
         "(potentially long). Proceed? (set run=false to only emit the command plan)"),
+    "build_daysim": (
+        "build_daysim will download the Daysim source code from GitHub (one fixed commit) and "
+        "compile it on this machine with cmake (several minutes). Proceed? (answer no to get "
+        "only the command plan)"),
 }
+
+# What `run` means when the caller leaves it out. The simulation tools run; the Daysim build,
+# which fetches and compiles code, only plans.
+_RUN_DEFAULT = {"build_daysim": False}
 
 
 _AS_BOOL = TypeAdapter(bool)
@@ -2133,7 +2153,8 @@ _AS_BOOL = TypeAdapter(bool)
 
 def _would_simulate(tool, arguments):
     """Would this call start the long simulation? Mirrors each tool's own condition for asking;
-    absent arguments take the tool's defaults (run=True, daylight_savings mode="point_in_time").
+    absent arguments take the tool's defaults (run=True except where _RUN_DEFAULT says
+    otherwise, daylight_savings mode="point_in_time").
 
     `run` is read the way the tool's signature reads it. Clients that do not type their
     arguments send the string "false", which the tool accepts as False; a truthiness test here
@@ -2141,7 +2162,7 @@ def _would_simulate(tool, arguments):
     call is about to fail on its own.
     """
     try:
-        run = _AS_BOOL.validate_python(arguments.get("run", True))
+        run = _AS_BOOL.validate_python(arguments.get("run", _RUN_DEFAULT.get(tool, True)))
     except ValidationError:
         return False
     if not run:
@@ -2159,7 +2180,7 @@ class _ConfirmBeforeTask(Middleware):
     task. Middleware is the place: it wraps every call and runs ahead of task creation.
 
     Only calls that are about to become tasks are handled here (MCP 2026-07-28, client declared
-    the extension, tool is one of the four that ask). Every other call asks from inside the
+    the extension, tool is one of the five that ask). Every other call asks from inside the
     tool, as before. A yes creates the task; a no creates it with run=False, so the task
     returns the command plan; the task body itself then asks nothing.
 

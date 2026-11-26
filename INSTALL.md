@@ -325,6 +325,7 @@ Set these in your client config's `env` block (or your shell) as needed:
 |---|---|---|
 | `HCL_RADIANCE_BIN` | Radiance `bin` dir, if not on `PATH` | `/usr/local/radiance/bin` · `C:/Radiance/bin` |
 | `HCL_DAYSIM_BIN` | Daysim `bin` dir (experimental) | `/usr/local/daysim/bin` |
+| `HCL_DAYSIM_REF` | Daysim commit or branch for `build_daysim`, in place of the pinned commit | unset |
 | `HCL_WORK_ROOT` | Where the server writes scenes/results | `~/hcl-work` |
 | `HCL_ATMOS_CACHE` | Where `gensdaymtx` keeps its pre-computed scattering tables (`atmos_data/`). The first run fills it (minutes; tens of MB to a few GB, by how many atmosphere states the weather file spans); later runs reuse it | `<HCL_WORK_ROOT>/atmos_cache` |
 | `RAYPATH` | Radiance `lib` dir (required for annual runs). For `gensdaymtx` the server finds the `lib` beside `bin` by itself when this is unset | `.:/usr/local/radiance/lib` |

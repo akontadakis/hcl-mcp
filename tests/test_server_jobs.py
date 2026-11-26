@@ -242,7 +242,8 @@ def _start_server_with_a_slow_build(tmp_path):
     send({"jsonrpc": "2.0", "method": "notifications/initialized"})
     send({"jsonrpc": "2.0", "id": 2, "method": "tools/call",
           "params": {"name": "build_daysim",
-                     "arguments": {"src_dir": str(tmp_path / "Daysim"), "work_dir": str(tmp_path)}}})
+                     "arguments": {"src_dir": str(tmp_path / "Daysim"), "work_dir": str(tmp_path),
+                                   "run": True}}})
     return server, _pids(pid_file, timeout=60)
 
 
