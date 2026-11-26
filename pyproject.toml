@@ -1,6 +1,6 @@
 [project]
 name = "hcl-mcp"
-version = "0.1.0"
+version = "0.1.1"
 description = "Spectral / human-centric-lighting toolkit (derived from Lark Spectral Lighting) as an MCP server"
 readme = "README.md"
 requires-python = ">=3.11"

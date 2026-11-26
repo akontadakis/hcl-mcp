@@ -2,4 +2,4 @@
 
 # Reported to clients as the server version. Keep equal to `version` in pyproject.toml
 # (tests/test_server_identity.py fails when the two drift).
-__version__ = "0.1.0"
+__version__ = "0.1.1"

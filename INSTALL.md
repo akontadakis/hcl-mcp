@@ -109,14 +109,16 @@ uvx --from git+https://github.com/akontadakis/hcl-mcp hcl-mcp
 ```
 
 Pin a specific release or commit by appending `@<ref>` — any tag, branch, or commit SHA the
-repository carries. For example, once a `v1.0.0` tag exists:
+repository carries. For example, the `v0.1.1` release:
 
 ```bash
-uvx --from git+https://github.com/akontadakis/hcl-mcp@v1.0.0 hcl-mcp
+uvx --from git+https://github.com/akontadakis/hcl-mcp@v0.1.1 hcl-mcp
 ```
 
-> **No releases are tagged yet.** Until the first tag is published, omit the `@<ref>` and take the
-> default branch (the plain command above), or pin an exact commit SHA.
+> **Releases are tagged from `v0.1.1` on.** `v0.1.1` is the first release with the corrected
+> LM-83 engine; an `lm83_daylight` result from an earlier state is far too low and must not be
+> used. Omit the `@<ref>` to take the default branch, or pin a tag or an exact commit SHA when a
+> result has to be reproducible.
 
 You normally never type this yourself — you paste it into a client config in Step 3. To sanity-check
 it once by hand, run the command above; it should start and wait on stdio (Ctrl-C to exit).
@@ -351,7 +353,7 @@ Set these in your client config's `env` block (or your shell) as needed:
 
 ## Updating & uninstalling
 
-- **Method A (`uvx`):** pin a tag (`@v1.0.0`) for a fixed version, or omit it to track the latest on
+- **Method A (`uvx`):** pin a tag (`@v0.1.1`) for a fixed version, or omit it to track the latest on
   each new launch. Clear the cache with `uv cache clean` to force a rebuild.
 - **Method B (`uv tool install`):** `git pull && uv tool install . --reinstall` to update;
   `uv tool uninstall hcl-mcp` to remove.

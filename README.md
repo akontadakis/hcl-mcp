@@ -11,7 +11,7 @@ The spectral and circadian methods implement published models directly: Bird & R
 spectra), Amundadottir 2016 (nvRD alertness), Inanici, Brennan & Clark 2015 (3-/9-channel).
 Full citation map and grounding-status index: [`docs/literature-bibliography.md`](docs/literature-bibliography.md).
 
-> **Version** 0.1.0 · **Python** ≥ 3.11 · **License** MIT
+> **Version** 0.1.1 · **Python** ≥ 3.11 · **License** MIT
 > **Optional engines** Radiance 6.1a (daylight / electric / glare / native spectral) · Daysim (sub-hourly weather) · SMARTS (spectral oracle)
 
 The pure-Python spectral core has **zero runtime dependency on Radiance or Daysim** — it always
