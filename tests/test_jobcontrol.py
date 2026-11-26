@@ -45,6 +45,12 @@ def _fake_program(path, pid_file):
     return path
 
 
+def _running_commands_mentioning(marker):
+    """Pids of processes whose command line contains `marker` (a unique temp path)."""
+    out = subprocess.run(["pgrep", "-f", marker], capture_output=True, text=True).stdout.split()
+    return [int(pid) for pid in out if int(pid) != os.getpid()]
+
+
 def _pids(pid_file, timeout=10.0):
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
@@ -143,18 +149,20 @@ def test_cancelling_the_job_kills_the_command_and_the_children_it_started(tmp_pa
 
 
 @posix_only
-def test_a_timeout_inside_a_job_still_raises_timeout_and_kills_the_command(tmp_path):
-    # The command must exist before the timeout fires, however busy the machine is. A Python
-    # child can take longer than that to start under load, and a freshly written script can be
-    # held up on its first exec by endpoint-security software (both failed here once). /bin/sh
-    # with an inline script is neither: an existing binary that has its pid on disk in
-    # milliseconds.
-    pid_file = tmp_path / "pids"
-    command = ["/bin/sh", "-c", f"echo $$ > {pid_file}; exec sleep 60"]
+def test_a_timeout_inside_a_job_still_raises_timeout_and_kills_the_command():
+    # The command is found by its command line, not by a pid file it writes. On a loaded
+    # machine a process can take longer than the timeout just to start, and a test that then
+    # waits for a pid file fails although nothing is wrong (it did, three times). A unique
+    # sleep duration is the marker: whether the command got going or not, none may be left.
+    import random
+    marker = f"{60 + random.random():.9f}"
     with jobcontrol.job():
         with pytest.raises(subprocess.TimeoutExpired):
-            jobcontrol.run(command, timeout=2.0)
-    assert _gone(_pids(pid_file))
+            jobcontrol.run(["sleep", marker], timeout=1.0)
+    deadline = time.monotonic() + 10
+    while _running_commands_mentioning(marker) and time.monotonic() < deadline:
+        time.sleep(0.1)
+    assert _running_commands_mentioning(marker) == []
 
 
 @posix_only
@@ -388,12 +396,6 @@ def test_cancelling_stops_an_upstream_pipe_stage_that_outlives_the_last_one(tmp_
     assert isinstance(box.get("error"), jobcontrol.JobCancelled), box
     assert _gone(pids)
     assert time.monotonic() - started < 20, "waited the upstream stage out"
-
-
-def _running_commands_mentioning(marker):
-    """Pids of processes whose command line contains `marker` (a unique temp path)."""
-    out = subprocess.run(["pgrep", "-f", marker], capture_output=True, text=True).stdout.split()
-    return [int(pid) for pid in out if int(pid) != os.getpid()]
 
 
 @posix_only

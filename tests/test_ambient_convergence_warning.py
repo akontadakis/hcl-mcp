@@ -90,9 +90,17 @@ def test_whole_run_at_ab_0_is_flagged_as_the_worst_case():
 
 
 def test_missing_parameters_fall_back_to_radiance_defaults():
-    """rtrace's own defaults (-ab 0) are direct-only, so an empty string is not under-converged."""
-    assert ambient_convergence_note("") is None
+    """rtrace's own default is -ab 0. Parameters that name no ambient flag at all therefore run
+    direct-only, exactly like an explicit `-ab 0` -- and get the same warning. (This used to
+    return None, on the argument that an empty string is "not under-converged": the one
+    direct-only run nobody chose was the one that went unreported. Review 2026-11-26, G13.)"""
+    note = ambient_convergence_note("")
+    assert note and "NO interreflected light" in note
+    assert ambient_convergence_note("", direct_only_ok=True) is None
 
 
 def test_malformed_input_does_not_raise():
-    assert ambient_convergence_note("-ab notanumber -ad") is None
+    """Unreadable ambient values are treated as absent: no exception, and the absent-flag
+    warning, since rtrace would not be running with the values the caller meant."""
+    note = ambient_convergence_note("-ab notanumber -ad")
+    assert note and "NO interreflected light" in note

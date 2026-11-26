@@ -101,8 +101,11 @@ def window_sender_rad(faces, name, *, flip=True):
     FROM the window, so the front has to face them. Measured on a 4x4x3 m room with a
     south window: normal (0,+1,0) into the room gave a V matrix summing to 3.83, and
     (0,-1,0) out of it gave exactly 0.0 -- a well-formed matrix, no error, no warning.
-    D is winding-insensitive (measured identical both ways: rays leave the sender's back
-    and the sky dome is reached either way), so one file serves both roles.
+    D sends its rays from the sender's BACK, so with the normal facing the room it looks
+    out at the sky and one file serves both roles. (D was once recorded here as
+    winding-insensitive, "measured identical both ways". It was measured while the sky
+    receiver's up vector collapsed every azimuth onto north -- threephase_commands -- and so
+    could not have shown a difference.)
 
     An OBJ exterior wall is normally wound with its normal pointing OUT of the building,
     so `flip` defaults ON: callers pass faces straight from `glass_faces` and get the
@@ -122,8 +125,8 @@ def window_sender_rad(faces, name, *, flip=True):
 def write_window_sender(faces, name, work_dir, *, interior_point=None):
     """Write the glow sender/receiver .rad for a window group. Returns its absolute path.
 
-    ONE file serves both roles: D is winding-insensitive, and V needs the normal facing
-    into the room. Pass `interior_point` (the sensor-grid centroid is ideal) to have the
+    ONE file serves both roles: V needs the normal facing into the room, and D sends from
+    the sender's back, which then faces the sky. Pass `interior_point` (the sensor-grid centroid is ideal) to have the
     orientation measured rather than assumed; without it the OBJ's conventional outward
     winding is assumed and reversed.
     """

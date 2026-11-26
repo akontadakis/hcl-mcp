@@ -74,6 +74,21 @@ def klems_solid_angles():
     return out
 
 
+def klems_projected_solid_angles():
+    """Projected solid angle of each of the 145 bins, in basis order. Sums to pi.
+
+    This, not the plain solid angle, is the weight Radiance gives a BSDF value: a BTDF is
+    radiance out per unit irradiance in, and irradiance on the layer carries the cosine of
+    the direction. A bin between polar angles a and b in a ring of n patches has
+    pi * (cos^2 a - cos^2 b) / n.
+    """
+    out = []
+    for lower, upper, _centre, n_patches in KLEMS_ANGLE_BASIS:
+        ring = math.pi * (math.cos(math.radians(lower)) ** 2 - math.cos(math.radians(upper)) ** 2)
+        out.extend([ring / n_patches] * n_patches)
+    return out
+
+
 def lm83_default_blind(shade_type=None, *, vlt=None, openness=None, reflectance=None):
     """LM-83 2.2.7's default blind optics, dispatched on SHADE TYPE.
 
@@ -123,15 +138,20 @@ def lm83_default_blind(shade_type=None, *, vlt=None, openness=None, reflectance=
 def uniform_diffuse_tmatrix(vlt, *, specular=0.0):
     """A 145x145 Klems T matrix: uniform diffuse transmission, optional specular peak.
 
-    Each incident bin scatters uniformly over the outgoing hemisphere, so every entry is
-    vlt / (2*pi) -- a radiance per unit incident flux, integrating back to `vlt` when
-    weighted by bin solid angles.
+    Each incident bin scatters uniformly over the outgoing hemisphere. A perfect diffuser of
+    transmittance `vlt` has BTDF vlt / pi: integrated over the hemisphere with the cosine
+    (i.e. over PROJECTED solid angle, which sums to pi) that gives back `vlt`. It is not
+    vlt / (2 pi): that integrates to vlt only against plain solid angle, which is not how a
+    BSDF is used, and it made every matrix transmit half of what it declared (measured with
+    rtrace through the generated XML; see tests/test_klems_tmatrix.py).
 
     `specular` adds a forward peak on the diagonal (outgoing bin = incident bin), which
-    is how a fabric shade's openness factor transmits DIRECT BEAM. With specular=0 the
-    blind is opaque to the beam, which is 2.2.7's "no specular transmittance" default.
-    The row then integrates to vlt + specular, so callers pass the DIFFUSE component as
-    `vlt` and the openness factor as `specular` for a total of the shade's true VLT.
+    is how a fabric shade's openness factor transmits DIRECT BEAM. A share `specular` of the
+    light arriving in bin i, sent on into bin i alone, is a BTDF of specular / (projected
+    solid angle of bin i). With specular=0 the blind is opaque to the beam, which is 2.2.7's
+    "no specular transmittance" default. Every column then transmits vlt + specular, so
+    callers pass the DIFFUSE component as `vlt` and the openness factor as `specular` for a
+    total of the shade's true VLT.
     """
     v = float(vlt)
     if not 0.0 <= v <= 1.0:
@@ -139,29 +159,48 @@ def uniform_diffuse_tmatrix(vlt, *, specular=0.0):
     s = float(specular)
     if not 0.0 <= s <= 1.0:
         raise ValueError(f"specular must be within 0..1, got {specular}")
-    base = v / (2.0 * math.pi)
-    omega = klems_solid_angles()
+    base = v / math.pi
+    projected = klems_projected_solid_angles()
     matrix = [[base] * KLEMS_FULL_BINS for _ in range(KLEMS_FULL_BINS)]
     if s > 0.0:
         for i in range(KLEMS_FULL_BINS):
-            matrix[i][i] += s / omega[i]
+            matrix[i][i] += s / projected[i]
     return matrix
 
 
 def clear_glazing_tmatrix(tvis):
-    """T matrix for plain glazing -- the 'blinds open' state.
+    """T matrix for plain glazing -- the 'blinds open' state. Direction-preserving.
 
-    Modelled as diffuse at the same total transmittance rather than as a specular delta.
-    Within three-phase this is the standard Klems treatment: the basis cannot resolve a
-    beam narrower than one bin, so a specular spike would land wholly in one bin and
-    mis-place direct sun. LM-83's direct-sun quantities come from the separate
-    zero-bounce pass, not from this matrix, so the approximation affects only the
-    ambient term -- which is what V.T.D.s computes.
+    Glass does not scatter: light arriving in a bin leaves in the same bin, so the matrix is
+    diagonal, tvis / (projected solid angle) on each entry. That keeps the sky's own
+    distribution behind the window -- a point deep in the room sees the sky near the horizon,
+    a point at the sill the sky overhead. (It was once modelled as a diffuser of the same
+    total transmittance, which lights the room as if the window itself glowed: too little at
+    the window, too much at the back. Measured against rtrace, test_lm83_reference.py.)
+
+    This matrix carries SKY light only. Direct sun through an open window comes from the
+    separate zero-bounce pass, at full angular resolution; a Klems bin is 10-15 degrees wide
+    and would smear the beam across the room.
 
     Carries no angular dependence, which 2.2.9 and the 2.2.6 glossary's "angular
-    effects" would require: a recorded departure, not an oversight.
+    effects" would require: a recorded departure, not an oversight. Real glass passes less
+    at steep angles, so this overstates sky light by roughly a tenth.
     """
-    return uniform_diffuse_tmatrix(tvis)
+    t = float(tvis)
+    if not 0.0 <= t <= 1.0:
+        raise ValueError(f"tvis must be within 0..1, got {tvis}")
+    projected = klems_projected_solid_angles()
+    matrix = [[0.0] * KLEMS_FULL_BINS for _ in range(KLEMS_FULL_BINS)]
+    for i in range(KLEMS_FULL_BINS):
+        matrix[i][i] = t / projected[i]
+    return matrix
+
+
+def scale_tmatrix(matrix, factor):
+    """A layer's matrix behind (or in front of) a non-scattering layer of transmittance
+    `factor` -- a blind behind glazing. Inter-reflection between the two is not modelled."""
+    f = float(factor)
+    return [[value * f for value in row] for row in matrix]
 
 
 _XML_HEAD = """<?xml version="1.0" encoding="UTF-8"?>
@@ -224,7 +263,7 @@ def write_klems_xml(matrix, path, *, name, reflectance=0.0):
     import os
     if len(matrix) != KLEMS_FULL_BINS:
         raise ValueError(f"expected {KLEMS_FULL_BINS} rows, got {len(matrix)}")
-    refl = [[float(reflectance) / (2.0 * math.pi)] * KLEMS_FULL_BINS
+    refl = [[float(reflectance) / math.pi] * KLEMS_FULL_BINS
             for _ in range(KLEMS_FULL_BINS)]
     trans_rows = _data_rows(matrix)
     refl_rows = _data_rows(refl)

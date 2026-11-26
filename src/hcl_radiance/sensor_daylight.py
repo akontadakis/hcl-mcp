@@ -1,7 +1,7 @@
 """Daylight-dimming photosensor placement (methodology.md §3). Pure stdlib, pre-north frame."""
 import math
 
-from hcl_radiance.geometry_obj import face_area
+from hcl_radiance.geometry_obj import face_area, face_normal
 from hcl_radiance.geometry_import import _to_world, _glass_groups, _floor_groups, _context_groups
 from hcl_radiance.sensor_methodology import floor_top_z, _ceiling_z, detect_interior
 from hcl_radiance.footprint import floor_polygons, point_in_footprint
@@ -50,15 +50,49 @@ def glazing_wall(parsed, material_map, scale, up_axis):
     for f in faces:
         area_by_g[f["group"]] = area_by_g.get(f["group"], 0.0) + face_area(parsed, f)
     dom = max(area_by_g, key=area_by_g.get)
-    dpts = [_to_world(parsed["vertices"][vi - 1], up_axis, None, scale)
-            for f in faces if f["group"] == dom for vi in f["verts"]]
+    fcx, fcy = _floor_centroid_xy(parsed, material_map, scale, up_axis)
+    # One material often glazes several walls. The facade is ONE of them: taking the centroid
+    # of every pane of the group puts it in the middle of the room when the panes are on
+    # opposite walls, the "inward" direction comes out (0, 0), and every sensor or observer
+    # built from it sits on one spot looking nowhere (rtrace answers 0 without complaint).
+    # So the group's panes are sorted by which way they face, and the largest set is the facade.
+    facades = []                          # [direction (ux, uy) into the room, area, points]
+    for f in faces:
+        if f["group"] != dom:
+            continue
+        pts = [_to_world(parsed["vertices"][vi - 1], up_axis, None, scale) for vi in f["verts"]]
+        nx, ny, _nz = _to_world(face_normal(parsed, f), up_axis, None, 1.0)
+        horizontal = math.hypot(nx, ny)
+        if horizontal < 1e-6:
+            direction = None              # a skylight: no horizontal facing at all
+        else:
+            ux, uy = nx / horizontal, ny / horizontal
+            cx = sum(p[0] for p in pts) / len(pts)
+            cy = sum(p[1] for p in pts) / len(pts)
+            if ux * (fcx - cx) + uy * (fcy - cy) < 0:     # winding is unreliable: face the room
+                ux, uy = -ux, -uy
+            direction = (ux, uy)
+        for facade in facades:
+            same = (facade[0] is None and direction is None) or (
+                facade[0] is not None and direction is not None
+                and facade[0][0] * direction[0] + facade[0][1] * direction[1] > 0.866)
+            if same:
+                facade[1] += face_area(parsed, f)
+                facade[2].extend(pts)
+                break
+        else:
+            facades.append([direction, face_area(parsed, f), list(pts)])
+    dpts = max(facades, key=lambda facade: facade[1])[2]
     gx = sum(p[0] for p in dpts) / len(dpts)
     gy = sum(p[1] for p in dpts) / len(dpts)
     zmax = max(p[2] for p in dpts)
     zmin = min(p[2] for p in dpts)
-    fcx, fcy = _floor_centroid_xy(parsed, material_map, scale, up_axis)
     ix, iy = fcx - gx, fcy - gy
-    mag = math.hypot(ix, iy) or 1.0
+    mag = math.hypot(ix, iy)
+    if mag < 1e-6:
+        raise ValueError(
+            f"cannot tell which way the glazing of group {dom!r} faces: its centre is the "
+            "room's centre (a skylight, or panes all round). Give the facade explicitly.")
     inward = (ix / mag, iy / mag)
     return {"point": (gx, gy), "inward": inward, "transverse": (-inward[1], inward[0]),
             "H_win": zmax, "sill_z": zmin, "group": dom}

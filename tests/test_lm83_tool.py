@@ -258,3 +258,42 @@ def test_a_model_with_no_glazing_is_refused_with_a_reason(tmp_path):
                 floor_area_m2=16.0, work_dir=work, **_FAST)
     assert out["ran"] is False
     assert "glass" in out["reason"]
+
+
+# ---- second review 2026-11-26: the planner must see the model in the SCENE's frame ----
+
+def _as_millimetres_y_up(obj_text):
+    """The same room as a modeller exporting millimetres with Y up would write it:
+    scene (x, y, z) in metres is model (x, z, -y) in millimetres."""
+    out = []
+    for line in obj_text.splitlines():
+        if line.startswith("v "):
+            x, y, z = (float(t) for t in line.split()[1:4])
+            line = f"v {x * 1000:g} {z * 1000:g} {-y * 1000:g}"
+        out.append(line)
+    return "\n".join(out) + "\n"
+
+
+def _groups(tmp_path, obj_text, **kw):
+    work, obj, wea, points = _setup(tmp_path)
+    with open(obj, "w") as fh:
+        fh.write(obj_text)
+    out = _call(obj_path=obj, material_map=_MAP, wea=wea, points=points, floor_area_m2=16.0,
+                work_dir=work, run=False, **_FAST, **kw)
+    return [(g["name"], round(g["azimuth_deg"]) % 360, round(g["area_m2"], 3))
+            for g in out["window_groups"]]
+
+
+def test_a_model_in_millimetres_with_y_up_plans_the_same_windows_as_one_in_metres(tmp_path):
+    """The room handed to Radiance was scaled and turned; the window list was read from the raw
+    file. A millimetre model got a window sender a thousand times too large, lying on its side."""
+    metres = _groups(tmp_path / "m", _OBJ)
+    assert metres == [("wg_s_180", 180, 3.0)]
+    assert _groups(tmp_path / "mm", _as_millimetres_y_up(_OBJ), units="mm", up_axis="Y") == metres
+
+
+def test_turning_the_model_to_north_turns_its_windows_with_it(tmp_path):
+    """north_angle_deg=90: the model's +Y points east, so its south-facing (-Y) window faces
+    west in the scene. The windows used to stay where the file had them."""
+    turned = _groups(tmp_path / "n", _OBJ, north_angle_deg=90.0)
+    assert [(az, area) for _name, az, area in turned] == [(270, 3.0)]

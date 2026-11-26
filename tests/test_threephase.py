@@ -56,14 +56,28 @@ def test_both_matrix_roles_use_the_same_sender_file():
     assert "wg_south_sender.rad" in d
 
 
-def test_sky_matrix_is_built_once_at_the_receivers_subdivision():
-    """A -m 1 sky (145 rows) cannot multiply a D built against an h=r4 receiver."""
+def test_two_sky_matrices_are_built_at_the_receivers_subdivision():
+    """A -m 1 sky (145 rows) cannot multiply a D built against an h=r4 receiver. And there
+    are two of them: the sky alone, and the sky with the sun in it."""
     steps, out = build_threephase_steps(_SCENE, _SENDERS, "in.wea", "p.pts", 50,
                                         work_dir="/w", sky_mf=4)
     gendaymtx = [c for c in _cmds(steps) if c.startswith("gendaymtx")]
-    assert len(gendaymtx) == 1
-    assert "-m 4" in gendaymtx[0]
-    assert out["sky_mtx"] == "sky.smx"
+    assert len(gendaymtx) == 2
+    assert all("-m 4" in c for c in gendaymtx)
+    assert out["sky_mtx"] == "sky.smx" and out["skysun_mtx"] == "skysun.smx"
+    assert sum(1 for c in gendaymtx if " -s " in c) == 1
+
+
+def test_a_group_multiplies_against_the_sky_with_the_sun_only_when_asked():
+    """An open group takes its sunlight from the exact direct-sun pass, so its matrix product
+    must not contain the sun as well; a closed group diffuses the sun and gets it here."""
+    _steps, out = build_threephase_steps(_SCENE, _SENDERS, "in.wea", "p.pts", 50,
+                                         work_dir="/w")
+    mul, _ill = multiply_steps(out, {"wg_south": "blind.xml", "wg_north": "open.xml"},
+                               "closed_south", with_sun={"wg_south"})
+    products = {c.split()[1]: c for c in _cmds(mul) if c.startswith("dctimestep")}
+    assert "skysun.smx" in products["wg_south_v.mtx"]
+    assert "sky.smx" in products["wg_north_v.mtx"] and "skysun.smx" not in products["wg_north_v.mtx"]
 
 
 def test_receiver_file_is_written_not_echoed():

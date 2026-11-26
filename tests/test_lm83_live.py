@@ -133,14 +133,16 @@ def test_plan_names_one_south_group_and_a_five_percent_blind(tmp_path):
     assert len(plan["states"]) == 2          # open + closed
 
 
-def test_a_sun_pass_is_planned_per_group_plus_one_for_ase(tmp_path):
-    """Sharing one whole-model series between groups lets a closure cancel beam another
-    group admitted, satisfying the criterion with the wrong blind down."""
+def test_every_group_has_a_sun_series_and_a_lone_groups_is_the_whole_models(tmp_path):
+    """Sharing one whole-model series between SEVERAL groups lets a closure cancel beam
+    another group admitted, satisfying the criterion with the wrong blind down -- that case,
+    and how each group is isolated, is in test_lm83_plan.py. With a single group there is
+    nothing to separate: its sun is the model's, and one pass serves both."""
     work = str(tmp_path)
     plan = plan_lm83(_scene(work), parse_obj(_WINDOW_OBJ), _MAP, _wea(work), "p.pts", 18,
                      work_dir=work, **_FAST)
     assert set(plan["sun_ill"]) == {g["name"] for g in plan["window_groups"]}
-    assert plan["sun_total_ill"] not in plan["sun_ill"].values()
+    assert list(plan["sun_ill"].values()) == [plan["sun_total_ill"]]
     assert any("-ab 0" in c for c in plan["commands"])
 
 

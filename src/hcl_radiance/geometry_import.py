@@ -12,7 +12,7 @@ import math
 import os
 import time
 
-from hcl_core.materials import write_material
+from hcl_core.materials import write_material, require_safe_name
 from hcl_core.spd import parse_spd, bin_average, to_grid_list
 from hcl_core.surface_library import surface_lookup, surface_meta
 from hcl_platform import rad_path as _rad_path  # aliased: `rad_path` is a local var name below
@@ -69,6 +69,20 @@ def _to_world(p, up_axis, north_angle_deg=None, scale=1.0):
         c, s = math.cos(th), math.sin(th)
         x, y = x * c - y * s, x * s + y * c
     return (x, y, z)
+
+
+def parsed_in_world(parsed, *, units="m", up_axis="Z", north_angle_deg=None):
+    """A parsed OBJ with its vertices in the SCENE's frame: metres, Z up, turned to north.
+
+    `import_geometry` scales and turns the geometry it hands to Radiance (build_xform). Anything
+    else read from the same file and then placed in that scene (window senders, blockers, a
+    point compared with the sensor grid) has to make the same move, or it sits in the raw
+    file's units and orientation while the room does not. The moves are a uniform scale and
+    rotations, so face winding is kept.
+    """
+    scale = scale_factor(units)
+    return {**parsed, "vertices": [_to_world(v, up_axis, north_angle_deg, scale)
+                                   for v in parsed.get("vertices", [])]}
 
 
 def _rotate_north(rows, north_angle_deg):
@@ -177,12 +191,22 @@ def aperture_report(parsed, material_map, scale, *, up_axis="Y", north_angle_deg
             af = face_area(parsed, f)
             fnx, fny, fnz = face_normal(parsed, f)
             wx += af * fnx; wy += af * fny; wz += af * fnz
-        wmag = math.sqrt(wx * wx + wy * wy + wz * wz) or 1.0
+        wmag = math.sqrt(wx * wx + wy * wy + wz * wz)
+        total = sum(face_area(parsed, f) for f in faces)
+        # The mean normal only means something when the panes face the same way. For panes on
+        # opposite walls, or wound opposite ways, it cancels: normalising what is left gave
+        # "azimuth 0, tilt 90" -- a north-facing window -- for glazing that faces east and west.
+        ambiguous = total <= 0.0 or wmag < 0.5 * total
+        if ambiguous:
+            out.append({"group": g, "area_m2": round(area, 4), "azimuth_deg": None,
+                        "tilt_deg": None, "orientation_ambiguous": True})
+            continue
         nx, ny, nz = _to_world((wx / wmag, wy / wmag, wz / wmag), up_axis, north_angle_deg, 1.0)
         azimuth = math.degrees(math.atan2(nx, ny)) % 360.0
         tilt = math.degrees(math.acos(max(-1.0, min(1.0, nz))))
         out.append({"group": g, "area_m2": round(area, 4),
-                    "azimuth_deg": round(azimuth, 1), "tilt_deg": round(tilt, 1)})
+                    "azimuth_deg": round(azimuth, 1), "tilt_deg": round(tilt, 1),
+                    "orientation_ambiguous": False})
     return out
 
 
@@ -350,6 +374,30 @@ def obj_group_qualifier(obj_text):
         if tok and tok[0] == "usemtl" and len(tok) > 1:
             return "Material"
     return "Group"
+
+
+def obj_ungrouped_faces(obj_text):
+    """Count face lines before the first `g` line, in a file that names its surfaces by group.
+
+    The counterpart of `obj_unmaterialized_faces` for group-only files (no usemtl anywhere).
+    Such faces belong to no group, obj2rad writes nothing for them, and the room comes out
+    with a surface missing and no word said. A file with no `g` line at all is a different
+    case -- everything is one implicit group -- and returns 0, as does a usemtl file.
+    """
+    seen_group = False
+    ungrouped = 0
+    has_group = False
+    for line in obj_text.splitlines():
+        tok = line.split()
+        if not tok:
+            continue
+        if tok[0] == "usemtl" and len(tok) > 1:
+            return 0
+        if tok[0] == "g":
+            seen_group = has_group = True
+        elif tok[0] == "f" and not seen_group:
+            ungrouped += 1
+    return ungrouped if has_group else 0
 
 
 def obj_unmaterialized_faces(obj_text):
@@ -723,16 +771,27 @@ def luminaire_electric_lights(parsed, material_map, *, scale, up_axis="Y", north
 _MANIFEST_HEADER_MARK = "# --- hcl-mcp geometry provenance ---"
 
 
+def manifest_header(manifest):
+    """The provenance block as text: one `# key: value` line per entry.
+
+    A value is flattened to a single line first. A line break inside one (a sidecar path can
+    hold one) would end the comment, and the rest would be a line of its own in a file Radiance
+    reads, where `!command` is run.
+    """
+    lines = [_MANIFEST_HEADER_MARK]
+    for k in sorted(manifest):
+        lines.append(f"# {k}: {' '.join(str(manifest[k]).split())}")
+    lines.append("# --- end provenance ---")
+    return "\n".join(lines) + "\n"
+
+
 def _embed_manifest_header(rad_path, manifest):
     """Prepend a #-comment provenance block to a geometry .rad. Idempotent; Radiance ignores #."""
     with open(rad_path) as fh:
         body = fh.read()
     if _MANIFEST_HEADER_MARK in body:
         return
-    lines = [_MANIFEST_HEADER_MARK]
-    for k in sorted(manifest):
-        lines.append(f"# {k}: {manifest[k]}")
-    lines.append("# --- end provenance ---")
+    lines = manifest_header(manifest).splitlines()
     with open(rad_path, "w") as fh:
         fh.write("\n".join(lines) + "\n" + body)
 
@@ -758,6 +817,8 @@ def material_summary(parsed, material_map, apertures):
     ap = {a["group"]: a for a in apertures}
     rows = []
     for g in parsed["groups"]:
+        if g not in material_map:
+            continue                      # e.g. parse_obj's implicit default group
         spec, _ = resolve_spec(material_map[g])
         row = {"group": g, "type": spec.get("type", "plastic")}
         if "refl" in spec:
@@ -845,7 +906,16 @@ def import_geometry(obj_path, *, material_map=None, units=None, up_axis=None,
         parsed = parse_obj(obj_text)
         return _discovery_payload(obj_path, parsed, units, scale)
 
+    ungrouped = obj_ungrouped_faces(obj_text)
+    if ungrouped:
+        raise ValueError(
+            f"{ungrouped} face(s) come before the first `g` line and so belong to no group. "
+            "obj2rad would drop them silently and the room would be missing a surface. Put a "
+            "`g <name>` line before them (and map that name in material_map).")
     groups = parse_obj_groups(obj_text)
+    # Every group becomes <work_dir>/<group>.rad and a line of the obj2rad map file.
+    for g in groups:
+        require_safe_name(g, "OBJ group / material")
     bbox = parse_obj_bbox(obj_text)
     missing_normals = not obj_has_normals(obj_text)
     # DEF-8: a forgotten `units` must not mask the more actionable unmapped-groups error. Use a
@@ -987,8 +1057,9 @@ def import_geometry(obj_path, *, material_map=None, units=None, up_axis=None,
     if annotate:
         out["summary"] = material_summary(parsed_rich, resolved_map, out["apertures"])
         scene = [*out["material_sets"][0], out["geometry_set"][0]]
+        # `run and ...`: a dry run must execute nothing, the annotation render included.
         ann = annotate_steps(scene, "annot.hdr", "-vp 2 1 1.5 -vd 0 -1 0 -vh 60 -vv 60",
-                             "annot_fc.hdr", abs_work, _available())
+                             "annot_fc.hdr", abs_work, run and _available())
         out["annotate_commands"] = ann["commands"]
 
     # Health report: always computed, advisory by default (spec 2026-07-23).

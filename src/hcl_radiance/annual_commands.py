@@ -1,4 +1,5 @@
 """Annual 2-phase DDS command builders — verbatim from Lark 'Colored Sky For Annual Irradiance'."""
+import filecmp
 import os
 import shutil
 import shlex
@@ -52,7 +53,8 @@ def stage_cal_files(work_dir, run=True):
     """Mirror the source's guard: ensure reinhartb.cal/reinsrc.cal/reinhart.cal are in work_dir.
 
     Returns a list of describe-able 'copy' step dicts for the emit (run=False) path so the user
-    can reproduce. When run=True, also copies any found .cal that is not already present.
+    can reproduce. When run=True, also copies any found .cal that is missing from work_dir or
+    differs from the installed one: a copy left by an older Radiance must not outlive it.
     """
     lib = _radiance_lib_dir()
     steps = []
@@ -60,7 +62,8 @@ def stage_cal_files(work_dir, run=True):
         src = os.path.join(lib, name) if lib else name
         dst = os.path.join(work_dir, name)
         steps.append({"cmd": ["cp", src, dst], "stage_cal": name})
-        if run and lib and os.path.isfile(src) and not os.path.isfile(dst):
+        if run and lib and os.path.isfile(src) and not (
+                os.path.isfile(dst) and filecmp.cmp(src, dst, shallow=False)):
             shutil.copyfile(src, dst)
     return steps
 

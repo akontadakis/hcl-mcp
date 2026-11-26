@@ -6,9 +6,11 @@ Only IMPLEMENTED gensdaymtx flags are used (the binary's usage string advertises
 -c/-O/-A/-D/-M — using them aborts the run). Location/time come from the EPW header.
 """
 import os
+import signal
 import subprocess
 
 from hcl_core import jobcontrol
+from hcl_platform import shell_join, shell_quote
 from hcl_core._spectra import ACTION_MEL
 
 _MODE_FLAG = {"all": [], "sun": ["-d"], "sky": ["-s"]}
@@ -103,12 +105,81 @@ def parse_smx_header(text):
     return out
 
 
+#: The aerosol table gensdaymtx reads at start-up. Without it the program does not report an
+#: error: it dies of a segmentation fault and prints nothing.
+_AEROSOL_DATA = "mie_ca.dat"
+
+
+def _raypath_entries():
+    return [d for d in os.environ.get("RAYPATH", "").split(os.pathsep) if d]
+
+
+def _aerosol_data_dir(exe):
+    """The folder that holds gensdaymtx's aerosol table: a RAYPATH entry if one has it, else the
+    library folder beside the program. Returns (folder, on_raypath); (None, False) if not found."""
+    for entry in _raypath_entries():
+        if os.path.isfile(os.path.join(entry, _AEROSOL_DATA)):
+            return entry, True
+    seen = []
+    for located in (exe, os.path.realpath(exe) if exe else None):     # a symlink in /usr/local/bin
+        if not located:
+            continue
+        bin_dir = os.path.dirname(located)
+        for lib in (os.path.join(bin_dir, os.pardir, "lib"),
+                    os.path.join(bin_dir, os.pardir, "lib", "ray")):
+            lib = os.path.normpath(lib)
+            if lib not in seen and os.path.isfile(os.path.join(lib, _AEROSOL_DATA)):
+                return lib, False
+            seen.append(lib)
+    return None, False
+
+
+def atmosphere_cache_dir(work_dir):
+    """Where gensdaymtx runs, and so where it keeps its `atmos_data` folder.
+
+    gensdaymtx pre-computes its scattering tables into `atmos_data/` in the folder it is started
+    from: minutes of work and tens of megabytes to gigabytes the first time, a few seconds after that. Started
+    in the server's own folder, that is `/` under Claude Desktop (not writable, the run fails)
+    and an arbitrary folder otherwise, with a fresh pre-computation in each one. One fixed
+    folder is computed once and shared by every study:
+    HCL_ATMOS_CACHE if set, else `atmos_cache` under the work root (HCL_WORK_ROOT, ~/hcl_work).
+    If that cannot be created the run's own work folder is used.
+    """
+    chosen = os.environ.get("HCL_ATMOS_CACHE") or os.path.join(
+        os.environ.get("HCL_WORK_ROOT") or os.path.expanduser("~/hcl_work"), "atmos_cache")
+    try:
+        os.makedirs(chosen, exist_ok=True)
+        if os.access(chosen, os.W_OK):
+            return chosen
+    except OSError:
+        pass
+    return work_dir
+
+
 def radiance_spectral_status():
-    """Detect the Radiance 6.x spectral tools via HCL_RADIANCE_BIN or PATH."""
+    """Detect the Radiance 6.x spectral tools via HCL_RADIANCE_BIN or PATH.
+
+    `aerosol_data` is the folder holding mie_ca.dat, or None. `available` says the program is
+    there; without the data file it still cannot run, and `data_note` then says what to set.
+    """
     from hcl_radiance.discover import resolve_bin
     gens = resolve_bin("gensdaymtx")
     rc = resolve_bin("rcomb")
-    return {"available": gens is not None, "gensdaymtx": gens, "rcomb": rc}
+    out = {"available": gens is not None, "gensdaymtx": gens, "rcomb": rc}
+    if gens:
+        out["aerosol_data"] = _aerosol_data_dir(gens)[0]
+        if out["aerosol_data"] is None:
+            out["data_note"] = _missing_data_note()
+    return out
+
+
+def _missing_data_note():
+    raypath = os.environ.get("RAYPATH")
+    state = f"RAYPATH is {raypath!r}" if raypath else "RAYPATH is not set"
+    return (f"gensdaymtx needs {_AEROSOL_DATA} and cannot find it: {state}, and there is no copy "
+            "in the `lib` folder beside the program. Set RAYPATH to the Radiance library folder "
+            "in the `env` block of this MCP server's entry (an MCP client does not pass your "
+            "shell's environment on), then call again.")
 
 
 def run_gensdaymtx(epw_path, work_dir, *, mf=1, mode="all", ground_refl=None, run=True, timeout=None):
@@ -127,27 +198,82 @@ def run_gensdaymtx(epw_path, work_dir, *, mf=1, mode="all", ground_refl=None, ru
     if not (run and status["available"]):
         rcomb = build_rcomb_melanopic_cmd(smx)
         return {"ran": False,
-                "commands": [" ".join(cmd) + " > " + smx, " ".join(rcomb) + " > sky_melanopic.mtx"],
+                # Quoted, so a folder or file name with a blank in it is still one argument.
+                "commands": [shell_join(cmd) + " > " + shell_quote(smx),
+                             shell_join(rcomb) + " > sky_melanopic.mtx"],
                 "reason": "gensdaymtx (Radiance 6.x) not on PATH. Ensure mie_ca.dat is on RAYPATH, "
                           "then run the commands; re-call with run=True once available."}
+
+    # What is RUN differs from the plan above in three ways, none of which changes the result.
+    #  - The program is the one discovery found, so HCL_RADIANCE_BIN is honoured, not just PATH.
+    #  - The weather file is absolute, because the program does not start in our folder.
+    #  - It starts in the atmosphere cache folder (see atmosphere_cache_dir).
+    exe = status.get("gensdaymtx")
+    run_cmd = build_gensdaymtx_cmd(os.path.abspath(epw_path), mf=mf, mode=mode,
+                                   ground_refl=ground_refl)
+    if exe and run_cmd[0] == "gensdaymtx":
+        run_cmd[0] = exe
+    cache = atmosphere_cache_dir(work_dir)
+    extra = {"atmosphere_cache": os.path.join(cache, "atmos_data")}
+
+    # An MCP client starts a server with a minimal environment, so RAYPATH is usually absent and
+    # gensdaymtx then crashes without a word. The data file sits in `lib` beside the program:
+    # point at it for this one process, and leave the server's own environment alone.
+    data_dir, on_raypath = _aerosol_data_dir(exe)
+    env = None
+    if data_dir and not on_raypath:
+        env = {**os.environ,
+               "RAYPATH": os.pathsep.join([*(_raypath_entries() or ["."]), data_dir])}
+        extra["raypath_supplied"] = data_dir
+
     try:
         with open(smx, "w") as fh:
             # Stoppable inside a job (the MCP server opens one per tool call); plain
             # subprocess.run outside one.
-            proc = jobcontrol.run(cmd, stdout=fh, stderr=subprocess.PIPE, timeout=timeout)
+            proc = jobcontrol.run(run_cmd, stdout=fh, stderr=subprocess.PIPE, timeout=timeout,
+                                  cwd=cache, env=env)
     except subprocess.TimeoutExpired:
-        return {"ran": True, "ok": False, "timed_out": True, "smx": smx,
+        return {"ran": True, "ok": False, "timed_out": True, "smx": smx, **extra,
                 "error": f"gensdaymtx exceeded the {timeout}s timeout. A full-year EPW matrix is many "
-                         "minutes of CPU (gensdaymtx runs every hour); pass a larger `timeout` (or None "
-                         "for no cap) or trim the EPW to the hours you need."}
+                         "minutes of CPU (gensdaymtx runs every hour), and the first run in a new "
+                         "atmosphere cache pre-computes its scattering tables for several minutes "
+                         "more; pass a larger `timeout` (or None for no cap) or trim the EPW to the "
+                         "hours you need."}
     if proc.returncode != 0:
-        return {"ran": True, "ok": False, "error": proc.stderr.decode(errors="replace"),
-                "returncode": proc.returncode, "smx": smx}
-    # Read the whole file: parse_smx_header skips body rows (lines without '='), so a full read is
-    # safe and avoids the fixed-4096-byte read truncating before NCOMP on a long argv echo (I2).
+        return {"ran": True, "ok": False, "returncode": proc.returncode, "smx": smx, **extra,
+                "error": _failure_text(proc, data_dir)}
+    # A program can exit 0 and still have written nothing usable; the caller would then read
+    # NCOMP=None and carry on. Read the whole file: parse_smx_header skips body rows (lines
+    # without '='), so a full read is safe and avoids the fixed-4096-byte read truncating before
+    # NCOMP on a long argv echo (I2).
+    if os.path.getsize(smx) == 0:
+        return {"ran": True, "ok": False, "returncode": 0, "smx": smx, **extra,
+                "error": "gensdaymtx exited 0 but wrote an empty matrix file. "
+                         + proc.stderr.decode(errors="replace").strip()}
     with open(smx) as fh:
         header = parse_smx_header(fh.read())
-    return {"ran": True, "ok": True, "smx": smx, "header": header}
+    if not header.get("ncomp"):
+        return {"ran": True, "ok": False, "returncode": 0, "smx": smx, "header": header, **extra,
+                "error": "gensdaymtx exited 0 but its output has no matrix header (no NCOMP "
+                         "record), so it is not a sky matrix. "
+                         + proc.stderr.decode(errors="replace").strip()}
+    return {"ran": True, "ok": True, "smx": smx, "header": header, **extra}
+
+
+def _failure_text(proc, data_dir):
+    """What went wrong, in words. A process stopped by a signal has a negative return code and,
+    for gensdaymtx without its data file, an empty stderr: say so instead of passing on ''."""
+    text = proc.stderr.decode(errors="replace").strip()
+    if proc.returncode < 0:
+        try:
+            name = signal.Signals(-proc.returncode).name
+        except ValueError:
+            name = f"signal {-proc.returncode}"
+        text = (f"gensdaymtx was stopped by {name}"
+                + (f" after printing: {text}" if text else " and printed nothing.")).strip()
+        if data_dir is None:
+            text += " " + _missing_data_note()
+    return text
 
 
 # gensdaymtx's native spectral grid: NSSAMP=20 bins UNIFORM over 380–780nm. Verified in the bundled

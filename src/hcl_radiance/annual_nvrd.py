@@ -123,6 +123,16 @@ def _run_nvrd_for_method(point_xyz, view_vec, timestamps, series, *, method, cha
     res = _nvrd([r[12:] for r in rows], timestep_h=timestep_h)
     return {"R_D": res["relative_response"], "RD_cum": res["cumulative_response"]}
 
+def _failed_stage(stage, result, commands):
+    """A stage that RAN and failed. Both stages answer {ran: True, error, failed_step} when a
+    step exits non-zero, with none of the keys a success carries, so `ran` alone does not say
+    there is anything to read."""
+    return {"ran": True, "ok": False, "stage": stage,
+            "error": result.get("error") or f"{stage} produced no output",
+            "failed_step": result.get("failed_step"), "commands": commands,
+            "relative_RD_note": _RELATIVE_NOTE}
+
+
 def annual_nvrd(*, point_xyz, view_vec, timestep_min=6, reconstruction="both",
                 sky_reconstruction="reference", sun_spectral="colored", sky_cct=None,
                 epw=None, channel_scenes=None, points=None, channel_type=1,
@@ -180,6 +190,8 @@ def annual_nvrd(*, point_xyz, view_vec, timestep_min=6, reconstruction="both",
         else:
             wea_res = generate_subhourly_wea(epw, timestep_min=timestep_min, work_dir=wd, run=run)
         commands += wea_res.get("commands", [])
+        if wea_res.get("ran") and wea_res.get("error"):
+            return _failed_stage("subhourly_weather", wea_res, commands)
         wea = wea_res.get("wea")
         # 2) separated annual transport on the sub-hourly .wea
         from hcl_radiance.annual import run_annual_separated
@@ -201,6 +213,8 @@ def annual_nvrd(*, point_xyz, view_vec, timestep_min=6, reconstruction="both",
                           or "Daysim and/or Radiance unavailable; full command plan emitted.")
             return {"ran": False, "commands": commands, "reason": reason,
                     "relative_RD_note": _RELATIVE_NOTE}
+        if ann.get("error") or "sky_sets" not in ann:
+            return _failed_stage("annual_transport", ann, commands)
         sky_ch = _regroup_to_channels(ann["sky_sets"], channel_type)
         sun_ch = _regroup_to_channels(ann["sun_sets"], channel_type)
         series = list(zip(sky_ch, sun_ch))

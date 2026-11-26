@@ -61,30 +61,43 @@ def build_threephase_steps(scene, senders, wea, points, n_pts, *, work_dir,
         out["v_mtx"][name] = v_name
         out["d_mtx"][name] = d_name
 
+    # Two sky matrices: the sky alone, and the sky with the sun in it. Which one a window
+    # group multiplies depends on its blind -- see multiply_steps.
     steps.append({"cmd": build_gendaymtx_sky_mf(wea, scene["sky_color"], mf=sky_mf),
                   "stdout": "sky.smx"})
+    steps.append({"cmd": build_gendaymtx_sky_mf(wea, scene["sky_color"], mf=sky_mf, sun=True),
+                  "stdout": "skysun.smx"})
     out["sky_mtx"] = "sky.smx"
+    out["skysun_mtx"] = "skysun.smx"
     out["sky_mf"] = sky_mf
     return steps, out
 
 
-def multiply_steps(outputs, t_matrices, tag):
+def multiply_steps(outputs, t_matrices, tag, *, with_sun=()):
     """dctimestep + photopic collapse + group sum for ONE shading state. No ray tracing.
 
     `t_matrices` maps every group name to a Klems T-matrix path. A missing group is an
     error, not a silent omission: dropping a group would quietly delete a window's whole
     contribution. Group contributions are SUMMED, since each lights every sensor.
+
+    `with_sun` names the groups that multiply the sky-WITH-sun matrix: the ones whose blind
+    is closed in this state, since a diffusing blind passes its share of the sun's light.
+    Every other group multiplies the sky alone; its sunlight is added afterwards from the
+    exact direct-sun pass (hcl_core.lm83.add_direct_sun), which resolves the beam far better
+    than a 10-15 degree Klems bin can.
     """
     missing = sorted(set(outputs["v_mtx"]) - set(t_matrices))
     if missing:
         raise ValueError(f"no T matrix supplied for window group(s): {', '.join(missing)}")
+    with_sun = set(with_sun)
     steps, per_group = [], []
     for name in outputs["v_mtx"]:
         lux = f"{name}_{tag}.ill"
+        sky = outputs["skysun_mtx"] if name in with_sun else outputs["sky_mtx"]
         steps.append({"cmd": [*build_dctimestep_3ph(outputs["v_mtx"][name],
                                                     t_matrices[name],
                                                     outputs["d_mtx"][name],
-                                                    outputs["sky_mtx"]),
+                                                    sky),
                               "|", *build_rmtxop_photopic()],
                       "stdout": lux})
         per_group.append(lux)

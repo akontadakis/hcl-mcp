@@ -2,26 +2,42 @@
 
   1. Extract glass faces; group them (2.2.6) or take the caller's declaration.
   2. Write one glow sender per group; ray-trace V and D ONCE per group.
-  3. Synthesise a T matrix per state: clear glazing open, 2.2.7's blind closed.
-  4. Multiply for the open state and each closure step -- N+1 states, not 2^N.
-  5. Run the zero-bounce sun pass PER GROUP, which feeds ASE (3.2.6) and the trigger
-     (2.2.6). Per-group matters: with one whole-model series shared between groups,
-     closing any group cancels beam that another group admitted, so the criterion is
-     satisfied with the wrong blind down.
+  3. Synthesise a T matrix per state: clear glazing when the blind is open, 2.2.7's blind
+     BEHIND that glazing when it is closed.
+  4. Multiply for the open state and each closure step -- N+1 states, not 2^N. An open group
+     multiplies the sky alone; a closed group multiplies the sky with the sun in it.
+  5. Run the zero-bounce sun pass, whole model and PER GROUP. It feeds ASE (3.2.6), the
+     trigger (2.2.6), and the sunlight of every open group in the sDA illuminance.
+     Per-group matters: with one whole-model series shared between groups, closing any
+     group cancels beam that another group admitted, so the criterion is satisfied with the
+     wrong blind down.
 
 `plan_lm83` builds the step list; `run_lm83` executes it and computes the metrics.
+
+Where the light comes from, per window group and timestep:
+
+    blind open    sky:  V . T_glazing . D . s_sky          sun:  zero-bounce beam, exact
+    blind closed  sky + sun:  V . (T_blind x tvis) . D . s_sky+sun
+
+The split exists because a Klems bin is 10-15 degrees wide: sunlight through clear glass sent
+down the matrix chain is smeared over the room, while the sun pass places the beam where it
+falls. Behind a diffusing blind there is no beam left to place.
 """
 import os
 
-from hcl_core.klems import (clear_glazing_tmatrix, lm83_default_blind,
+from hcl_core.klems import (clear_glazing_tmatrix, lm83_default_blind, scale_tmatrix,
                             uniform_diffuse_tmatrix, write_klems_xml)
-from hcl_core.lm83 import (group_windows, lm83_metrics, lm83_schedule, resolve_states,
-                           select_illuminance, validate_analysis_areas)
+from hcl_core.lm83 import (add_direct_sun, group_windows, lm83_metrics, lm83_schedule,
+                           resolve_states, select_illuminance, validate_analysis_areas)
 from hcl_radiance.aperture import glass_faces, write_window_sender
 from hcl_radiance.discover import radiance_status
 from hcl_radiance.lm83_sun import build_sun_pass_steps, parse_lux_matrix
 from hcl_radiance.runner import _render, run_sequence as _run_sequence
 from hcl_radiance.threephase import build_threephase_steps, multiply_steps
+
+#: How far outside a pane its blocker stands (m). Far enough not to be coincident with the
+#: glass, near enough that no sun gets round its edge.
+_BLOCKER_OFFSET_M = 0.002
 
 
 def _glazing_tvis(material_map, default=0.7):
@@ -32,21 +48,31 @@ def _glazing_tvis(material_map, default=0.7):
     return default
 
 
-def _group_geometry(faces, name, work_dir):
-    """A .rad holding only this group's glazing, for its own direct-sun pass.
+def _blocked(faces, name, work_dir, interior_point=None):
+    """A .rad that shuts one window group: an opaque sheet just OUTSIDE each of its panes.
 
-    The sun pass needs to know how much beam THIS group admits, so every other group's
-    aperture must be absent from its octree. Written as an opaque-free surface: the
-    surrounding walls come from the scene geometry, and only this group's opening lets
-    sun through.
+    The room geometry holds every pane at its real transmittance, so a group's own direct-sun
+    pass cannot be made by adding that group's glazing -- it is already there, with all the
+    others. Its sun is isolated by shutting the OTHER groups. The sheets stand a couple of
+    millimetres outside the glass: a sheet lying on the pane would be coincident with it,
+    and which of two coincident surfaces a ray meets first is not something to depend on.
+
+    "Outside" is measured from `interior_point` when given; without it the OBJ's conventional
+    outward winding is taken at its word.
     """
-    path = os.path.abspath(os.path.join(work_dir, f"{name}_glazing.rad"))
-    lines = []
+    path = os.path.abspath(os.path.join(work_dir, f"{name}_blocked.rad"))
+    lines = [f"void plastic {name}_blk", "0", "0", "5 0 0 0 0 0", ""]
     for i, face in enumerate(faces):
-        reals = " ".join(f"{c:g}" for v in face["verts"] for c in v)
-        lines += [f"void glass {name}_g", "0", "0", "3 1 1 1", "",
-                  f"{name}_g polygon {name}_g.{i}", "0", "0",
-                  f"{len(face['verts']) * 3} {reals}", ""]
+        outward = face["normal"]
+        if interior_point is not None:
+            to_room = tuple(c - f for c, f in zip(interior_point, face["centroid"]))
+            if sum(n * t for n, t in zip(outward, to_room)) > 0.0:
+                outward = tuple(-n for n in outward)
+        shifted = [tuple(c + _BLOCKER_OFFSET_M * n for c, n in zip(v, outward))
+                   for v in face["verts"]]
+        reals = " ".join(f"{c:.6g}" for v in shifted for c in v)
+        lines += [f"{name}_blk polygon {name}_blk.{i}", "0", "0",
+                  f"{len(shifted) * 3} {reals}", ""]
     with open(path, "w") as fh:
         fh.write("\n".join(lines) + "\n")
     return path
@@ -76,21 +102,29 @@ def plan_lm83(scene, parsed, material_map, wea, points, n_pts, *, work_dir,
                                             work_dir=work_dir, v_params=v_params,
                                             d_params=d_params)
 
-    open_xml = write_klems_xml(clear_glazing_tmatrix(_glazing_tvis(material_map)),
+    tvis = _glazing_tvis(material_map)
+    open_xml = write_klems_xml(clear_glazing_tmatrix(tvis),
                                os.path.join(work_dir, "t_open.xml"), name="glazing_open")
     spec = dict(blind or {})
     if spec.get("bsdf"):
+        # A supplied BSDF is used as given: it must describe the whole closed SYSTEM,
+        # glazing included, and is taken to pass no direct beam.
         closed_xml, blind_source, beam_pass = spec["bsdf"], "supplied_bsdf", 0.0
     else:
         d = lm83_default_blind(spec.get("shade_type"), vlt=spec.get("vlt"),
                                openness=spec.get("openness"),
                                reflectance=spec.get("reflectance"))
+        # 2.2.7 gives the SHADE's transmittance. The glazing is still there when the shade
+        # comes down, so the closed system is the shade behind the glass.
         closed_xml = write_klems_xml(
-            uniform_diffuse_tmatrix(d["diffuse_vlt"], specular=d["specular"]),
+            scale_tmatrix(uniform_diffuse_tmatrix(d["diffuse_vlt"], specular=d["specular"]),
+                          tvis),
             os.path.join(work_dir, "t_blind.xml"), name=d["source"])
         blind_source = d["source"]
-        total = d["diffuse_vlt"] + d["specular"]
-        beam_pass = (d["specular"] / total) if total > 0 else 0.0
+        # The share of a group's direct beam (already measured through its glazing) that a
+        # closed shade still passes is its openness factor: 2.2.7, "the specular
+        # transmittance should be equal to the openness factor".
+        beam_pass = d["specular"]
 
     # N+1 states: all open, then close one more group per step in a fixed nested order.
     order = [g["name"] for g in groups]
@@ -99,29 +133,33 @@ def plan_lm83(scene, parsed, material_map, wea, points, n_pts, *, work_dir,
     for state in states:
         tag = "open" if not state else "closed_" + "_".join(sorted(state))
         t_map = {name: (closed_xml if name in state else open_xml) for name in senders}
-        mul, ill = multiply_steps(outputs, t_map, tag)
+        # Closed groups take the sky WITH the sun: the blind diffuses its share of it.
+        mul, ill = multiply_steps(outputs, t_map, tag, with_sun=state)
         steps.extend(mul)
         state_ill[state] = ill
 
-    # One zero-bounce pass per group, each seeing only that group's glazing, plus one
-    # whole-model pass for ASE. Sharing a single series across groups would let a
-    # closure cancel beam it never admitted.
-    sun_ill = {}
-    for name, picked in group_faces.items():
-        group_scene = dict(scene)
-        group_scene["exterior"] = [*(scene.get("exterior") or []),
-                                   _group_geometry(picked, name, work_dir)]
-        sun_steps, ill = build_sun_pass_steps(group_scene, wea, points, n_pts,
-                                              work_dir=work_dir, tag=f"sun_{name}")
-        steps.extend(sun_steps)
-        sun_ill[name] = ill
-    all_glazing = [f for picked in group_faces.values() for f in picked]
-    total_scene = dict(scene)
-    total_scene["exterior"] = [*(scene.get("exterior") or []),
-                              _group_geometry(all_glazing, "all", work_dir)]
-    sun_steps, sun_total = build_sun_pass_steps(total_scene, wea, points, n_pts,
+    # The zero-bounce sun pass. The room geometry already carries every pane at its real
+    # transmittance, so the whole-model pass needs nothing added.
+    sun_steps, sun_total = build_sun_pass_steps(scene, wea, points, n_pts,
                                                work_dir=work_dir, tag="sun_all")
     steps.extend(sun_steps)
+    # One pass per group, each with every OTHER group's windows shut, so that a group is
+    # credited with its own beam only. Sharing a single series across groups would let a
+    # closure cancel beam it never admitted. A lone group's sun is the whole model's.
+    sun_ill = {}
+    if len(group_faces) == 1:
+        sun_ill[next(iter(group_faces))] = sun_total
+    else:
+        blocked = {name: _blocked(picked, name, work_dir, interior_point)
+                   for name, picked in group_faces.items()}
+        for name in group_faces:
+            group_scene = dict(scene)
+            group_scene["exterior"] = [*(scene.get("exterior") or []),
+                                       *(path for other, path in blocked.items() if other != name)]
+            sun_steps, ill = build_sun_pass_steps(group_scene, wea, points, n_pts,
+                                                  work_dir=work_dir, tag=f"sun_{name}")
+            steps.extend(sun_steps)
+            sun_ill[name] = ill
 
     return {"window_groups": groups, "blind_source": blind_source,
             "beam_pass_fraction": {name: beam_pass for name in senders},
@@ -134,6 +172,22 @@ def _read_lux(path, work_dir):
     """Read one produced .ill into [n_points][n_timesteps] lux."""
     with open(os.path.join(work_dir, path)) as fh:
         return parse_lux_matrix(fh.read())
+
+
+def state_illuminance(plan, work_dir):
+    """The illuminance each simulated shading state gives, sun included, as [points][timesteps].
+
+    What sDA is computed from, state by state: the matrix product for that state plus the
+    exact direct sun of every group it leaves open. `run_lm83` picks among these per
+    timestep; this view exists so the engine can be checked against a ray trace.
+    """
+    sun_by_group = {name: _read_lux(ill, work_dir) for name, ill in plan["sun_ill"].items()}
+    out = {}
+    for state, path in plan["state_ill"].items():
+        matrix = _read_lux(path, work_dir)
+        n_ts = len(matrix[0]) if matrix else 0
+        out[state] = add_direct_sun(matrix, [state] * n_ts, sun_by_group)
+    return out
 
 
 def run_lm83(scene, parsed, material_map, wea, points, n_pts, *, work_dir, areas,
@@ -186,6 +240,7 @@ def run_lm83(scene, parsed, material_map, wea, points, n_pts, *, work_dir, areas
     sun_total = _read_lux(plan["sun_total_ill"], work_dir)
     sun_by_group = {name: _read_lux(ill, work_dir)
                     for name, ill in plan["sun_ill"].items()}
+    # Matrix products only: an open group's share of these holds sky light, no sun yet.
     state_matrices = {state: _read_lux(path, work_dir)
                       for state, path in plan["state_ill"].items()}
     n_ts = len(sun_total[0]) if sun_total else 0
@@ -193,11 +248,15 @@ def run_lm83(scene, parsed, material_map, wea, points, n_pts, *, work_dir, areas
 
     states = resolve_states(plan["window_groups"], sun_by_group, sun_total, occupancy,
                             areas, beam_pass_fraction=plan["beam_pass_fraction"])
-    operated = select_illuminance(state_matrices, states)
+    # The exact beam, for every group whose blind is open at that timestep.
+    operated = add_direct_sun(select_illuminance(state_matrices, states), states,
+                              sun_by_group)
+    never_shaded = add_direct_sun(state_matrices[frozenset()], [frozenset()] * n_ts,
+                                  sun_by_group)
     metrics = lm83_metrics(operated, sun_total, occupancy,
                            groups=plan["window_groups"], points=point_rows, areas=areas,
                            blind_source=plan["blind_source"], latitude=latitude,
-                           no_blind_lux=state_matrices.get(frozenset()),
+                           no_blind_lux=never_shaded,
                            declared_no_blinds=declared_no_blinds)
     return {"ran": True, "metrics": metrics,
             "blind_hours": sum(1 for s in states if s), **base}

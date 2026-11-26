@@ -3,6 +3,8 @@
 Chains Phase 1–3: parse the EPW hourly row + LOCATION header → derive atmosphere → solar geometry at
 the MID-INTERVAL hour (EPW is hour-ending) → build_record (engine → cloud modifier → resample).
 """
+import math
+
 from hcl_core import jobcontrol
 from hcl_core import epw_hourly, atmosphere, solpos
 from hcl_core.spectral_sky import build_record
@@ -14,6 +16,48 @@ _SOLAR_CONSTANT = 1361.0   # W/m² at mean sun–earth distance (modern WMO valu
 # Used ONLY to normalize the clearness index Kt (i0_normal = 1361·ERV); it is a normalization constant,
 # deliberately decoupled from any engine's internal ETR spectrum. (SMARTS keeps its native 1367; SPECTRL2
 # has its own ET_H0 table. These are different roles — not unified, not a bug. spec §12.)
+
+
+def _irradiance(row, cos_zenith):
+    """(dni, dhi, ghi, derived, missing) for one EPW row. A missing value is not a zero.
+
+    The three columns are tied by GHI = DNI * cos(zenith) + DHI, so ONE missing column is
+    closed from the other two and named in `derived`. That matters most for GHI: it sets the
+    clearness index, and a missing GHI read as 0 made a sunny hour "fully overcast" (diffuse
+    CCT 11 060 K -> 21 070 K) with nothing in the record to show it. Two or more missing
+    cannot be closed: they stay 0 for the arithmetic and are named in `missing`, so the record
+    is auditable instead of silently dark. Closing DNI needs the sun above the horizon; with
+    it at or below, a missing DNI is 0 by definition.
+    """
+    values = {key: row[key] for key in ("dni", "dhi", "ghi")}
+    absent = [key for key, value in values.items() if value is None]
+    derived, missing = [], []
+    if len(absent) == 1:
+        key = absent[0]
+        if key == "ghi":
+            values["ghi"] = values["dni"] * max(cos_zenith, 0.0) + values["dhi"]
+        elif key == "dhi":
+            values["dhi"] = max(0.0, values["ghi"] - values["dni"] * max(cos_zenith, 0.0))
+        else:
+            values["dni"] = (max(0.0, (values["ghi"] - values["dhi"]) / cos_zenith)
+                             if cos_zenith > 0.05 else 0.0)
+        derived = [key]
+    elif absent:
+        missing = absent
+        for key in absent:
+            values[key] = 0.0
+    return values["dni"], values["dhi"], values["ghi"], derived, missing
+
+
+def _build(engine, modifier, atm, geo, row, timestamp):
+    """build_record on one EPW row, with the irradiance flags stamped into its provenance."""
+    cos_zenith = math.cos(math.radians(geo.zenith_deg))
+    dni, dhi, ghi, derived, missing = _irradiance(row, cos_zenith)
+    record = build_record(engine, modifier, atm, geo, timestamp=timestamp, dni=dni, dhi=dhi,
+                          ghi=ghi, i0_normal=_SOLAR_CONSTANT * geo.earth_radius_vector)
+    record.provenance["irradiance_derived"] = derived
+    record.provenance["irradiance_missing"] = missing
+    return record
 
 
 def record_from_epw(epw_path, month, day, hour, *, engine=None, modifier=None, overrides=None,
@@ -43,7 +87,7 @@ def record_from_epw(epw_path, month, day, hour, *, engine=None, modifier=None, o
 
     geo = solpos.compute(month=month, day=day, hour=hour - 0.5,
                          latitude=loc["latitude"], longitude=loc["longitude"],
-                         time_zone=loc["time_zone"])
+                         time_zone=loc["time_zone_exact"])
     ovr = dict(overrides or {})
     if aerosol_g is not None:
         ovr["aerosol_g"] = aerosol_g
@@ -52,12 +96,7 @@ def record_from_epw(epw_path, month, day, hour, *, engine=None, modifier=None, o
     atm = atmosphere.derive(row, overrides=ovr, ozone_mode=(ozone_mode or "constant"),
                             aod_anchor_nm=aod_anchor_nm, lat_deg=loc["latitude"],
                             lon_deg=-loc["longitude"], day_of_year=geo.day_of_year)
-    dni = row["dni"] or 0.0
-    dhi = row["dhi"] or 0.0
-    ghi = row["ghi"] or 0.0
-    i0_normal = _SOLAR_CONSTANT * geo.earth_radius_vector
-    record = build_record(engine, modifier, atm, geo, timestamp=(month, day, hour),
-                          dni=dni, dhi=dhi, ghi=ghi, i0_normal=i0_normal)
+    record = _build(engine, modifier, atm, geo, row, (month, day, hour))
     return (record, diag) if return_diagnostics else record
 
 
@@ -91,7 +130,7 @@ def annual_records(epw_path, *, engine=None, modifier=None, hours=None, override
             continue
         geo = solpos.compute(month=row["month"], day=row["day"], hour=row["hour"] - 0.5,
                              latitude=loc["latitude"], longitude=loc["longitude"],
-                             time_zone=loc["time_zone"])
+                             time_zone=loc["time_zone_exact"])
         ovr = dict(overrides or {})
         if aerosol_g is not None:
             ovr["aerosol_g"] = aerosol_g
@@ -99,8 +138,5 @@ def annual_records(epw_path, *, engine=None, modifier=None, hours=None, override
         atm = atmosphere.derive(row, overrides=ovr, ozone_mode=(ozone_mode or "constant"),
                                 aod_anchor_nm=aod_anchor_nm, lat_deg=loc["latitude"],
                                 lon_deg=-loc["longitude"], day_of_year=geo.day_of_year)
-        i0_normal = _SOLAR_CONSTANT * geo.earth_radius_vector
-        out.append(build_record(engine, modifier, atm, geo, timestamp=key,
-                                dni=row["dni"] or 0.0, dhi=row["dhi"] or 0.0,
-                                ghi=row["ghi"] or 0.0, i0_normal=i0_normal))
+        out.append(_build(engine, modifier, atm, geo, row, key))
     return (out, diag) if return_diagnostics else out

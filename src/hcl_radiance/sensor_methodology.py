@@ -4,7 +4,7 @@ All math runs in the PRE-north footprint frame; callers apply _rotate_north once
 """
 import math
 import re
-from hcl_radiance.geometry_obj import face_normal, object_centroid
+from hcl_radiance.geometry_obj import face_area, face_normal, object_centroid
 from hcl_radiance.geometry_import import (
     _to_world, _glass_groups, _context_groups, _floor_groups, _world_footprint,
 )
@@ -43,7 +43,9 @@ def _ceiling_z(parsed, material_map, scale, up_axis, floor_z):
         if f["group"] in fg or f["group"] in glass:
             continue
         _, _, nz = _to_world(face_normal(parsed, f), up_axis, None, 1.0)
-        if nz <= 0.8:                       # require fairly horizontal (<~37 deg tilt) for a ceiling;
+        if abs(nz) <= 0.8:                  # either winding: a ceiling wound to face the room
+                                            # has its normal pointing DOWN, and surfaces are
+                                            # two-sided here. Require fairly horizontal (<~37 deg tilt) for a ceiling;
                                             # accepts typical sloped ceilings, rejects steep wall-ish
                                             # faces. Normal alone can't separate a 45 deg ceiling from
                                             # a 45 deg wall — if undetected, room height degrades to None.
@@ -64,14 +66,21 @@ def _ceiling_z(parsed, material_map, scale, up_axis, floor_z):
     return best_z
 
 
+#: A wall plane counts as a side of the room only if it carries at least this share of the
+#: largest plane's area on that side. A window reveal is 1-3 % of its wall; a partition that
+#: really bounds the room is far above a quarter.
+_WALL_PLANE_SHARE = 0.25
+
+
 def detect_interior(parsed, material_map, scale, up_axis, *, wall_thickness=None, override=None):
     """Interior (xmin,xmax,ymin,ymax,source).
 
     Inner-surface rule: identifies wall-scale groups (those containing at least one vertical
-    face spanning ≥50% of the room height from floor to ceiling). Then, for each of the four
-    axis-aligned sides, it selects the single innermost wall face (the one whose centroid is
-    closest to the room centre) and takes that face's room-facing (inner) edge on the dominant
-    axis only. A side with no detected face is mirrored about the room centre. This reliably
+    face spanning ≥50% of the room height from floor to ceiling). Each vertical face of those
+    groups is filed under the side it FACES (the dominant horizontal axis of its normal; east
+    or west by which side of the room centre it lies on), faces are gathered into planes, and
+    each side takes its innermost plane that carries a real share of the wall area, at that
+    plane's room-facing (inner) edge. A side with no wall is mirrored about the room centre. This reliably
     excludes floor/ceiling slab edges, furniture, and frames while capturing the actual wall
     inner surfaces. Fallback: floor footprint inset by wall_thickness.
     """
@@ -117,50 +126,49 @@ def detect_interior(parsed, material_map, scale, up_axis, *, wall_thickness=None
     else:
         cx = cy = 0.0
 
-    # For each of the 4 axis-aligned sides, find the face whose centroid is closest to
-    # the room centre — this is the innermost (inner-surface) wall face for that side.
-    # xmax: smallest positive x-centroid face; xmin: largest negative x-centroid face;
-    # ymax: smallest positive y-centroid face; ymin: largest negative y-centroid face.
-    # (relative to room centre cx, cy)
-    best: dict = {"xmin": None, "xmax": None, "ymin": None, "ymax": None}
+    # File every vertical wall face under the side it FACES, then take the innermost wall
+    # plane on each side.
+    #
+    # The side comes from the face's normal, not from where its centre lies. A wall cut into
+    # pieces round a window has strips whose centres sit diagonally from the room's centre; by
+    # the centre's bearing such a strip of the south wall is a "west wall", and it used to drag
+    # the west edge of the interior in to the strip's end. The normal's SIGN is not used: a
+    # surface is two-sided, so which side of the room centre the face lies on decides
+    # east from west.
+    #
+    # A plane counts only if it carries a real share of the side's wall area. That keeps out
+    # window reveals and door jambs, which face along a wall and sit well inside the room's
+    # outline, yet are a few tenths of a square metre each.
+    planes: dict = {"xmin": {}, "xmax": {}, "ymin": {}, "ymax": {}}
     for f in parsed["faces"]:
         if f["group"] not in wall_groups:
             continue
-        _, _, nz = _to_world(face_normal(parsed, f), up_axis, None, 1.0)
+        nx, ny, nz = _to_world(face_normal(parsed, f), up_axis, None, 1.0)
         if abs(nz) >= 0.5:                      # not vertical
             continue
-        fcx, fcy = _face_xy_centroid(parsed, f, scale, up_axis)
-        dx, dy = fcx - cx, fcy - cy
-        # Dominant axis of this face's centroid offset
-        if abs(dx) >= abs(dy):
-            if dx > 0:   # east side
-                if best["xmax"] is None or dx < best["xmax"][0]:
-                    best["xmax"] = (dx, f)
-            else:        # west side
-                if best["xmin"] is None or dx > best["xmin"][0]:
-                    best["xmin"] = (dx, f)
+        axis = 0 if abs(nx) >= abs(ny) else 1
+        coords = [_xy(parsed, vi, scale, up_axis)[axis] for vi in f["verts"]]
+        offset = sum(coords) / len(coords) - (cx, cy)[axis]
+        # The ROOM-FACING edge on that axis: the smaller coordinate on the east/north sides,
+        # the larger on the west/south. For an upright wall min == max; for a leaning one this
+        # keeps the interior inside the wall's inner surface.
+        if offset > 0:
+            side, inner = ("xmax", "ymax")[axis], min(coords)
         else:
-            if dy > 0:   # north side
-                if best["ymax"] is None or dy < best["ymax"][0]:
-                    best["ymax"] = (dy, f)
-            else:        # south side
-                if best["ymin"] is None or dy > best["ymin"][0]:
-                    best["ymin"] = (dy, f)
+            side, inner = ("xmin", "ymin")[axis], max(coords)
+        key = round(inner, 3)
+        planes[side][key] = planes[side].get(key, 0.0) + face_area(parsed, f)
 
-    # From each side's innermost wall face, take only the dominant-axis coordinate of its
-    # ROOM-FACING (inner) edge: the east/north sides use the smaller coord, west/south the
-    # larger. For axis-aligned walls every vertex shares the dominant coordinate, so min == max
-    # (a no-op); for leaning walls this keeps the interior inside the wall's inner surface
-    # instead of extending out to its outer edge.
-    xmin_v = xmax_v = ymin_v = ymax_v = None
-    if best["xmax"] is not None:
-        xmax_v = min(_xy(parsed, vi, scale, up_axis)[0] for vi in best["xmax"][1]["verts"])
-    if best["xmin"] is not None:
-        xmin_v = max(_xy(parsed, vi, scale, up_axis)[0] for vi in best["xmin"][1]["verts"])
-    if best["ymax"] is not None:
-        ymax_v = min(_xy(parsed, vi, scale, up_axis)[1] for vi in best["ymax"][1]["verts"])
-    if best["ymin"] is not None:
-        ymin_v = max(_xy(parsed, vi, scale, up_axis)[1] for vi in best["ymin"][1]["verts"])
+    def innermost(side):
+        found = planes[side]
+        if not found:
+            return None
+        enough = _WALL_PLANE_SHARE * max(found.values())
+        real = [coord for coord, area in found.items() if area >= enough]
+        return min(real) if side in ("xmax", "ymax") else max(real)
+
+    xmin_v, xmax_v = innermost("xmin"), innermost("xmax")
+    ymin_v, ymax_v = innermost("ymin"), innermost("ymax")
 
     # Mirror a single missing side about the room centre (NOT the origin).
     if xmin_v is None and xmax_v is not None: xmin_v = 2 * cx - xmax_v

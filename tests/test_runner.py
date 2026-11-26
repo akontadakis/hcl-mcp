@@ -4,7 +4,11 @@ def test_parse_res_takes_first_three_floats():
     text = "0.10\t0.20\t0.30\n1.0 2.0 3.0 99\n"
     assert parse_rtrace_res(text) == [[0.10, 0.20, 0.30], [1.0, 2.0, 3.0]]
 
-def test_run_sequence_emit_only_when_unavailable():
+def test_run_sequence_emit_only_when_unavailable(monkeypatch):
+    # Pinned to "Radiance is not installed": with it installed, an emitted plan is a dry run
+    # and the reason says so instead (test_geometry_review_fixes.py, G6).
+    from hcl_radiance import runner
+    monkeypatch.setattr(runner, "_radiance_present", lambda: False)
     steps = [{"cmd": ["oconv", "-f", "a.rad"], "stdout": "scene.oct"},
              {"cmd": ["rtrace", "scene.oct"], "stdin": "p.pts", "stdout": "out.res"}]
     res = run_sequence(steps, work_dir="/tmp/x", available=False)
@@ -86,3 +90,17 @@ def test_run_sequence_still_succeeds_on_a_real_binary(tmp_path):
     assert out["ran"] is True
     assert out.get("returncode", 0) == 0
     assert (tmp_path / "o.txt").read_text().strip() == "hello"
+
+
+def test_radiance_present_asks_discovery_so_windows_exe_names_are_found(monkeypatch):
+    """The dry-run wording used its own look for `rtrace`, with no `.exe` handling: on Windows
+    with HCL_RADIANCE_BIN set it said Radiance was missing when it was there."""
+    import hcl_radiance.runner as runner
+    import hcl_radiance.discover as discover
+    asked = []
+    monkeypatch.setattr(discover, "resolve_bin",
+                        lambda name: asked.append(name) or f"C:/Radiance/bin/{name}.exe")
+    assert runner._radiance_present() is True
+    assert set(asked) == {"rtrace", "oconv"}
+    monkeypatch.setattr(discover, "resolve_bin", lambda name: None)
+    assert runner._radiance_present() is False

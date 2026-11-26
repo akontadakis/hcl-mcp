@@ -383,6 +383,7 @@ All environment variables are optional.
 | Variable | Purpose | Default |
 | --- | --- | --- |
 | `HCL_WORK_ROOT` | Directory where simulation files are written | first MCP client root, else `~/hcl_work` |
+| `HCL_ATMOS_CACHE` | Where `gensdaymtx` keeps its pre-computed scattering tables (`atmos_data/`); filled once, reused after | `<HCL_WORK_ROOT>/atmos_cache` |
 | `HCL_RADIANCE_BIN` | Radiance `bin` directory, if not on `PATH` | auto-discovered on `PATH` |
 | `HCL_DAYSIM_BIN` | Daysim `bin` directory (`ds_shortterm`, `epw2wea`) | auto-discovered on `PATH` |
 | `SMARTSPATH` | SMARTS executable — **the file, not its directory** | unset (SMARTS engine unavailable) |

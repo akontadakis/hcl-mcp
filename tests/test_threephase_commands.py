@@ -58,6 +58,27 @@ def test_sky_receiver_carries_the_ground_patch_before_the_dome():
     assert "4 1 1 1 0" in text
 
 
+def test_the_sky_receivers_up_vector_is_not_its_own_axis():
+    """rfluxmtx bins the sky by azimuth around the receiver's axis, measured from `u`. The
+    dome's axis is Z, so u=+Z leaves the azimuth undefined: every patch of an altitude band
+    collapsed onto the one due north, and no window ever saw the sun. +Y is north, the
+    convention gendaymtx numbers its patches by (and what the two-phase path always used)."""
+    for line in sky_receiver_rad(4).splitlines():
+        if line.startswith("#@rfluxmtx"):
+            assert "u=+Y" in line.split(), line
+
+
+def test_the_sky_matrix_comes_with_or_without_the_sun():
+    """Sky light and sunlight take different routes to an unshaded point (matrices; the exact
+    direct-sun pass), so the engine needs the sky alone -- and, for a diffusing blind, the
+    sky together with the sun."""
+    sky_only = build_gendaymtx_sky_mf("in.wea", [1, 1, 1], mf=4)
+    with_sun = build_gendaymtx_sky_mf("in.wea", [1, 1, 1], mf=4, sun=True)
+    assert "-s" in sky_only and "-d" not in sky_only
+    assert "-s" not in with_sun and "-d" not in with_sun
+    assert with_sun[-1] == "in.wea" and with_sun[with_sun.index("-m") + 1] == "4"
+
+
 def test_sky_matrix_subdivision_is_settable_and_matches_the_receiver():
     """annual_commands.build_gendaymtx_sky hardcodes -m 1 (145 patches), which cannot
     multiply a D matrix built against an h=r4 receiver."""

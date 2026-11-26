@@ -33,6 +33,10 @@ def run_image(scene_sets, channel_type, *, view="-vta -vh 180 -vv 180", x=800, y
     extracts cosine-weighted RGB eye irradiance (rgb.txt). Returns {ran, outputs|commands, maps,
     notes, weighting}.
 
+    electric_lights: luminaires to add to the view. The scene is then rendered twice, without
+    them (img{i}.hdr, returned as `daylight_only_images`) and with them (combined{i}.hdr). The
+    maps, rgb.txt and glare are all read from the render WITH them; a note in `notes` says so.
+
     fov_weighting (default False) selects the reported quantity, echoed in result["weighting"]:
       * False -> "cosine_vertical": cosine-weighted corneal-vertical eye irradiance, the
         STANDARDS-ALIGNED quantity WELL/CIE S 026/iNSOM threshold against 250 lx mel-EDI. Use this
@@ -60,32 +64,8 @@ def run_image(scene_sets, channel_type, *, view="-vta -vh 180 -vv 180", x=800, y
         steps.append({"cmd": build_rpict(oct_name, view, x, y, rad_params), "stdout": hdr})
         hdrs.append(hdr)
 
-    if channel_type == 1:
-        steps.append({"cmd": pcomb_photopic_map(hdrs, "photopic.hdr"), "stdout": "photopic.hdr"})
-        steps.append({"cmd": pcomb_melanopic_map(hdrs, "melanopic.hdr"), "stdout": "melanopic.hdr"})
-        steps.append({"cmd": pcomb_neuropic_map(hdrs, "neuropic.hdr"), "stdout": "neuropic.hdr"})
-        eye_src = "melanopic.hdr"
-    else:
-        eye_src = hdrs[0]  # 3-channel: the rendered RGB HDR is the photopic-bin image
-
-    if fov_weighting:
-        notes.append(FOV_OPT_IN_NOTE)
-        md = mask_dir or os.path.join(work_dir, "masks")
-        if not masks_present(md):
-            os.makedirs(md, exist_ok=True)
-            mk_steps, note = synthesize_fov_masks_steps(resolution=x, mask_dir=md)
-            steps = mk_steps + steps
-            notes.append(note)
-        # Resample masks to the render resolution (pcomb requires matching dimensions; the shipped
-        # Khademagha masks are 512px while renders default to 800px). Mirrors Lark's pfilt resize.
-        resize_steps, masks = mask_resize_steps(fov_mask_paths(md), x, y)
-        steps += resize_steps
-        steps += fov_pcomb_steps(eye_src, masks=masks, out="weighted.hdr")
-        eye_src = "weighted.hdr"
-
-    steps += list(rgb_from_hdr_steps(eye_src, "rgb.txt"))  # "|" steps route to the shell-free Popen pipe
-
     total_w = 0.0
+    lit = []
     if electric_lights:
         n_sets = 1 if channel_type == 0 else 3
         for li, lum in enumerate(electric_lights):
@@ -107,6 +87,39 @@ def run_image(scene_sets, channel_type, *, view="-vta -vh 180 -vv 180", x=800, y
             c_oct, c_hdr = f"combined{i}.oct", f"combined{i}.hdr"
             steps.append({"cmd": build_oconv(list(files) + placed_all, c_oct), "stdout": c_oct})
             steps.append({"cmd": build_rpict(c_oct, view, x, y, rad_params), "stdout": c_hdr})
+            lit.append(c_hdr)
+        # Every eye quantity below is read from the images WITH the luminaires in them. They
+        # used to be read from img{i}.hdr, the render without: the luminaires reached evalglare
+        # and nothing else, and a room lit only by them reported an eye irradiance of zero.
+        notes.append("maps and rgb.txt include the electric lights (read from combined*.hdr); "
+                     "img*.hdr are the same view without them (daylight_only_images).")
+
+    sources = lit or hdrs      # what the eye sees
+
+    if channel_type == 1:
+        steps.append({"cmd": pcomb_photopic_map(sources, "photopic.hdr"), "stdout": "photopic.hdr"})
+        steps.append({"cmd": pcomb_melanopic_map(sources, "melanopic.hdr"), "stdout": "melanopic.hdr"})
+        steps.append({"cmd": pcomb_neuropic_map(sources, "neuropic.hdr"), "stdout": "neuropic.hdr"})
+        eye_src = "melanopic.hdr"
+    else:
+        eye_src = sources[0]  # 3-channel: the rendered RGB HDR is the photopic-bin image
+
+    if fov_weighting:
+        notes.append(FOV_OPT_IN_NOTE)
+        md = mask_dir or os.path.join(work_dir, "masks")
+        if not masks_present(md):
+            os.makedirs(md, exist_ok=True)
+            mk_steps, note = synthesize_fov_masks_steps(resolution=x, mask_dir=md)
+            steps = mk_steps + steps
+            notes.append(note)
+        # Resample masks to the render resolution (pcomb requires matching dimensions; the shipped
+        # Khademagha masks are 512px while renders default to 800px). Mirrors Lark's pfilt resize.
+        resize_steps, masks = mask_resize_steps(fov_mask_paths(md), x, y)
+        steps += resize_steps
+        steps += fov_pcomb_steps(eye_src, masks=masks, out="weighted.hdr")
+        eye_src = "weighted.hdr"
+
+    steps += list(rgb_from_hdr_steps(eye_src, "rgb.txt"))  # "|" steps route to the shell-free Popen pipe
 
     if glare:
         combined_hdr = "combined0.hdr" if electric_lights else hdrs[0]
@@ -126,7 +139,8 @@ def run_image(scene_sets, channel_type, *, view="-vta -vh 180 -vv 180", x=800, y
     if result.get("returncode", 0) != 0:
         return {"ran": True, "error": result.get("error"), "failed_step": result.get("failed_step"), "notes": notes}
     abs_work = os.path.abspath(work_dir)
-    analysis_maps = (["photopic.hdr", "melanopic.hdr", "neuropic.hdr"] if channel_type == 1 else [hdrs[0]])
+    analysis_maps = (["photopic.hdr", "melanopic.hdr", "neuropic.hdr"] if channel_type == 1
+                     else [sources[0]])
     if fov_weighting:
         analysis_maps.append("weighted.hdr")
     out = {"ran": True, "outputs": result.get("outputs"),
@@ -135,6 +149,7 @@ def run_image(scene_sets, channel_type, *, view="-vta -vh 180 -vv 180", x=800, y
            "notes": notes, "weighting": weighting}
     if electric_lights:
         out["total_wattage"] = total_w
+        out["daylight_only_images"] = [os.path.join(abs_work, h) for h in hdrs]
         # Same reason as the grid path: A1 governs how brightly IES luminaires rendered, and
         # this is the path where a build that drops it shows up as UGR 0 rather than as a
         # low number, because the sources fall below evalglare's detection threshold.

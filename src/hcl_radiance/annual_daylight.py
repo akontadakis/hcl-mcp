@@ -60,6 +60,21 @@ def _concat_sets(sets):
     return out
 
 
+def _pair_sky_sun(sky, sun, sky_name, sun_name):
+    """Sky + sun per point and timestep. The two matrices come from one run over one set of
+    points and one weather file, so they are the same size; if they are not, a step went wrong
+    and `zip` would hide it by dropping the surplus points or hours."""
+    def shape(m):
+        return len(m), (len(m[0]) if m else 0)
+    if shape(sky) != shape(sun):
+        (sp, st), (up, ut) = shape(sky), shape(sun)
+        raise ValueError(
+            f"the sky and sun results of one annual run differ in size: {sky_name} has "
+            f"{sp} point(s) x {st} timestep(s), {sun_name} has {up} point(s) x {ut} timestep(s). "
+            "One of the two matrix steps did not finish; clear the work folder and run again.")
+    return [combine_sky_sun(s, u) for s, u in zip(sky, sun)]
+
+
 def run_annual_daylight(channel_scenes, wea, points, channel_type, *,
                         rad_params="-ab 2 -ad 512 -aa 0.1 -ar 64", work_dir, run=True, ase=True):
     """Run the annual sim -> per-point total lux matrix (and, when ase=True, a direct-only
@@ -94,7 +109,7 @@ def run_annual_daylight(channel_scenes, wea, points, channel_type, *,
         ill_sky, ill_sun = entry[0], entry[1]
         sky = parse_ill_matrix(open(os.path.join(work_dir, ill_sky)).read())
         sun = parse_ill_matrix(open(os.path.join(work_dir, ill_sun)).read())
-        total_sets.append([combine_sky_sun(s, u) for s, u in zip(sky, sun)])
+        total_sets.append(_pair_sky_sun(sky, sun, ill_sky, ill_sun))
         if ase:
             ill_sun_ase = entry[2]
             ase_sets.append(parse_ill_matrix(open(os.path.join(work_dir, ill_sun_ase)).read()))

@@ -9,6 +9,16 @@ import os
 from hcl_core.proc import render as _render, run_sequence as _run_sequence
 
 _REASON = "Radiance not available; set HCL_RADIANCE_BIN or run the commands yourself."
+_DRY_RUN_REASON = "run=False: emitting the command plan without executing it."
+
+
+def _radiance_present():
+    """Is Radiance there to run? A cheap look (no subprocess), used only to word the reason
+    a plan was emitted rather than executed."""
+    # Through discovery, the one place that knows HCL_RADIANCE_BIN and the platform's
+    # executable extensions (`rtrace.exe`). A second look of its own missed both on Windows.
+    from hcl_radiance import discover
+    return all(discover.resolve_bin(name) for name in ("rtrace", "oconv"))
 
 def run_env_for(work_dir):
     """The environment Radiance steps run under: os.environ, plus the A1 shim when enabled.
@@ -41,7 +51,10 @@ def run_sequence(steps, work_dir, available, *, timeout=None):
     if shim:
         existing = os.environ.get("RAYPATH", "")
         env_extra = {"RAYPATH": os.pathsep.join([shim] + ([existing] if existing else []))}
-    return _run_sequence(steps, work_dir, available, unavailable_reason=_REASON,
+    # `available` is False both when Radiance is missing and when the caller asked for a dry
+    # run. Blaming a dry run on a missing install sends the user to fix one that is fine.
+    reason = _REASON if (available or not _radiance_present()) else _DRY_RUN_REASON
+    return _run_sequence(steps, work_dir, available, unavailable_reason=reason,
                          timeout=timeout, path_prepend=[bin_dir] if bin_dir else None,
                          env_extra=env_extra)
 

@@ -59,7 +59,10 @@ def test_find_solar_line():
 def test_scale_solar_3channel_uses_mean():
     # direct == diffuse == [0.8,0.9,0.85]; solar "3 0.5 0.4 0.3"; coef = mean(0.5,0.4,0.3)/sum3
     out = scale_solar([3, 0.5, 0.4, 0.3], [0.8, 0.9, 0.85], channel_type=0)
-    assert out == ["3 0.37 0.41 0.39"]   # verified golden
+    # Lark's golden line was "3 0.37 0.41 0.39": the same numbers cut to two decimals. Six
+    # significant figures are written now (review 2026-11-26, A6); they round to Lark's.
+    assert out == ["3 0.36771 0.413674 0.390692"]
+    assert [round(float(v), 2) for v in out[0].split()[1:]] == [0.37, 0.41, 0.39]
 
 def test_scale_solar_9channel_uses_first_component():
     ch = [0.1] * 9
@@ -68,7 +71,8 @@ def test_scale_solar_9channel_uses_first_component():
 
 def test_sky_glow_3channel_normalized():
     s = sky_glow([0.8, 0.9, 0.85], channel_type=0)
-    assert isinstance(s, str) and "skyfunc glow sky_mat" in s and "0.92 1.03 0.98" in s  # verified golden
+    # Lark's golden values were "0.92 1.03 0.98", the same numbers cut to two decimals (A6).
+    assert isinstance(s, str) and "skyfunc glow sky_mat" in s and "4 0.919276 1.03419 0.976731 0" in s
 
 def test_assemble_includes_solar_and_skymat():
     defs = assemble_sky_def(GENDAYLIT_OUT, ["3 0.37 0.41 0.39"], [sky_glow([0.8, 0.9, 0.85], 0)], channel_type=0)

@@ -169,9 +169,12 @@ def check_compliance(*, mel_edi=None, eml=None, standard, period="daytime", dayl
     if isinstance(out, dict) and out.get("kind") != "daylight_provision":
         out.setdefault("quantity", "mel_edi" if mel_edi is not None else
                        ("eml->mel_edi" if eml is not None else "non_melanopic"))
-        out.setdefault("quantity_note",
-                       "Scored as CIE S 026 mel-EDI. `melanopic_lux` is NOT this quantity "
-                       "(larger by D65's melanopic/photopic ratio); pass `mel_edi`.")
+        out.setdefault("quantity_note", (
+            "Not a melanopic check: scored on the photometric values supplied "
+            "(illuminance, glare, uniformity, colour rendering). No mel-EDI was used."
+            if out["quantity"] == "non_melanopic" else
+            "Scored as CIE S 026 mel-EDI. `melanopic_lux` is NOT this quantity "
+            "(larger by D65's melanopic/photopic ratio); pass `mel_edi`."))
     return out
 
 

@@ -7,7 +7,9 @@ Produces work-plane grids, eye observers, and Radiance fisheye view strings.
 
 def _centred_axis(lo, hi, spacing):
     span = hi - lo
-    n = int(span // spacing)
+    # Not `span // spacing`: 6.6 // 0.6 is 10.0 in floating point although eleven fit, and a
+    # whole row and column went missing whenever the span was an exact multiple.
+    n = int(span / spacing + 1e-9)
     if n <= 0:
         return [(lo + hi) / 2.0]
     offset = (span - n * spacing) / 2.0

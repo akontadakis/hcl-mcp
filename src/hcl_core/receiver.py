@@ -121,7 +121,10 @@ def _anchored_facade(record, surface_az, tilt, color_field):
     out = []
     for k in range(nwl):
         dome_k = integrate_diffuse([patch_spd[i][k] for i in range(N_SKY)])
-        anchor = (base[k] * math.pi / dome_k) if dome_k > 1e-30 else 0.0
+        # dome_k is already the irradiance this field puts on the horizontal (integrate_diffuse
+        # is cosine-weighted: unit radiance gives pi). The anchor is the plain ratio; an extra
+        # pi here made every anchored facade pi times too bright.
+        anchor = (base[k] / dome_k) if dome_k > 1e-30 else 0.0
         fac = sum(max(0.0, facade_cos_inc(p["alt"], p["az"], surface_az, tilt)) * p["omega"] * patch_spd[i][k]
                   for i, p in enumerate(DOME))
         out.append(fac * anchor)

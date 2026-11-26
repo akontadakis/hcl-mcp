@@ -15,6 +15,7 @@ import shutil
 import subprocess
 
 from hcl_core import jobcontrol
+from hcl_platform import shell_quote
 
 REPO = "https://github.com/MITSustainableDesignLab/Daysim.git"
 BRANCH = "master"
@@ -32,9 +33,11 @@ def _configure_flags():
 def _plan(src_dir):
     """Ordered clone + configure + build commands (the exact ground-truth recon plan)."""
     build_dir = f"{src_dir}/build"
-    clone = (f"git clone --depth 1 --branch {BRANCH} {REPO} {src_dir}")
-    configure = f"cmake -S {src_dir} -B {build_dir} " + " ".join(_configure_flags())
-    compile_ = f"cmake --build {build_dir} --target ds_shortterm epw2wea"
+    # Quoted for a shell: these lines are for a person to paste, and a path may hold a blank.
+    src, build = shell_quote(src_dir), shell_quote(build_dir)
+    clone = (f"git clone --depth 1 --branch {BRANCH} {REPO} {src}")
+    configure = f"cmake -S {src} -B {build} " + " ".join(_configure_flags())
+    compile_ = f"cmake --build {build} --target ds_shortterm epw2wea"
     return [clone, configure, compile_], f"{build_dir}/bin"
 
 def build_daysim(src_dir=None, *, run=True, work_dir=None, build_timeout=_BUILD_TIMEOUT):

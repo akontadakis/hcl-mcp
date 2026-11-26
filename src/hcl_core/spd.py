@@ -38,6 +38,13 @@ def _rows_from_text(text):
             continue  # tolerate stray text rows
     return rows
 
+def _require_distinct(a, b):
+    """Two samples at one wavelength leave the end slope undefined: say so, do not divide."""
+    if a == b:
+        raise ValueError(f"the SPD has two samples at the same wavelength ({a:g} nm); "
+                         "each wavelength may appear once")
+
+
 def parse_spd(spd):
     """spd: text, a `.spd` file path, or iterable of (wavelength, value). Returns {int_nm: value} on a 1-nm grid 380..780."""
     spd = _read_if_path(spd)
@@ -58,12 +65,14 @@ def parse_spd(spd):
     else:
         if lines[0][0] > MIN_A:
             (oa, ob), (na, nb) = lines[0], lines[1]
+            _require_distinct(oa, na)
             grad = (nb - ob) / (na - oa)
             # clamp: linear extrapolation can dip below zero; negative irradiance is unphysical
             # and would bias alpha-opic / melanopic integrals (positive action-spectrum weights).
             lines.insert(0, [MIN_A, max(0.0, ob - grad * (oa - MIN_A))])
         if lines[-1][0] < MAX_A:
             (oa, ob), (na, nb) = lines[-2], lines[-1]
+            _require_distinct(oa, na)
             grad = (nb - ob) / (na - oa)
             lines.append([MAX_A, max(0.0, nb + grad * (MAX_A - na))])
 

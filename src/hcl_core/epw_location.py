@@ -47,13 +47,18 @@ def parse_epw_location(epw_path):
         truncated = tz_raw != tz_int
         if truncated:
             warnings.warn(
-                f"EPW time zone {tz_raw} is not a whole hour; truncating to {tz_int} for epw2wea "
-                "parity (DAYSIM .wea uses integer offsets). Pass an explicit time_zone to override.",
+                f"EPW time zone {tz_raw} is not a whole hour; `time_zone` is truncated to "
+                f"{tz_int} for epw2wea parity (DAYSIM .wea uses integer offsets). The exact "
+                "meridian is kept as `time_zone_exact` and is what solar geometry uses.",
                 stacklevel=2)
         return {
             "latitude": float(parts[_LAT]),
             "longitude": round(-1.0 * float(parts[_LON]), 2),
             "time_zone": int(-15 * tz_int),
+            # The true standard meridian. `time_zone` above is truncated because DAYSIM's
+            # .wea writer truncates; anything that computes a SOLAR POSITION must use this
+            # one -- for UTC+5.5 the two differ by 7.5 degrees, half an hour of solar time.
+            "time_zone_exact": -15.0 * tz_raw,
             "site_elevation": float(parts[_ELEV]),
             "tz_truncated": truncated,
         }

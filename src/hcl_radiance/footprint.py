@@ -83,16 +83,63 @@ def _point_seg_dist(px, py, ax, ay, bx, by):
     return math.hypot(px - (ax + t * dx), py - (ay + t * dy))
 
 
-def min_edge_distance(x, y, polygons):
-    best = math.inf
+_SIDE_PROBE_M = 1e-4
+
+
+def boundary_edges(polygons):
+    """The edges where the footprint actually ends: floor on one side, none on the other.
+
+    A floor exported as several faces (two triangles, a row of tiles) has seams inside it;
+    an edge with floor on BOTH sides is such a seam, not a boundary. Each distinct edge is
+    returned once.
+
+    Two passes. First, for every edge, note which of its two sides a ring that USES the edge
+    lies on. Counting how often an edge is used would not do: a slab's top and bottom faces are
+    two identical rings, their edges are used twice and are real boundaries, but both rings lie
+    on the same side. An edge with a ring on each side is a seam, and that settles nearly every
+    edge of a triangulated floor without looking at any other ring. Second, a side with no ring
+    using the edge may still be floor (a long edge meeting two short ones shares the line, not
+    the edge), so only those sides are probed, a hair off the midpoint. Probing every edge
+    against every ring was quadratic and took minutes on a 5000-triangle floor.
+    """
+    covered = {}                                   # edge -> [left has a ring, right has a ring]
     for ring in polygons:
         n = len(ring)
+        twice_area = sum(ring[i][0] * ring[(i + 1) % n][1] - ring[(i + 1) % n][0] * ring[i][1]
+                         for i in range(n))
+        if twice_area == 0.0:
+            continue                               # no inside to lie on either side
         for i in range(n):
-            ax, ay = ring[i]
-            bx, by = ring[(i + 1) % n]
-            d = _point_seg_dist(x, y, ax, ay, bx, by)
-            if d < best:
-                best = d
+            a, b = tuple(ring[i]), tuple(ring[(i + 1) % n])
+            if a == b:
+                continue
+            forward = a < b                        # the edge's own direction: low end first
+            key = (a, b) if forward else (b, a)
+            # A counter-clockwise ring has its inside to the LEFT of each edge as walked.
+            inside_left = (twice_area > 0) == forward
+            covered.setdefault(key, [False, False])[0 if inside_left else 1] = True
+
+    out = []
+    for ((ax, ay), (bx, by)), sides in covered.items():
+        dx, dy = bx - ax, by - ay
+        length = math.hypot(dx, dy)
+        mx, my = (ax + bx) / 2.0, (ay + by) / 2.0
+        nx, ny = -dy / length * _SIDE_PROBE_M, dx / length * _SIDE_PROBE_M      # to the left
+        floor_left = sides[0] or point_in_footprint(mx + nx, my + ny, polygons)
+        floor_right = sides[1] or point_in_footprint(mx - nx, my - ny, polygons)
+        if not (floor_left and floor_right):
+            out.append(((ax, ay), (bx, by)))
+    return out
+
+
+def min_edge_distance(x, y, polygons, edges=None):
+    """Distance from (x, y) to the footprint's boundary (seams between rings ignored).
+    Pass `edges=boundary_edges(polygons)` when asking for many points."""
+    best = math.inf
+    for (ax, ay), (bx, by) in (boundary_edges(polygons) if edges is None else edges):
+        d = _point_seg_dist(x, y, ax, ay, bx, by)
+        if d < best:
+            best = d
     return best
 
 
@@ -102,9 +149,11 @@ def clip_points(points, polygons, border=0.0):
     if not polygons:
         return list(points), []
     kept, dropped = [], []
+    edges = boundary_edges(polygons) if border > 0 else []
     for p in points:
         x, y = p[0], p[1]
-        if point_in_footprint(x, y, polygons) and min_edge_distance(x, y, polygons) >= border:
+        if point_in_footprint(x, y, polygons) and (
+                border <= 0 or min_edge_distance(x, y, polygons, edges) >= border):
             kept.append(p)
         else:
             dropped.append(p)

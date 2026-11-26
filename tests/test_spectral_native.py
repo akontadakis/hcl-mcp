@@ -105,7 +105,9 @@ def test_parse_smx_header():
 
 def test_radiance_spectral_status_shape():
     st = radiance_spectral_status()
-    assert set(st.keys()) == {"available", "gensdaymtx", "rcomb"}
+    # aerosol_data / data_note appear only when gensdaymtx itself was found (review N1).
+    assert {"available", "gensdaymtx", "rcomb"} <= set(st.keys()) <= {
+        "available", "gensdaymtx", "rcomb", "aerosol_data", "data_note"}
     assert isinstance(st["available"], bool)
 
 

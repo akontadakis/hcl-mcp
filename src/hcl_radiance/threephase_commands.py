@@ -15,7 +15,13 @@ DEFAULT_V_PARAMS = "-ab 12 -ad 50000 -lw 2e-5"
 #: D is cheap: the window mostly sees sky. -c averages 1000 samples per Klems bin.
 DEFAULT_D_PARAMS = "-c 1000 -ab 2 -ad 1024"
 
-_SKY_RECEIVER = """#@rfluxmtx h=u u=+Z
+# `u` is the direction azimuth is measured from, and it must not be the receiver's own axis.
+# A sky dome's axis is Z, so u=+Z leaves azimuth undefined: rfluxmtx then files every patch of
+# an altitude band under the one due north, D connects the window to 30 patches of 2306, and
+# no window ever sees the sun. +Y is north, which is how gendaymtx numbers its patches and
+# what the two-phase path (annual_commands._SKYGLOW) has always used. u=+Z is right for a
+# WINDOW (aperture.window_sender_rad), which is where it was copied from.
+_SKY_RECEIVER = """#@rfluxmtx h=u u=+Y
 void glow groundglow
 0
 0
@@ -26,7 +32,7 @@ groundglow source ground
 0
 4 0 0 -1 180
 
-#@rfluxmtx h=r{mf} u=+Z
+#@rfluxmtx h=r{mf} u=+Y
 void glow skyglow
 0
 0
@@ -55,17 +61,23 @@ def sky_receiver_rad(mf=4):
     return _SKY_RECEIVER.format(mf=int(mf))
 
 
-def build_gendaymtx_sky_mf(wea, sky_color, mf=4):
-    """Coloured sky matrix at a CHOSEN Reinhart subdivision.
+def build_gendaymtx_sky_mf(wea, sky_color, mf=4, *, sun=False):
+    """Coloured sky matrix at a CHOSEN Reinhart subdivision, without or with the sun.
 
     annual_commands.build_gendaymtx_sky hardcodes `-m 1` (145 patches), which is right
     for the 2-phase path but fatal here: the D matrix is built against an `h=r{mf}`
     receiver, so a 145-row sky vector cannot multiply a 2305-column D. dctimestep would
     reject the shapes or, worse, mis-multiply them. The subdivision MUST match whatever
     `sky_receiver_rad` was given.
+
+    sun=False is the sky alone (`-s`): what a window with its blind OPEN multiplies, because
+    its sunlight comes from the exact direct-sun pass and must not be counted twice.
+    sun=True is the sky with the sun in its patches (no flag): what a window with its blind
+    CLOSED multiplies, because a diffusing blind passes its share of the sun's light too.
     """
     r, g, b = sky_color
-    return ["gendaymtx", "-m", str(int(mf)), "-s", "-c", str(r), str(g), str(b), wea]
+    flags = [] if sun else ["-s"]
+    return ["gendaymtx", "-m", str(int(mf)), *flags, "-c", str(r), str(g), str(b), wea]
 
 
 def build_rfluxmtx_view(n_points, rad_params, receiver_rad, oct_file):

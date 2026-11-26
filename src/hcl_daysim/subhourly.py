@@ -72,7 +72,9 @@ def generate_subhourly_wea(epw, *, timestep_min=6, latitude=None, longitude=None
             f"{', '.join(missing)} could not be determined for {epw!r}: the EPW LOCATION line was "
             "unreadable and no explicit value was supplied. Pass latitude/longitude/time_zone "
             "(DAYSIM convention: WEST-positive longitude, time_zone = -15 × UTC offset).")
-    stem = os.path.splitext(os.path.basename(epw))[0]
+    # A Daysim header is `keyword value`, split on blanks, with no way to quote: a file name
+    # with a blank in it is read as a name plus rubbish. These two files are ours to name.
+    stem = "_".join(os.path.splitext(os.path.basename(epw))[0].split())
     hourly_wea = f"{stem}.wea"
     short_wea = f"{stem}_{timestep_min}_short.wea"
     hea_name = "daysim_header.hea"

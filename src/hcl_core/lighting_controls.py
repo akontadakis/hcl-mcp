@@ -29,6 +29,9 @@ def light_fraction(itot, iset, *, workbook_compat=False):
     fL = max(0, (iset - itot) / iset). DEFAULT is EnergyPlus-faithful: itot=0 -> fL=1 (full electric
     at darkness). workbook_compat=True adds the elec_lights.xlsx gate itot==0 -> fL=0.
     """
+    if iset <= 0:
+        raise ValueError(f"the illuminance setpoint must be above 0 lux, got {iset!r}: with no "
+                         "target there is no fraction of it for the electric light to supply")
     if workbook_compat and itot == 0:
         return 0.0
     return max(0.0, (iset - itot) / iset)

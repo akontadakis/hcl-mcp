@@ -41,3 +41,26 @@ def test_isotropic_still_flat():
     rec = _record()
     ccts = [_cct(rec, az, "isotropic") for az in (0.0, 90.0, 180.0, 270.0)]
     assert max(ccts) - min(ccts) < 1.0
+
+
+# ---- review 2026-11-26, C4: the anchored modes carry the right AMOUNT of light ----
+
+@pytest.mark.parametrize("mode", ["isotropic", "perez", "single_scatter"])
+def test_a_horizontal_receiver_gets_back_the_horizontal_diffuse(mode):
+    """Tilt 0 is the plane the record's diffuse spectrum was measured on. Every mode must hand
+    that spectrum back. The two anchored modes returned pi times it: the anchor was
+    `base * pi / dome`, and the dome integral already carries the pi."""
+    rec = _record()
+    got = sum(R.oriented_diffuse_for_receiver(rec, surface_az=180.0, tilt=0.0, mode=mode))
+    assert got == pytest.approx(sum(rec.sky_diffuse_horizontal), rel=0.02)
+
+
+@pytest.mark.parametrize("mode", ["perez", "single_scatter"])
+def test_a_vertical_facade_cannot_receive_several_times_the_whole_sky(mode):
+    """A wall sees half the sky. Facing the sun on a clear day it can beat the horizontal value
+    by the bright ring round the sun, not by a factor of pi."""
+    rec = _record()
+    horizontal = sum(rec.sky_diffuse_horizontal)
+    for az in (0.0, 90.0, 180.0, 270.0):
+        facade = sum(R.oriented_diffuse_for_receiver(rec, surface_az=az, tilt=90.0, mode=mode))
+        assert 0.1 * horizontal < facade < 1.6 * horizontal, (az, facade / horizontal)

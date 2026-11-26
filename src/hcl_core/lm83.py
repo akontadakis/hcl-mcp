@@ -52,6 +52,15 @@ SCHEDULE_DEPARTURE = (
 #: and ground defaults, interior reflectance defaults and zoning, and furniture. They
 #: are out of scope by decision, so this departure is unconditional -- a result from
 #: this tool is computed BY LM-83's method but is not an LM-83-compliant study.
+#: How sunlight reaches the sDA illuminance, and what that leaves out.
+SUN_PATH_DEPARTURE = (
+    "sunlight enters the sDA illuminance by two routes: for a window whose blind is open, "
+    "the exact zero-bounce beam; for a window whose blind is closed, the sky-with-sun matrix "
+    "through the blind. Sunlight that comes through an UNSHADED window and is then reflected "
+    "inside the room is not counted, which biases sDA downward on sunny hours with blinds "
+    "open. The glazing matrix has no angular dependence (2.2.9), which overstates sky light "
+    "by roughly a tenth.")
+
 MODEL_INPUTS_DEPARTURE = (
     "model-input clauses 2.2.8-2.2.11 are not applied or verified: no dirt depreciation "
     "(2.2.9 requires 5% on vertical glazing), no frame/occlusion reduction (2.2.9 "
@@ -313,6 +322,27 @@ def select_illuminance(state_matrices, states):
             for p in range(n_pts)]
 
 
+def add_direct_sun(operated_lux, states, sun_by_group):
+    """Add each OPEN window group's direct sun to the operated illuminance.
+
+    `operated_lux` (points x timesteps) comes from the matrix products, which for an open
+    group hold sky light only. Its sunlight is the zero-bounce beam the sun pass measured
+    through that group's glazing -- the same series the blind trigger reads. A group that is
+    closed at a timestep adds nothing here: what its blind lets through is already in its
+    matrix product, which for a closed group includes the sun.
+
+    Returns a new matrix; the inputs are not modified.
+    """
+    out = [list(row) for row in operated_lux]
+    for t, closed in enumerate(states):
+        for name, series in sun_by_group.items():
+            if name in closed or not series:
+                continue
+            for p, row in enumerate(out):
+                row[t] += series[p][t]
+    return out
+
+
 # ---------------------------------------------------------------------------- metrics
 
 def grid_geometry(points):
@@ -345,7 +375,7 @@ def _conditions(occupancy, groups, points, areas, blind_source, latitude):
     """Every LM-83 condition this layer can see, and whether each is met."""
     occupied_hours = float(sum(1 for o in occupancy if o > 0))
     grid = grid_geometry(points)
-    departures = [MODEL_INPUTS_DEPARTURE, SCHEDULE_DEPARTURE]
+    departures = [MODEL_INPUTS_DEPARTURE, SCHEDULE_DEPARTURE, SUN_PATH_DEPARTURE]
 
     if abs(occupied_hours - LM83_PERIOD_HOURS) > 1.0:
         departures.append(

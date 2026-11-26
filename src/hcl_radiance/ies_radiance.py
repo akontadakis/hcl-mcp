@@ -6,9 +6,10 @@ candela_multiplier / ballast_factor / pfactor are applied by ies2rad itself
 (sinf->mult = -m * mult * bfactor * pfactor); folding them into -m would square them.
 """
 
+import os
 import shlex
 
-from hcl_platform import rad_path
+from hcl_platform import rad_path, shell_join
 
 _UNITS_LETTER = {1: "f", 2: "m"}  # 1=feet, 2=meters
 
@@ -39,7 +40,8 @@ def build_ies2rad(ies_path, *, multiplier=1.0, maintenance_factor=1.0, color=Non
         argv += ["-o", out_prefix]
     argv.append(rad_path(ies_path))  # forward-slash user IES path (Windows-safe)
     if inline:
-        return "!" + " ".join(argv)
+        # Radiance hands a `!command` line to the shell, which splits it on blanks.
+        return "!" + shell_join(argv)
     return argv
 
 

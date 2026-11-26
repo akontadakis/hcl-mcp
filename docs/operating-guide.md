@@ -128,6 +128,9 @@ Optional environment:
 - `HCL_RADIANCE_BIN` — directory of the Radiance binaries (else `PATH`).
 - `HCL_DAYSIM_BIN` — directory of `ds_shortterm`/`epw2wea` (else `PATH`; build via `build_daysim`).
 - `HCL_WORK_ROOT` — default output directory (else a client root, else `~/hcl_work`).
+- `HCL_ATMOS_CACHE` — where `spectral_sky_native` (`gensdaymtx`) keeps its pre-computed
+  scattering tables (else `<HCL_WORK_ROOT>/atmos_cache`). The first run in an empty cache takes
+  several minutes; later runs take seconds. The result names the folder as `atmosphere_cache`.
 - `HCL_RADIANCE_SHIM` — set to `1` **only if** `radiance_status()` reports `source_cal.a1_honored:
   false` (see below). Off by default.
 

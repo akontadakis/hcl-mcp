@@ -95,9 +95,31 @@ def _select_non_sky(files, sky_files):
     claimed sky geometry "can never leak"; it could, and did.)
     """
     if sky_files:
-        sky_set = set(sky_files)
-        return [f for f in files if f not in sky_set]
+        sky_indices = set()
+        for named in sky_files:
+            matches = [i for i, f in enumerate(files) if _same_scene_file(named, f)]
+            if not matches:
+                # A name that matches nothing would leave the real sky in the electric-only
+                # octree and report daylight as electric light. Refuse instead.
+                raise ValueError(
+                    f"sky_files names {named!r}, which is none of the scene files "
+                    f"({', '.join(files)}). Give it exactly as it appears in scene_sets.")
+            sky_indices.update(matches)
+        return [f for i, f in enumerate(files) if i not in sky_indices]
     return [f for f in files if not _is_sky_file(f)]
+
+
+def _same_scene_file(named, scene_file):
+    """Does a caller's `sky_files` entry mean this scene file?
+
+    Yes when the two paths are the same once normalised (`/w/./sky.rad`), or when the entry is
+    relative and the scene file ends with it on a path boundary (`sky.rad`, `skies/sky.rad`
+    against `/w/skies/sky.rad`). Never on a partial file name.
+    """
+    a, b = os.path.normpath(named), os.path.normpath(scene_file)
+    if a == b or os.path.abspath(a) == os.path.abspath(b):
+        return True
+    return not os.path.isabs(a) and b.endswith(os.sep + a)
 
 from hcl_core.metrics import circadian_metrics
 from hcl_core.data import W_PHOTOPIC_3, W_PHOTOPIC_9

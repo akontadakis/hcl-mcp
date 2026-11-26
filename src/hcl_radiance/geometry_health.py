@@ -219,7 +219,84 @@ def _xy_extent_overlaps(parsed, fa, fb, tol=0.0):
             if size_gated and not equal_ish(ba[k], bb[k]) and (
                     subset_ish(ba[k], bb[k]) or subset_ish(bb[k], ba[k])):
                 return False
+
+    # The boxes say these two overlap. Boxes cannot tell the two triangles of one split
+    # rectangle apart from a duplicate: such a pair has IDENTICAL boxes and shares nothing but
+    # an edge, and triangulated exports (Blender, IFC, Revit) are made of them -- every pair
+    # was reported as z-fighting. Where both faces are convex the shared area is cheap to
+    # compute exactly, and it decides: no shared area, no coincidence. (Done last, so the
+    # cost is paid only by the few pairs that get this far.)
+    in_plane = [k for k in range(3) if k != axis]
+    pa = [(parsed["vertices"][i - 1][in_plane[0]], parsed["vertices"][i - 1][in_plane[1]])
+          for i in fa["verts"]]
+    pb = [(parsed["vertices"][i - 1][in_plane[0]], parsed["vertices"][i - 1][in_plane[1]])
+          for i in fb["verts"]]
+    shared = _convex_overlap_area(pa, pb)
+    if shared is not None and shared <= max(tol * tol, 1e-9):
+        return False
     return True
+
+
+def _signed_area(poly):
+    return 0.5 * sum(poly[i][0] * poly[(i + 1) % len(poly)][1]
+                     - poly[(i + 1) % len(poly)][0] * poly[i][1] for i in range(len(poly)))
+
+
+def _is_convex(poly):
+    sign = 0
+    n = len(poly)
+    for i in range(n):
+        ax, ay = poly[i]
+        bx, by = poly[(i + 1) % n]
+        cx, cy = poly[(i + 2) % n]
+        cross = (bx - ax) * (cy - by) - (by - ay) * (cx - bx)
+        if abs(cross) < 1e-12:
+            continue
+        if sign == 0:
+            sign = 1 if cross > 0 else -1
+        elif (cross > 0) != (sign > 0):
+            return False
+    return sign != 0
+
+
+def _convex_overlap_area(pa, pb):
+    """Area two convex polygons share in the plane, or None if either is not convex
+    (the caller then falls back to its bounding-box reasoning). Sutherland-Hodgman clip."""
+    if len(pa) < 3 or len(pb) < 3 or not _is_convex(pa) or not _is_convex(pb):
+        return None
+    if _signed_area(pa) < 0:
+        pa = pa[::-1]
+    if _signed_area(pb) < 0:
+        pb = pb[::-1]
+    out = pa
+    for i in range(len(pb)):
+        if not out:
+            return 0.0
+        ax, ay = pb[i]
+        bx, by = pb[(i + 1) % len(pb)]
+
+        def inside(p):
+            return (bx - ax) * (p[1] - ay) - (by - ay) * (p[0] - ax) >= -1e-12
+
+        def cut(p, q):
+            dx, dy = q[0] - p[0], q[1] - p[1]
+            denom = (bx - ax) * dy - (by - ay) * dx
+            if abs(denom) < 1e-15:
+                return q
+            t = ((by - ay) * (p[0] - ax) - (bx - ax) * (p[1] - ay)) / denom
+            return (p[0] + t * dx, p[1] + t * dy)
+
+        clipped = []
+        for j in range(len(out)):
+            p, q = out[j], out[(j + 1) % len(out)]
+            if inside(q):
+                if not inside(p):
+                    clipped.append(cut(p, q))
+                clipped.append(q)
+            elif inside(p):
+                clipped.append(cut(p, q))
+        out = clipped
+    return abs(_signed_area(out)) if len(out) >= 3 else 0.0
 
 
 def check_coincident_surfaces(parsed, *, tol=0.001):
@@ -634,6 +711,23 @@ def check_no_floor_group(parsed, material_map):
              "direction inward) are estimated from the geometry instead of read directly."))]
 
 
+def check_has_faces(parsed):
+    """The model holds no surface at all (NO_FACES).
+
+    Every other check walks the faces, so an export that wrote none gives them nothing to
+    object to and the report reads `ok`. Nothing can be simulated from it: an error.
+    """
+    if parsed.get("faces"):
+        return []
+    n_vertices = len(parsed.get("vertices") or [])
+    return [finding(
+        "NO_FACES", "error", "geometry",
+        "the model has no faces",
+        detail={"vertices": n_vertices},
+        fix=("Export the model again with its surfaces. An OBJ needs `f` lines; one that holds "
+             "only vertices, curves or comments has no geometry Radiance can use."))]
+
+
 _TIER1_SKIPPED = (
     ("materials", "material checks land in tier 2"),
     ("apertures", "aperture and shading checks land in tier 3"),
@@ -672,6 +766,7 @@ def check_geometry_health(parsed, material_map, *, sensors=None, photosensors=No
     """
     parsed = _scaled_to_metres(parsed, scale)
     findings = []
+    findings += check_has_faces(parsed)
     findings += check_finite_coordinates(parsed)
     findings += check_coincident_surfaces(parsed)
     findings += check_duplicate_faces(parsed)

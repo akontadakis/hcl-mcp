@@ -118,7 +118,9 @@ def ambient_convergence_note(params, *, direct_only_ok=False):
     ab = _rad_param(params, "-ab")
     ad = _rad_param(params, "-ad")
     if ab is None and ad is None:
-        return None                      # rtrace's own default is -ab 0: direct-only
+        # No ambient flag at all leaves rtrace on its own default, which is -ab 0: the same
+        # direct-only run as an explicit -ab 0, and the easiest one to make without noticing.
+        ab = 0.0
     if ab is not None and ab <= 0:
         # -ab 0 computes NO interreflection. For a deliberately direct-only pass (ASE, and the
         # internal sun pass) that is exactly right and needs no warning. But as a whole-run
@@ -164,5 +166,24 @@ def build_rtrace(oct_file, rad_params=DEFAULT_RTRACE_PARAMS):
     return ["rtrace", "-I+", "-h-", *shlex.split(rad_params), "-ov", oct_file]
 
 def pts_to_text(points):
-    """points: iterable of [x,y,z,dx,dy,dz] -> Radiance points text (one per line)."""
-    return "\n".join(" ".join(str(c) for c in p) for p in points) + "\n"
+    """points: iterable of [x,y,z,dx,dy,dz] -> Radiance points text (one per line).
+
+    Every row must be exactly six numbers. rtrace reads its input as one free stream of
+    numbers, so a short row is not an error to it: four 3-column rows become two rays, at the
+    wrong places, and the result comes back plausible and half as long.
+    """
+    lines = []
+    for i, row in enumerate(points):
+        values = list(row)
+        ok = len(values) == 6
+        if ok:
+            try:
+                for value in values:
+                    float(value)
+            except (TypeError, ValueError):
+                ok = False
+        if not ok:
+            raise ValueError(f"sensor row {i} is {values!r}; every row must be six numbers, "
+                             "x y z dx dy dz (a position and a direction)")
+        lines.append(" ".join(str(c) for c in values))
+    return "\n".join(lines) + "\n"

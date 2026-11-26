@@ -5,6 +5,7 @@ Pure construction (solar scaling, sky-glow normalization, assembly) is split fro
 import os
 
 from hcl_core.data import W_PHOTOPIC_3, W_PHOTOPIC_9
+from hcl_core.materials import require_safe_name
 # NOTE: hcl_radiance.discover.radiance_status and hcl_radiance.runner.run_sequence are imported
 # LAZILY inside _available() and colored_sky()'s run branch (Plan-3 modules, not present yet).
 
@@ -42,6 +43,17 @@ def _solar_position_args(sun_zenith_deg, sun_azimuth_deg):
     azimuth = float(sun_azimuth_deg) - 180.0
     return ["-ang", f"{altitude:.4f}", f"{azimuth:.4f}"]
 
+def _meridian(utc):
+    """Standard meridian for gendaylit's -m (degrees WEST) from a UTC offset in hours.
+
+    Kept exact. Truncating to a whole degree put UTC+5.5 (India) at -82 instead of -82.5 and
+    UTC+5.75 (Nepal) at -86 instead of -86.25; whole-hour zones render exactly as before
+    ("-30", not "-30.0"), so emitted commands for them are unchanged.
+    """
+    # `+ 0.0` turns the -0.0 that UTC+0 gives into 0.0, which prints as "0" and not "-0".
+    return f"{float(utc) * -15 + 0.0:g}"
+
+
 def build_gendaylit(month, day, hour, *, irrad_mode, lat, lon, utc, direct=None, diffuse=None,
                     globl=None, sun_zenith_deg=None, sun_azimuth_deg=None):
     """gendaylit command (spectra mode). irrad_mode 'W' (direct+diffuse) or 'E' (global).
@@ -61,7 +73,7 @@ def build_gendaylit(month, day, hour, *, irrad_mode, lat, lon, utc, direct=None,
     the orchestrator's job (spectral_pipeline.py:43), and `hour` here may legitimately be a wall-clock
     time. To keep a spectral record's spectrum and this sky on the SAME instant, pass that record's
     geometry through sun_zenith_deg/sun_azimuth_deg rather than relying on `hour` to agree."""
-    meridian = int(utc * -15)
+    meridian = _meridian(utc)
     lon_w = lon * -1
     ang = _solar_position_args(sun_zenith_deg, sun_azimuth_deg)
     if ang is not None:
@@ -108,6 +120,16 @@ def find_solar_line(out_lines):
             return i
     raise ValueError("no solar RGB line ('3 R G B') found in gendaylit output")
 
+def _num(value):
+    """A channel value as text, to six significant figures.
+
+    Lark wrote two DECIMALS, which suits a channel near 1 and destroys one near 0.01: 0.0149
+    became 0.01 and 0.004 became 0, a channel switched off. Significant figures keep every
+    channel to the same relative accuracy whatever its size.
+    """
+    return f"{value:.6g}"
+
+
 def _photopic_sum(channels, channel_type):
     w = W_PHOTOPIC_3 if channel_type == 0 else W_PHOTOPIC_9
     return sum(c * wi for c, wi in zip(channels, w))
@@ -117,20 +139,20 @@ def scale_solar(solar_rgb, direct_channels, channel_type):
     s = _photopic_sum(direct_channels, channel_type)
     if channel_type == 0:
         coef = ((solar_rgb[1] + solar_rgb[2] + solar_rgb[3]) / 3) / s  # mean of RGB
-        triplet = [round(direct_channels[i] * coef, 2) for i in range(3)]
-        return ["3 " + " ".join(str(v) for v in triplet)]
+        triplet = [direct_channels[i] * coef for i in range(3)]
+        return ["3 " + " ".join(_num(v) for v in triplet)]
     coef = ((solar_rgb[1] + solar_rgb[2] + solar_rgb[3]) / 3) / s  # mean of solar RGB (matches 3ch path)
     lines = []
     for grp in range(3):  # a=blue(0:3), b=green(3:6), c=red(6:9)
-        triplet = [round(direct_channels[grp * 3 + i] * coef, 2) for i in range(3)]
-        lines.append("3 " + " ".join(str(v) for v in triplet))
+        triplet = [direct_channels[grp * 3 + i] * coef for i in range(3)]
+        lines.append("3 " + " ".join(_num(v) for v in triplet))
     return lines
 
 def sky_glow(diffuse_channels, channel_type):
     """Normalized sky-glow material(s): each channel / photopic-weighted sum. 3ch: str; 9ch: [a,b,c]."""
     s = _photopic_sum(diffuse_channels, channel_type)
     def _mat(triplet):
-        vals = " ".join(str(round(t / s, 2)) for t in triplet)
+        vals = " ".join(_num(t / s) for t in triplet)
         return f"skyfunc glow sky_mat\n0\n0\n4 {vals} 0\n\n"
     if channel_type == 0:
         return _mat(diffuse_channels[:3])
@@ -183,6 +205,7 @@ def colored_sky(diffuse_channels, direct_channels, channel_type, *, month, day, 
                                      sun_zenith_deg=sun_zenith_deg, sun_azimuth_deg=sun_azimuth_deg)
     if mode != "spectra":
         raise ValueError("mode must be 'spectra' or 'luminance'")
+    require_safe_name(name, "sky")                 # it becomes <work_dir>/<name>[_a|_b|_c].rad
     os.makedirs(work_dir, exist_ok=True)
     cmd = build_gendaylit(month, day, hour, irrad_mode=irrad_mode, lat=lat, lon=lon, utc=utc,
                           direct=direct, diffuse=diffuse, globl=globl,
@@ -222,7 +245,7 @@ def build_gendaylit_luminance(month, day, hour, *, irrad_mode, lat, lon, utc,
     sun_zenith_deg/sun_azimuth_deg behave exactly as in build_gendaylit: supplied together they emit
     the `-ang altitude azimuth` form (which composes with `-C`, verified live) and drop the then-inert
     `-a/-o/-m`; omitted, the command is byte-identical to before this parameter existed."""
-    meridian = int(utc * -15)
+    meridian = _meridian(utc)
     lon_w = lon * -1
     ang = _solar_position_args(sun_zenith_deg, sun_azimuth_deg)
     if ang is not None:
@@ -261,6 +284,7 @@ def colored_sky_luminance(channel_type, *, month, day, hour, irrad_mode, lat, lo
     sun_zenith_deg/sun_azimuth_deg pin the sun explicitly — see build_gendaylit."""
     if channel_type != 0:
         raise ValueError("luminance mode is 3-channel only (no 9-channel -C path)")
+    require_safe_name(name, "sky")
     os.makedirs(work_dir, exist_ok=True)
     cmd = build_gendaylit_luminance(month, day, hour, irrad_mode=irrad_mode, lat=lat, lon=lon, utc=utc,
                                     direct=direct, diffuse=diffuse, globl=globl,

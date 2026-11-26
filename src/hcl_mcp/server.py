@@ -21,6 +21,7 @@ from hcl_core import jobcontrol
 from hcl_mcp.advisories import advise as _advise
 from hcl_core.spd import parse_spd, bin_average
 from hcl_core.materials import glass_transmissivity as _glass, write_material as _write_material
+from hcl_core.materials import require_safe_name as _require_safe_name
 from hcl_core.metrics import circadian_metrics as _metrics
 from hcl_core.alpha_opic import alpha_opic_from_channels, alpha_opic_from_spd
 from hcl_core.validation import run_validation
@@ -441,7 +442,7 @@ def presets(name: str | None = None) -> dict:
 async def colored_sky(diffuse_channels: list, direct_channels: list, channel_type: int = 1,
                       month: int = 6, day: int = 21, hour: float = 12.0, irrad_mode: str = "W",
                       mode: str = "spectra",
-                      lat: float = 0.0, lon: float = 0.0, utc: int = 0,
+                      lat: float = 0.0, lon: float = 0.0, utc: float = 0,
                       direct: float | None = None, diffuse: float | None = None, globl: float | None = None,
                       sun_zenith_deg: float | None = None, sun_azimuth_deg: float | None = None,
                       name: str = "sky", work_dir: str | None = None, run: bool = True, ctx: Context | None = None) -> dict:
@@ -481,6 +482,8 @@ async def colored_luminaire(rad_path: str, channels9: list, count: int, name: st
     """
     rad_text = _color_luminaire(rad_path, channels9, count, in_place=False)
     wd = await resolve_work_dir(ctx, work_dir)
+    if name is not None:
+        _require_safe_name(name, "luminaire")      # it becomes <work_dir>/<name>.rad
     os.makedirs(wd, exist_ok=True)
     if name is None:
         is_path = os.path.exists(rad_path)
@@ -1290,6 +1293,12 @@ async def lm83_daylight(obj_path: str, material_map: dict, wea: str,
     window group, an hourly blind that closes when 2.2.6's direct-sun trigger fires, and a
     zero-bounce ASE pass with blinds retracted and no sky or ground (3.2.6, 3.3).
 
+    Where the sDA illuminance comes from, per window group and hour: with the blind OPEN,
+    sky light through the matrices plus the exact zero-bounce sun beam; with the blind
+    CLOSED, sky and sun together through the blind, which stands behind the glazing. Sunlight
+    that enters an unshaded window and is then reflected inside the room is not counted
+    (a stated departure, biasing sDA down on sunny hours).
+
     obj_path + material_map: the same OBJ room and material mapping import_geometry takes.
     Glazing must be mapped {"type": "glass", "tvis": ...} -- window groups are formed from
     those faces, and with no glass face there is no window to operate.
@@ -1357,9 +1366,13 @@ async def lm83_daylight(obj_path: str, material_map: dict, wea: str,
         if proceed is False:
             run = False
 
+    from hcl_radiance.geometry_import import parsed_in_world
     from hcl_radiance.geometry_obj import parse_obj
     with open(obj_path) as fh:
-        parsed = parse_obj(fh.read())
+        # In the scene's frame, like the geometry import_geometry writes below: the windows,
+        # their blockers and the sensor points must all be in the same metres and orientation.
+        parsed = parsed_in_world(parse_obj(fh.read()), units=units, up_axis=up_axis,
+                                 north_angle_deg=north_angle_deg)
     scene = await _offload(_import_geometry, obj_path, material_map=material_map, units=units,
                            up_axis=up_axis, north_angle_deg=north_angle_deg,
                            work_dir=wd, run=run)
@@ -2180,11 +2193,37 @@ mcp.add_middleware(_ConfirmBeforeTask())
 _TASK_TOOLS = (run_annual, annual_daylight, lm83_daylight, daylight_savings, annual_nvrd,
                spectral_epw, spectral_sky_native, build_daysim)
 
+# Tool annotations: what a client may assume about a tool before it calls it. A client uses
+# `readOnlyHint` to decide what it can run without asking, so a wrong True is worse than no hint.
+# Read-only here means: computes and returns, writes no file, starts no simulation.
+# `spectral_sky_from_epw` is NOT in the list: with engine="smarts" it runs SMARTS in a
+# temporary folder. Nothing reaches the network, with one exception.
+_READ_ONLY_TOOLS = (spd_to_channels, glass_transmissivity, circadian_metrics, alpha_opic,
+                    validate, spectral_metrics, compliance, presets, reference, check_geometry,
+                    radiance_status, nvrd, ies_analyze, lighting_controls, daysim_status,
+                    reconstruct_spectrum, recommend_fixtures, atmosphere_from_epw,
+                    quality_presets, load_brief)
+_OPEN_WORLD_TOOLS = (build_daysim,)        # clones the Daysim source from GitHub
+
+
+def _annotations(fn):
+    read_only = fn in _READ_ONLY_TOOLS
+    return {"readOnlyHint": read_only,
+            # MCP reads False as "additive updates only". Every tool that writes replaces its
+            # own earlier output of the same name (a material, a sky, a brief, a result
+            # matrix) and `sensors` can delete, so none of them may claim that.
+            "destructiveHint": not read_only,
+            # Asking a read-only tool twice changes nothing. A simulation run twice rewrites its
+            # outputs, and Monte Carlo noise makes them differ, so it is not claimed for those.
+            "idempotentHint": read_only,
+            "openWorldHint": fn in _OPEN_WORLD_TOOLS}
+
+
 for _tool in _TOOL_FUNCS:
-    mcp.tool(_with_advisories(_tool), task=_tool in _TASK_TOOLS)
+    mcp.tool(_with_advisories(_tool), task=_tool in _TASK_TOOLS, annotations=_annotations(_tool))
 
 for _alias_name, _alias_fn in _TOOL_ALIASES:
-    mcp.tool(_with_advisories(_alias_fn), name=_alias_name)
+    mcp.tool(_with_advisories(_alias_fn), name=_alias_name, annotations=_annotations(_alias_fn))
 
 _resources.register_resources(mcp)
 

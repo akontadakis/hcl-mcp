@@ -3,6 +3,7 @@ plus an entry in <work_dir>/sensors/sensors.json. Grid placement reuses en12464_
 import json
 import os
 
+from hcl_core.materials import require_safe_name
 from hcl_platform import write_text
 from hcl_radiance.commands import pts_to_text
 from hcl_radiance.sensor_methodology import en12464_grid
@@ -31,6 +32,8 @@ def _save(work_dir, reg):
 
 
 def create_sensor_set(work_dir, name, *, points=None, grid=None, overwrite=False):
+    # It becomes <work_dir>/sensors/<name>.pts: a file name only, so a blank is fine.
+    require_safe_name(name, "sensor set", allow_blank=True)
     reg = _load(work_dir)
     if name in reg and not overwrite:
         raise ValueError(f"sensor set {name!r} already exists; pass overwrite=True to replace it")
@@ -78,6 +81,15 @@ def delete_sensor_set(work_dir, name):
     path = reg[name]["path"]
     reg.pop(name)
     _save(work_dir, reg)
+    out = {"deleted": name}
+    # The path is read back from sensors.json, a plain file in the work folder. Only a file that
+    # really lies in the sensor folder is ours to remove; anything else is left where it is.
+    home = os.path.realpath(_dir(work_dir))
     if os.path.isfile(path):
-        os.remove(path)
-    return {"deleted": name}
+        if os.path.dirname(os.path.realpath(path)) == home:
+            os.remove(path)
+        else:
+            out["file_left"] = path
+            out["note"] = ("the registry pointed outside the sensor folder, so the entry was "
+                           "removed and the file was not touched")
+    return out
